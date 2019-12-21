@@ -27,6 +27,20 @@ const authValidations = {
 	},
 
 	/**
+	 * Get user uuid from context of Apollo Server
+	 * @param  {Object} context 				- The context object of Apollo Server
+	 * @param  {Object} [context.user]  		- The context object data: user data
+	 * @param  {String} [context.user.uuid] 	- The context object data: user data uuid information
+	 * @return {null|String}
+	 */
+	getUserUUID: (context) => {
+		if (!context.user) {
+			return null;
+		}
+		return context.user.uuid || null;
+	},
+
+	/**
 	 * Check if the maximum limit of users has been reached
 	 * @param  {Integer} numberOfCurrentlyUsersRegistered 	- The number of users currently registered in the service
 	 * @param  {Integer} limitOfUsers 						- Represents the maximum number of users allowed in the service. Zero represents no limit

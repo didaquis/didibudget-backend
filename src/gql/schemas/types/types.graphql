@@ -12,3 +12,11 @@ type User {
 	registrationDate: String
 	lastLogin: String
 }
+
+""" Monthly Balance """
+type MonthlyBalance {
+	balance: Float!
+	date: String!
+	currencyISO: String!
+	uuid: String!
+}

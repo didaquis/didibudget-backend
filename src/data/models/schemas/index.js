@@ -1,5 +1,7 @@
 const UsersSchema = require('./UsersSchema');
+const MonthlyBalanceSchema = require('./MonthlyBalanceSchema');
 
 module.exports = {
-	UsersSchema
+	UsersSchema,
+	MonthlyBalanceSchema
 };
