@@ -27,7 +27,7 @@ module.exports = {
 				throw new AuthenticationError('You must be logged in to perform this action');
 			}
 
-			return new MonthlyBalance({ idUser: user._id, balance, date }).save()
+			return new MonthlyBalance({ user_id: user._id, balance, date }).save()
 				.then(monthlyBalance => {
 					return {
 						balance: monthlyBalance.balance.toString(),

@@ -8,7 +8,7 @@ const uuidv4 = require('uuid/v4');
  * @constructor Monthly Balance model constructor
  */
 const MonthlyBalanceSchema = new Schema({
-	idUser: {
+	user_id: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'users',
 		required: true

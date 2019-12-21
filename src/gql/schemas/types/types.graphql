@@ -15,6 +15,7 @@ type User {
 
 """ Monthly Balance """
 type MonthlyBalance {
+	user_id: ID!
 	balance: Float!
 	date: String!
 	currencyISO: String!
