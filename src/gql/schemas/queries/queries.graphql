@@ -1,0 +1,5 @@
+type Query {
+	# Users queries:
+	""" Get list of all users registered on database """
+	listAllUsers: [User]
+}
