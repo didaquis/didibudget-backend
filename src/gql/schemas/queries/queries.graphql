@@ -2,4 +2,8 @@ type Query {
 	# Users queries:
 	""" Get list of all users registered on database """
 	listAllUsers: [User]
+
+	# Monthly Balance queries:
+	""" Get list of all monthly balance registers from an specific user """
+	getMonthlyBalance: [MonthlyBalance]
 }
