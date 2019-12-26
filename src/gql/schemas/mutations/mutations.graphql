@@ -9,4 +9,7 @@ type Mutation {
 	# Monthly Balance mutations
 	""" It allows register a monthly balance """
 	registerMonthlyBalance(balance: Float!, date: String!): MonthlyBalance
+
+	""" It allows delete a register a monthly balance """
+	deleteMonthlyBalance(uuid: String!): MonthlyBalance
 }

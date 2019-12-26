@@ -19,8 +19,8 @@ module.exports = {
 				throw new ForbiddenError('You must be logged in to perform this action');
 			}
 
-			const uuid = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid });
+			const uuidOfUser = authValidations.getUserUUID(context);
+			const user = await Users.findOne({ uuid: uuidOfUser });
 			if (!user) {
 				throw new AuthenticationError('You must be logged in to perform this action');
 			}
@@ -40,6 +40,7 @@ module.exports = {
 				return result;
 			} catch (error) {
 				logger.error(error);
+				return null;
 			}
 		}
 	},
@@ -52,8 +53,8 @@ module.exports = {
 				throw new ForbiddenError('You must be logged in to perform this action');
 			}
 
-			const uuid = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid });
+			const uuidOfUser = authValidations.getUserUUID(context);
+			const user = await Users.findOne({ uuid: uuidOfUser });
 			if (!user) {
 				throw new AuthenticationError('You must be logged in to perform this action');
 			}
@@ -69,6 +70,35 @@ module.exports = {
 				})
 				.catch(error => {
 					logger.error(error);
+					return null;
+				});
+		},
+		/**
+		 * Delete one registry of monthly balance
+		 */
+		deleteMonthlyBalance: async (root, { uuid }, context) => {
+			if (!authValidations.isLogged(context)) {
+				throw new ForbiddenError('You must be logged in to perform this action');
+			}
+
+			const uuidOfUser = authValidations.getUserUUID(context);
+			const user = await Users.findOne({ uuid: uuidOfUser });
+			if (!user) {
+				throw new AuthenticationError('You must be logged in to perform this action');
+			}
+
+			return MonthlyBalance.findOneAndDelete({ uuid })
+				.then(monthlyBalance => {
+					return {
+						balance: monthlyBalance.balance.toString(),
+						date: monthlyBalance.date,
+						currencyISO: monthlyBalance.currencyISO,
+						uuid: monthlyBalance.uuid
+					};
+				})
+				.catch(error => {
+					logger.error(error);
+					return null;
 				});
 		}
 	}
