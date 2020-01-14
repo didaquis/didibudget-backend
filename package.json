@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.0.5",
+  "version": "0.1.6",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {
@@ -38,6 +38,7 @@
     "lodash": "^4.17.15",
     "log4js": "^6.1.0",
     "mongoose": "^5.8.1",
+    "serve-favicon": "^2.5.0",
     "uuid": "^3.3.3"
   }
 }
