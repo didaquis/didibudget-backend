@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {

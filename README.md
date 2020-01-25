@@ -5,19 +5,6 @@ The proyect is splitted on two repositories: one for the backend and one for the
 
 This repository is for the backend and is made to work with [the frontend](https://github.com/didaquis/didibudget-frontend)
 
-
-### 🎁 What it's included on the backend?
-Technologies used are: Node.js + GraphQL + Apollo + Express + Mongoose + MongoDB.
-
-**✨ These are some of the highlights:** 
-
-✅ A server ready to use!  
-✅ Users can login and registrate  
-✅ You can add the 'administration' rol to some users  
-✅ You can set a limit of users registered  
-✅ Users data are stored on a database  
-✅ The Auth validations are made with JWT  
-
 ### 📝 Backend Requirements
 * MongoDB 4.0 or higher service running
 * Node.js 10 or higher
