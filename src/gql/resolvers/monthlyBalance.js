@@ -1,4 +1,4 @@
-const { ForbiddenError, AuthenticationError } = require('apollo-server-express');
+const { AuthenticationError } = require('apollo-server-express');
 
 const { logger } = require('../../utils/logger');
 
@@ -16,7 +16,7 @@ module.exports = {
 		 */
 		getMonthlyBalance: async (root, args, context) => {
 			if (!authValidations.isLogged(context)) {
-				throw new ForbiddenError('You must be logged in to perform this action');
+				throw new AuthenticationError('You must be logged in to perform this action');
 			}
 
 			const uuidOfUser = authValidations.getUserUUID(context);
@@ -50,7 +50,7 @@ module.exports = {
 		 */
 		registerMonthlyBalance: async (root, { balance, date }, context) => {
 			if (!authValidations.isLogged(context)) {
-				throw new ForbiddenError('You must be logged in to perform this action');
+				throw new AuthenticationError('You must be logged in to perform this action');
 			}
 
 			const uuidOfUser = authValidations.getUserUUID(context);
@@ -78,7 +78,7 @@ module.exports = {
 		 */
 		deleteMonthlyBalance: async (root, { uuid }, context) => {
 			if (!authValidations.isLogged(context)) {
-				throw new ForbiddenError('You must be logged in to perform this action');
+				throw new AuthenticationError('You must be logged in to perform this action');
 			}
 
 			const uuidOfUser = authValidations.getUserUUID(context);
