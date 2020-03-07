@@ -1,3 +1,5 @@
+'use strict';
+
 const { AuthenticationError } = require('apollo-server-express');
 
 const { logger } = require('../../utils/logger');

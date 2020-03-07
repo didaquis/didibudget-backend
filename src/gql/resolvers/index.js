@@ -1,3 +1,5 @@
+'use strict';
+
 const { merge } = require('lodash');
 
 const users = require('./users');

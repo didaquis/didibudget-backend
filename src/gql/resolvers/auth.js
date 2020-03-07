@@ -1,3 +1,5 @@
+'use strict';
+
 const { ForbiddenError, UserInputError } = require('apollo-server-express');
 
 const { Users } = require('../../data/models/index');
