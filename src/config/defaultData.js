@@ -15,7 +15,7 @@
 
 /**
  * Default categories and subcategories for expenses
- * @type {Array<Object>}
+ * @type {Object[]}
  */
 const expenseCategories = [
 	{
