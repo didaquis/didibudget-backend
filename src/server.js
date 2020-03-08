@@ -32,7 +32,9 @@ db.once('open', () => {
 	}
 
 
+	logger.info('Trying to upsert the database with default values');
 	upsertDBWithExpenseCategories(expenseCategories);
+
 	initApplication();
 });
 
