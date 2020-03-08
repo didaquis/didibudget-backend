@@ -2,9 +2,11 @@
 
 const mongoose = require('mongoose');
 
-const { UsersSchema, MonthlyBalanceSchema } = require('./schemas');
+const { UsersSchema, MonthlyBalanceSchema, ExpenseCategorySchema, ExpenseSubcategorySchema } = require('./schemas');
 
 module.exports = {
 	Users: mongoose.model('users', UsersSchema),
-	MonthlyBalance: mongoose.model('monthlybalance', MonthlyBalanceSchema)
+	MonthlyBalance: mongoose.model('monthlybalance', MonthlyBalanceSchema),
+	ExpenseCategory: mongoose.model('expensecategory', ExpenseCategorySchema),
+	ExpenseSubcategory: mongoose.model('expensesubcategory', ExpenseSubcategorySchema),
 };

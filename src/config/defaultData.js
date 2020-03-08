@@ -20,31 +20,31 @@
 const expenseCategories = [
 	{
 		name: 'Computers, Smartphones and electronic devices',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Mobile phone cost (calls and internet cost)',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Applications, software and subscriptions for online services',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Presents',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Medicines, personal hygiene and health care',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Clothes and shoes',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Public transport',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Private vehicles',
@@ -60,7 +60,7 @@ const expenseCategories = [
 	},
 	{
 		name: 'Travels & holidays & weekend breaks',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Home',
@@ -100,27 +100,27 @@ const expenseCategories = [
 	},
 	{
 		name: 'Sports equipment (including boots and jackets)',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Other expenses',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Bank charges (commissions)',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Government taxes',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Personal insurance (sport, life...)',
-		subcategories: null,
+		subcategories: [],
 	},
 	{
 		name: 'Retirement plan and savings plan',
-		subcategories: null,
+		subcategories: [],
 	},
 ];
 
