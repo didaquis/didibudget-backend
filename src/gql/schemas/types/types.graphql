@@ -21,3 +21,16 @@ type MonthlyBalance {
 	currencyISO: String!
 	uuid: String!
 }
+
+""" Expense Category """
+type ExpenseCategory {
+	name: String!
+	subcategories: [ExpenseSubcategory]!
+	uuid: String!
+}
+
+""" Expense Subcategory """
+type ExpenseSubcategory {
+	name: String!
+	uuid: String!
+}
