@@ -6,4 +6,8 @@ type Query {
 	# Monthly Balance queries:
 	""" Get list of all monthly balance registers from an specific user """
 	getMonthlyBalance: [MonthlyBalance]
+
+	# Expense Category queries:
+	""" Get list of all expense category """
+	getExpenseCategory: [ExpenseCategory]
 }
