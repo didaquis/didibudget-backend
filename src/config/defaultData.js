@@ -27,7 +27,7 @@ const expenseCategories = [
 		subcategories: [],
 	},
 	{
-		name: 'Applications, software and subscriptions for online services',
+		name: 'Applications, software and subscriptions to online services',
 		subcategories: [],
 	},
 	{

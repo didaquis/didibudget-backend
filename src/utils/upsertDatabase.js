@@ -14,23 +14,22 @@
 
 
 
+const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
 
 
 
+const upsertDBWithExpenseCategories = ({ expenseCategories } = []) => {
+	expenseCategories.forEach(async (category) => {
+		const upsertSubcategories = category.subcategories.map((subcategory) => {
+			return ExpenseSubcategory.findOneAndUpdate({ name: subcategory }, { name: subcategory }, { upsert: true, new: true, setDefaultsOnInsert: true });
+		});
 
-const upsertDBWithExpenseCategories = (expenseCategories) => {
+		const listOfSubcategories = await Promise.all(upsertSubcategories);
 
-
-	// var query = {},
- 	//    update = { expire: new Date() },
- 	//    options = { upsert: true, new: true, setDefaultsOnInsert: true };
-
-	// // Find the document
-	// Model.findOneAndUpdate(query, update, options, function(error, result) {
-	//     if (error) return;
-
-	//     // do something with the document
-	// });
+		const listOfSubcategoriesId = listOfSubcategories.map((subcategory) => subcategory._id);
+		
+		await ExpenseCategory.findOneAndUpdate({ name: category.name }, { name: category.name, subcategories: listOfSubcategoriesId }, { upsert: true, new: true, setDefaultsOnInsert: true });
+	});
 };
 
 
