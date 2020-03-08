@@ -25,12 +25,12 @@ type MonthlyBalance {
 """ Expense Category """
 type ExpenseCategory {
 	name: String!
-	subcategories: [ExpenseSubcategory]
+	subcategories: [ExpenseSubcategory]!
 	uuid: String!
 }
 
 """ Expense Subcategory """
 type ExpenseSubcategory {
-	name: String
-	uuid: String
+	name: String!
+	uuid: String!
 }
