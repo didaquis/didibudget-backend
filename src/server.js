@@ -3,7 +3,9 @@
 const mongoose = require('mongoose');
 
 const { enviromentVariablesConfig } = require('./config/appConfig');
+const expenseCategories = require('./config/defaultData');
 const { logger, endLogger } = require('./utils/logger');
+const { upsertDBWithExpenseCategories } = require('./utils/upsertDatabase');
 
 
 const mongooseConnectOptions = { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false };
@@ -28,6 +30,10 @@ db.once('open', () => {
 	} else {
 		logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.dbHost}" in port "${enviromentVariablesConfig.dbPort}" using database "${enviromentVariablesConfig.database}"`);
 	}
+
+
+	logger.info('Trying to upsert the database with default values');
+	upsertDBWithExpenseCategories(expenseCategories);
 
 	initApplication();
 });

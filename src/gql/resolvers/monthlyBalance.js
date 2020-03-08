@@ -29,7 +29,7 @@ module.exports = {
 
 			try {
 				const allMonthlyBalance = await MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } });
-				//return { allMonthlyBalance };
+
 				const result = [];
 				allMonthlyBalance.forEach((data) => {
 					result.push({
