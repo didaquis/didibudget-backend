@@ -10,4 +10,8 @@ type Query {
 	# Expense Category queries:
 	""" Get list of all expense category """
 	getExpenseCategory: [ExpenseCategory]
+
+	# Expense queries:
+	""" Get list of all expense registers from an specific user """
+	getExpenses: [Expense]
 }
