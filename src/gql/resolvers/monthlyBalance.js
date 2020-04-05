@@ -8,7 +8,7 @@ const { Users, MonthlyBalance } = require('../../data/models/index');
 const { authValidations } = require('../auth/validations');
 
 /**
- * All resolvers related to users
+ * All resolvers related to monthly balances
  * @type {Object}
  */
 module.exports = {
