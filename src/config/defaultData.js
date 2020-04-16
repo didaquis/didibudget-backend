@@ -31,7 +31,7 @@ const expenseCategories = [
 		subcategories: [],
 	},
 	{
-		name: 'Presents',
+		name: 'Presents, gifts',
 		subcategories: [],
 	},
 	{
@@ -65,7 +65,7 @@ const expenseCategories = [
 	{
 		name: 'Home',
 		subcategories: [
-			'Food',
+			'Groceries',
 			'Household cleaning products',
 			'Objects, tools, cookware',
 			'Appliances and furniture',
@@ -77,8 +77,8 @@ const expenseCategories = [
 			'Home insurance',
 			'Taxes of the community of neighbors',
 			'Repairs and home works',
-			'Mortgage fee',
-			'Rent fee',
+			'Mortgage',
+			'Rent',
 		],
 	},
 	{
@@ -94,7 +94,7 @@ const expenseCategories = [
 			'Bar, restaurants and pubs',
 			'Gym and climbing wall',
 			'Books, events, cinema, music, concerts, museums, and other cultural activities',
-			'Camping, refugees',
+			'Camping, shelter',
 			'Recreational courses and formative sessions (cooking, alpinism...)',
 		],
 	},
