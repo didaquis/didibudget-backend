@@ -19,7 +19,7 @@
  */
 const expenseCategories = [
 	{
-		name: 'Computers, Smartphones and electronic devices',
+		name: 'Computers, smartphones and electronic devices',
 		subcategories: [],
 	},
 	{
@@ -50,7 +50,7 @@ const expenseCategories = [
 		name: 'Private vehicles',
 		subcategories: [
 			'Vehicle taxes, technical inspection',
-			'Vehicle Insurance',
+			'Vehicle insurance',
 			'Spare parts and maintenance',
 			'Garage',
 			'Vehicle cost (renting, leasing, vehicle itself)',
@@ -74,7 +74,7 @@ const expenseCategories = [
 			'Gas bill',
 			'ISP provider bill',
 			'Home taxes',
-			'Home Insurance',
+			'Home insurance',
 			'Taxes of the community of neighbors',
 			'Repairs and home works',
 			'Mortgage fee',
@@ -91,7 +91,7 @@ const expenseCategories = [
 	{
 		name: 'Recreational activities',
 		subcategories: [
-			'Bar, Restaurants and pubs',
+			'Bar, restaurants and pubs',
 			'Gym and climbing wall',
 			'Books, events, cinema, music, concerts, museums, and other cultural activities',
 			'Camping, refugees',
