@@ -17,12 +17,12 @@ const ExpensesSchema = new Schema({
 	},
 	category: {
 		type: mongoose.SchemaTypes.ObjectId,
-		ref: 'expensesubcategory',
+		ref: 'expensescategory',
 		required: true,
 	},
 	subcategory: {
 		type: mongoose.SchemaTypes.ObjectId,
-		ref: 'expensecategory',
+		ref: 'expensesubcategory',
 		required: false,
 	},
 	quantity: {
