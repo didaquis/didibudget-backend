@@ -1,6 +1,6 @@
 'use strict';
 
-const { ForbiddenError, UserInputError } = require('apollo-server-express');
+const { ValidationError, UserInputError } = require('apollo-server-express');
 
 const { Users } = require('../../data/models/index');
 const { createAuthToken } = require('../auth/jwt');
@@ -25,10 +25,18 @@ module.exports = {
 				throw new UserInputError('Data provided is not valid');
 			}
 
+			if (!authValidations.isValidEmail(email)) {
+				throw new UserInputError('The email is not valid');
+			}
+
+			if (!authValidations.isStrongPassword(password)) {
+				throw new UserInputError('The password is not secure enough');
+			}
+
 			const numberOfCurrentlyUsersRegistered = await Users.find().estimatedDocumentCount();
 
 			if (authValidations.isLimitOfUsersReached(numberOfCurrentlyUsersRegistered, globalVariablesConfig.limitOfUsersRegistered)) {
-				throw new ForbiddenError('The maximum number of users allowed has been reached. You must contact the administrator of the service in order to register');
+				throw new ValidationError('The maximum number of users allowed has been reached. You must contact the administrator of the service in order to register');
 			}
 
 			const isAnEmailAlreadyRegistered = await Users.findOne({email});
@@ -46,7 +54,7 @@ module.exports = {
 			};
 		},
 		/**
-		 * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When a user authenticates the value of lastLogin will be updated
+		 * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When an user authenticates the value of lastLogin will be updated
 		 */
 		authUser: async (root, { email, password }) => {
 			if (!email || !password) {
