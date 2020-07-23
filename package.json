@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.3.23",
+  "version": "0.3.24",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {
@@ -23,6 +23,7 @@
   "author": "Dídac García (https://didaquis.github.io/)",
   "license": "MIT",
   "devDependencies": {
+    "husky": "^4.2.5",
     "nodemon": "^2.0.4"
   },
   "dependencies": {
@@ -40,5 +41,10 @@
     "mongoose": "^5.9.7",
     "serve-favicon": "^2.5.0",
     "uuid": "^7.0.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   }
 }
