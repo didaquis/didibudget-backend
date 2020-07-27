@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.4.24",
+  "version": "0.4.25",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {
@@ -12,7 +12,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "lint": "eslint --ext .js .",
-    "purge": "rm -fr ./logs"
+    "clean": "rimraf logs"
   },
   "keywords": [
     "budget",
@@ -27,7 +27,8 @@
   "devDependencies": {
     "husky": "4.2.5",
     "jest": "26.1.0",
-    "nodemon": "2.0.4"
+    "nodemon": "2.0.4",
+    "rimraf": "3.0.2"
   },
   "dependencies": {
     "apollo-server-express": "2.16.0",
