@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.4.26",
+  "version": "0.4.27",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {
@@ -45,7 +45,7 @@
     "log4js": "6.3.0",
     "mongoose": "5.9.25",
     "serve-favicon": "2.5.0",
-    "uuid": "8.2.0"
+    "uuid": "8.3.0"
   },
   "husky": {
     "hooks": {
