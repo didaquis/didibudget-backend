@@ -1,6 +1,6 @@
 'use strict';
 
-const { merge } = require('lodash');
+const merge = require('lodash.merge');
 
 const users = require('./users');
 const monthlyBalance = require('./monthlyBalance');
