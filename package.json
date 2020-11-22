@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.4.29",
+  "version": "0.4.30",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {
@@ -26,24 +26,23 @@
   "license": "MIT",
   "devDependencies": {
     "husky": "4.3.0",
-    "jest": "26.6.0",
-    "jsonfile": "6.0.1",
+    "jest": "26.6.3",
+    "jsonfile": "6.1.0",
     "nodemon": "2.0.6",
     "rimraf": "3.0.2"
   },
   "dependencies": {
-    "apollo-server-express": "2.18.2",
+    "apollo-server-express": "2.19.0",
     "bcrypt": "5.0.0",
     "cors": "2.8.5",
     "dotenv": "8.2.0",
     "express": "4.17.1",
-    "graphql": "15.3.0",
+    "graphql": "15.4.0",
     "graphql-import": "1.0.2",
-    "graphql-tools": "6.2.4",
     "jsonwebtoken": "8.5.1",
     "lodash.merge": "4.6.2",
     "log4js": "6.3.0",
-    "mongoose": "5.10.9",
+    "mongoose": "5.10.15",
     "serve-favicon": "2.5.0",
     "uuid": "8.3.1"
   },
