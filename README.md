@@ -7,7 +7,7 @@ This repository is for the backend and is intended to work with [the frontend](h
 
 ### 📝 Backend Requirements
 * MongoDB 4.0 or higher service running
-* Node.js 10 or higher
+* Node.js 14 or higher
 
 ### 📚 How to run the application?
 * Use the command: `npm install`. If you are deploying the app in production, it's better to use this command: `npm install --production`
