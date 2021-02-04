@@ -47,3 +47,8 @@ type ExpenseSubcategory {
 	name: String!
 	uuid: String!
 }
+
+""" Delete Result """
+type DeleteResult {
+	deletedCount: Int!
+}
