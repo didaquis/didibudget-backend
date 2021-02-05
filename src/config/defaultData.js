@@ -23,7 +23,7 @@ const expenseCategories = [
 		subcategories: [],
 	},
 	{
-		name: 'Mobile phone cost (calls and internet cost)',
+		name: 'Mobile phone cost (calls and internet cost, not devices)',
 		subcategories: [],
 	},
 	{
