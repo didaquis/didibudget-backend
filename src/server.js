@@ -26,18 +26,19 @@ db.on('error', (err) => {
 
 db.once('open', () => {
 	if (enviromentVariablesConfig.enviroment !== 'development') {
-		logger.info('Connected with MongoDB service');
+		logger.info('Connected with MongoDB service (production mode)');
 	} else {
 		if (enviromentVariablesConfig.formatConnection === 'DNSseedlist' && enviromentVariablesConfig.mongoDNSseedlist !== '') {
-			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.mongoDNSseedlist}" using database "${enviromentVariablesConfig.database}"`);
+			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.mongoDNSseedlist}" using database "${enviromentVariablesConfig.database}" (development mode)`);
 		} else {
-			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.dbHost}" in port "${enviromentVariablesConfig.dbPort}" using database "${enviromentVariablesConfig.database}"`);
+			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.dbHost}" in port "${enviromentVariablesConfig.dbPort}" using database "${enviromentVariablesConfig.database}" (development mode)`);
 		}
 	}
 
 
-	logger.info('Trying to upsert the database with default values');
+	logger.info('Trying to upsert the database with default values...');
 	upsertDBWithExpenseCategories(expenseCategories);
+	logger.info('The upsert of database has been finished.');
 
 	initApplication();
 });
