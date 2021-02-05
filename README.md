@@ -6,7 +6,7 @@ The proyect is splitted on two repositories: one for the backend and one for the
 This repository is for the backend and is intended to work with [the frontend](https://github.com/didaquis/didibudget-frontend)
 
 ### 📝 Backend Requirements
-* MongoDB 4.0 or higher service running
+* MongoDB 4.4 or higher
 * Node.js 14 or higher
 
 ### 📚 How to run the application?

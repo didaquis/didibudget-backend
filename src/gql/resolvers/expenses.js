@@ -108,6 +108,27 @@ module.exports = {
 					logger.error(error);
 					return null;
 				});
+		},
+		/**
+		 * Delete all registries of expense
+		 */
+		deleteAllExpenses: async (root, args, context) => {
+			if (!authValidations.isLogged(context)) {
+				throw new AuthenticationError('You must be logged in to perform this action');
+			}
+
+			const uuidOfUser = authValidations.getUserUUID(context);
+			const user = await Users.findOne({ uuid: uuidOfUser });
+			if (!user) {
+				throw new AuthenticationError('You must be logged in to perform this action');
+			}
+
+			try {
+				return await Expenses.deleteMany({ user_id: user._id });
+			} catch (error) {
+				logger.error(error);
+				return null;
+			}
 		}
 	}
 };

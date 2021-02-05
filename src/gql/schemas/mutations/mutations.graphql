@@ -19,4 +19,7 @@ type Mutation {
 
 	""" It allows delete a register of expense """
 	deleteExpense(uuid: String!): Expense
+
+	""" It allows delete all registers of expense """
+	deleteAllExpenses: DeleteResult
 }
