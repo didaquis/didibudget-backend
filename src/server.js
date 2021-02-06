@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { enviromentVariablesConfig } = require('./config/appConfig');
 const expenseCategories = require('./config/defaultData');
 const { logger, endLogger } = require('./utils/logger');
+const { requestDevLogger } = require('./utils/requestDevLogger');
 const { upsertDBWithExpenseCategories } = require('./utils/upsertDatabase');
 
 
@@ -67,7 +68,8 @@ const initApplication = () => {
 		resolvers,
 		context: setContext,
 		introspection: (enviromentVariablesConfig.enviroment === 'production') ? false : true, // Set to "true" only in development mode
-		playground: (enviromentVariablesConfig.enviroment === 'production') ? false : true // Set to "true" only in development mode
+		playground: (enviromentVariablesConfig.enviroment === 'production') ? false : true, // Set to "true" only in development mode
+		plugins: (enviromentVariablesConfig.enviroment === 'production') ? [] : [requestDevLogger], // Log all querys and their responses (do not use in production)
 	});
 
 	server.applyMiddleware({app});
