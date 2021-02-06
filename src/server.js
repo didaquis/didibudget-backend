@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { enviromentVariablesConfig } = require('./config/appConfig');
 const expenseCategories = require('./config/defaultData');
 const { logger, endLogger } = require('./utils/logger');
+const { requestDevLogger } = require('./utils/requestDevLogger');
 const { upsertDBWithExpenseCategories } = require('./utils/upsertDatabase');
 
 
@@ -26,18 +27,19 @@ db.on('error', (err) => {
 
 db.once('open', () => {
 	if (enviromentVariablesConfig.enviroment !== 'development') {
-		logger.info('Connected with MongoDB service');
+		logger.info('Connected with MongoDB service (production mode)');
 	} else {
 		if (enviromentVariablesConfig.formatConnection === 'DNSseedlist' && enviromentVariablesConfig.mongoDNSseedlist !== '') {
-			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.mongoDNSseedlist}" using database "${enviromentVariablesConfig.database}"`);
+			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.mongoDNSseedlist}" using database "${enviromentVariablesConfig.database}" (development mode)`);
 		} else {
-			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.dbHost}" in port "${enviromentVariablesConfig.dbPort}" using database "${enviromentVariablesConfig.database}"`);
+			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.dbHost}" in port "${enviromentVariablesConfig.dbPort}" using database "${enviromentVariablesConfig.database}" (development mode)`);
 		}
 	}
 
 
-	logger.info('Trying to upsert the database with default values');
+	logger.info('Trying to upsert the database with default values...');
 	upsertDBWithExpenseCategories(expenseCategories);
+	logger.info('The upsert of database has been finished.');
 
 	initApplication();
 });
@@ -66,7 +68,8 @@ const initApplication = () => {
 		resolvers,
 		context: setContext,
 		introspection: (enviromentVariablesConfig.enviroment === 'production') ? false : true, // Set to "true" only in development mode
-		playground: (enviromentVariablesConfig.enviroment === 'production') ? false : true // Set to "true" only in development mode
+		playground: (enviromentVariablesConfig.enviroment === 'production') ? false : true, // Set to "true" only in development mode
+		plugins: (enviromentVariablesConfig.enviroment === 'production') ? [] : [requestDevLogger], // Log all querys and their responses (do not use in production)
 	});
 
 	server.applyMiddleware({app});
