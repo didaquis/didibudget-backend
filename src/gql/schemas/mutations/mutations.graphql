@@ -13,6 +13,9 @@ type Mutation {
 	""" It allows delete a register of monthly balance """
 	deleteMonthlyBalance(uuid: String!): MonthlyBalance
 
+	""" It allows delete all registers of monthly balance """
+	deleteAllMonthlyBalances: DeleteResult
+
 	# Expenses mutations
 	""" It allows register an expense """
 	registerExpense(category: ID!, subcategory: ID, quantity: Float!, date: String!): Expense
