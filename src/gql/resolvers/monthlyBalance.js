@@ -30,15 +30,15 @@ module.exports = {
 			try {
 				const allMonthlyBalance = await MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
-				const result = [];
-				allMonthlyBalance.forEach((data) => {
-					result.push({
+				const result = allMonthlyBalance.map((data) => {
+					return {
 						balance: data.balance.toString(),
 						date: data.date,
 						currencyISO: data.currencyISO,
 						uuid: data.uuid
-					});
+					};
 				});
+
 				return result;
 			} catch (error) {
 				logger.error(error);
