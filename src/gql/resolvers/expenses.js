@@ -28,19 +28,19 @@ module.exports = {
 			}
 
 			try {
-				const allExpenses = await Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } });
+				const allExpenses = await Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
-				const result = [];
-				allExpenses.forEach((data) => {
-					result.push({
+				const result = allExpenses.map((data) => {
+					return {
 						category: data.category,
 						subcategory: data.subcategory,
 						quantity: data.quantity.toString(),
 						date: data.date,
 						currencyISO: data.currencyISO,
 						uuid: data.uuid
-					});
+					};
 				});
+
 				return result;
 			} catch (error) {
 				logger.error(error);

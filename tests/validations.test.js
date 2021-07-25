@@ -15,21 +15,22 @@ describe('validations', () => {
 			expect(authValidations.isValidEmail()).toBe(false);
 		});
 
-		test('Should return false if no receive a valid data', () => {
-			const fakeData = ['foo', '', 'foo@@foo.foo', 'bar@bar..com', 'biz@biz.', '@foo.mail'];
-
-			fakeData.forEach( data => {
+		const noValidData = ['foo', '', 'foo@@foo.foo', 'bar@bar..com', 'biz@biz.', '@foo.mail'];
+		test.each(noValidData)(
+			'Should return false if no receive a valid data. Data: %p',
+			(data) => {
 				expect(authValidations.isValidEmail(data)).toBe(false);
-			});
-		});
+			}
+		);
 
-		test('Should return true if receive a valid data', () => {
-			const fakeData = ['maria@mail.com', 'john.doe@gmail.com', 'santi72@hotmail.es', 'foo_@yourcompany.it'];
 
-			fakeData.forEach( data => {
+		const validData = ['maria@mail.com', 'john.doe@gmail.com', 'santi72@hotmail.es', 'foo_@yourcompany.it'];
+		test.each(validData)(
+			'Should return true if receive a valid data. Data: %p',
+			(data) => {
 				expect(authValidations.isValidEmail(data)).toBe(true);
-			});
-		});
+			}
+		);
 	});
 
 	describe('isStrongPassword', () => {
