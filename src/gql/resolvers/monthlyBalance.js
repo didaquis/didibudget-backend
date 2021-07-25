@@ -28,7 +28,7 @@ module.exports = {
 			}
 
 			try {
-				const allMonthlyBalance = await MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } });
+				const allMonthlyBalance = await MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
 				const result = [];
 				allMonthlyBalance.forEach((data) => {

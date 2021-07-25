@@ -23,7 +23,7 @@ module.exports = {
 				throw new ForbiddenError('You must be an administrator to perform this action');
 			}
 
-			const users = await Users.find({});
+			const users = await Users.find({}).lean();
 			return users;
 		}
 	},

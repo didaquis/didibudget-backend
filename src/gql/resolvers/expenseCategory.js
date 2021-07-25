@@ -22,7 +22,7 @@ module.exports = {
 			}
 
 			try {
-				const allExpenseCategories = await ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories');
+				const allExpenseCategories = await ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
 
 				return allExpenseCategories || [];
 			} catch (error) {

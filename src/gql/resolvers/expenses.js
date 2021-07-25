@@ -28,7 +28,7 @@ module.exports = {
 			}
 
 			try {
-				const allExpenses = await Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } });
+				const allExpenses = await Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
 				const result = [];
 				allExpenses.forEach((data) => {
