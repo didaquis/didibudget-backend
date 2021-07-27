@@ -5,7 +5,7 @@ const { AuthenticationError } = require('apollo-server-express');
 const { logger } = require('../../utils/logger');
 
 const { Users, MonthlyBalance } = require('../../data/models/index');
-const { authValidations } = require('../auth/validations');
+const { authValidations } = require('../auth/authValidations');
 
 /**
  * All resolvers related to monthly balances
