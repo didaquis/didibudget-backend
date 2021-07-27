@@ -1,11 +1,9 @@
 'use strict';
 
-const { AuthenticationError } = require('apollo-server-express');
-
 const { logger } = require('../../utils/logger');
 
-const { Users, MonthlyBalance } = require('../../data/models/index');
-const { authValidations } = require('../auth/validations');
+const { MonthlyBalance } = require('../../data/models/index');
+const { authValidations } = require('../auth/authValidations');
 
 /**
  * All resolvers related to monthly balances
@@ -17,15 +15,9 @@ module.exports = {
 		 * Get all data of monthly balance by user
 		 */
 		getMonthlyBalance: async (root, args, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
 			try {
 				const allMonthlyBalance = await MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
@@ -51,15 +43,9 @@ module.exports = {
 		 * Register monthly balance
 		 */
 		registerMonthlyBalance: async (root, { balance, date }, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
 			return new MonthlyBalance({ user_id: user._id, balance, date }).save()
 				.then(monthlyBalance => {
@@ -79,17 +65,11 @@ module.exports = {
 		 * Delete one registry of monthly balance
 		 */
 		deleteMonthlyBalance: async (root, { uuid }, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
-			return MonthlyBalance.findOneAndDelete({ uuid })
+			return MonthlyBalance.findOneAndDelete({ uuid, user_id: user._id })
 				.then(monthlyBalance => {
 					return {
 						balance: monthlyBalance.balance.toString(),
@@ -107,15 +87,9 @@ module.exports = {
 		 * Delete all registries of monthly balance
 		 */
 		deleteAllMonthlyBalances: async (root, args, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
 			try {
 				return await MonthlyBalance.deleteMany({ user_id: user._id });

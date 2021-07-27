@@ -1,9 +1,7 @@
 'use strict';
 
-const { AuthenticationError, ForbiddenError } = require('apollo-server-express');
-
 const { Users } = require('../../data/models/index');
-const { authValidations } = require('../auth/validations');
+const { authValidations } = require('../auth/authValidations');
 
 /**
  * All resolvers related to users
@@ -15,16 +13,12 @@ module.exports = {
 		 * It allows to administrators users to list all users registered
 		 */
 		listAllUsers:  async (root, args, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
-			if (!authValidations.isAdmin(context)) {
-				throw new ForbiddenError('You must be an administrator to perform this action');
-			}
+			authValidations.ensureThatUserIsAdministrator(context);
 
-			const users = await Users.find({}).lean();
-			return users;
+			const allUsers = await Users.find({}).lean();
+			return allUsers;
 		}
 	},
 	Mutation: {
