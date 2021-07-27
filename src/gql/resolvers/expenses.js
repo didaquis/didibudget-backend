@@ -17,9 +17,7 @@ module.exports = {
 		 * Get all data of expenses by user
 		 */
 		getExpenses: async (root, args, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
 			const uuidOfUser = authValidations.getUserUUID(context);
 			const user = await Users.findOne({ uuid: uuidOfUser });
@@ -53,9 +51,7 @@ module.exports = {
 		 * Register expense
 		 */
 		registerExpense: async (root, { category, subcategory, quantity, date }, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
 			const uuidOfUser = authValidations.getUserUUID(context);
 			const user = await Users.findOne({ uuid: uuidOfUser });
@@ -83,9 +79,7 @@ module.exports = {
 		 * Delete one registry of expense
 		 */
 		deleteExpense: async (root, { uuid }, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
 			const uuidOfUser = authValidations.getUserUUID(context);
 			const user = await Users.findOne({ uuid: uuidOfUser });
@@ -113,9 +107,7 @@ module.exports = {
 		 * Delete all registries of expense
 		 */
 		deleteAllExpenses: async (root, args, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			authValidations.ensureThatUserIsLogged(context);
 
 			const uuidOfUser = authValidations.getUserUUID(context);
 			const user = await Users.findOne({ uuid: uuidOfUser });

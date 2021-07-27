@@ -1,7 +1,5 @@
 'use strict';
 
-const { AuthenticationError } = require('apollo-server-express');
-
 const { logger } = require('../../utils/logger');
 
 const { ExpenseCategory } = require('../../data/models/index');
@@ -17,9 +15,8 @@ module.exports = {
 		 * Get all expense categories and subcategories
 		 */
 		getExpenseCategory: async (root, args, context) => {
-			if (!authValidations.isLogged(context)) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+
+			authValidations.ensureThatUserIsLogged(context);
 
 			try {
 				const allExpenseCategories = await ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
