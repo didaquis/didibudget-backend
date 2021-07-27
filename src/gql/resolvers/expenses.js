@@ -4,6 +4,7 @@ const { logger } = require('../../utils/logger');
 
 const { Expenses } = require('../../data/models/index');
 const { authValidations } = require('../auth/authValidations');
+const { expenseDTO } = require('../../dto/expenseDTO');
 
 /**
  * All resolvers related to exxpenses
@@ -22,18 +23,7 @@ module.exports = {
 			try {
 				const allExpenses = await Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
-				const result = allExpenses.map((data) => {
-					return {
-						category: data.category,
-						subcategory: data.subcategory,
-						quantity: data.quantity.toString(),
-						date: data.date,
-						currencyISO: data.currencyISO,
-						uuid: data.uuid
-					};
-				});
-
-				return result;
+				return allExpenses.map((expense) => expenseDTO(expense));
 			} catch (error) {
 				logger.error(error);
 				return null;
@@ -50,16 +40,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			return new Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
-				.then(expense => {
-					return {
-						category: expense.category,
-						subcategory: expense.subcategory,
-						quantity: expense.quantity.toString(),
-						date: expense.date,
-						currencyISO: expense.currencyISO,
-						uuid: expense.uuid
-					};
-				})
+				.then(expense => expenseDTO(expense))
 				.catch(error => {
 					logger.error(error);
 					return null;
@@ -74,16 +55,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			return Expenses.findOneAndDelete({ uuid, user_id: user._id })
-				.then(expense => {
-					return {
-						category: expense.category,
-						subcategory: expense.subcategory,
-						quantity: expense.quantity.toString(),
-						date: expense.date,
-						currencyISO: expense.currencyISO,
-						uuid: expense.uuid
-					};
-				})
+				.then(expense => expenseDTO(expense))
 				.catch(error => {
 					logger.error(error);
 					return null;
