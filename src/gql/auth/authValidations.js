@@ -1,26 +1,13 @@
 'use strict';
 
 const { AuthenticationError, ForbiddenError } = require('apollo-server-express');
+const { Users } = require('../../data/models/index');
 
 /**
  * Auth validations repository
  * @type {Object}
  */
 const authValidations = {
-	/**
-	 * Get user uuid from context of Apollo Server
-	 * @param  {Object} context 				- The context object of Apollo Server
-	 * @param  {Object} [context.user]  		- The context object data: user data
-	 * @param  {String} [context.user.uuid] 	- The context object data: user data uuid information
-	 * @return {null|String}
-	 */
-	getUserUUID: (context) => {
-		if (!context.user) {
-			return null;
-		}
-		return context.user.uuid || null;
-	},
-
 	/**
 	 * Check if the maximum limit of users has been reached
 	 * @param  {Integer} numberOfCurrentlyUsersRegistered 	- The number of users currently registered in the service
@@ -56,6 +43,27 @@ const authValidations = {
 		if (!context.user || !context.user.isAdmin) {
 			throw new ForbiddenError('You must be an administrator to perform this action');
 		}
+	},
+
+	/**
+	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. If user does not exist, throw an error.
+	 * @async
+	 * @param {Object} context 					- The context object of Apollo Server
+	 * @param  {Object} [context.user]  		- The context object data: user data
+	 * @returns {User}
+	 */
+	getUser: async (context) => {
+		if (!context.user) {
+			return null;
+		}
+	
+		const uuidOfUser = context.user.uuid || null;
+		const user = await Users.findOne({ uuid: uuidOfUser });
+		if (!user) {
+			throw new AuthenticationError('You must be logged in to perform this action');
+		}
+
+		return user;
 	},
 };
 

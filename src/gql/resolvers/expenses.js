@@ -1,10 +1,8 @@
 'use strict';
 
-const { AuthenticationError } = require('apollo-server-express');
-
 const { logger } = require('../../utils/logger');
 
-const { Users, Expenses } = require('../../data/models/index');
+const { Expenses } = require('../../data/models/index');
 const { authValidations } = require('../auth/authValidations');
 
 /**
@@ -19,11 +17,7 @@ module.exports = {
 		getExpenses: async (root, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
 			try {
 				const allExpenses = await Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
@@ -53,11 +47,7 @@ module.exports = {
 		registerExpense: async (root, { category, subcategory, quantity, date }, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
 			return new Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
 				.then(expense => {
@@ -81,13 +71,9 @@ module.exports = {
 		deleteExpense: async (root, { uuid }, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
-			return Expenses.findOneAndDelete({ uuid })
+			return Expenses.findOneAndDelete({ uuid, user_id: user._id })
 				.then(expense => {
 					return {
 						category: expense.category,
@@ -109,11 +95,7 @@ module.exports = {
 		deleteAllExpenses: async (root, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
-			const uuidOfUser = authValidations.getUserUUID(context);
-			const user = await Users.findOne({ uuid: uuidOfUser });
-			if (!user) {
-				throw new AuthenticationError('You must be logged in to perform this action');
-			}
+			const user = await authValidations.getUser(context);
 
 			try {
 				return await Expenses.deleteMany({ user_id: user._id });
