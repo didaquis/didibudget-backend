@@ -6,7 +6,7 @@ const { Users } = require('../../data/models/index');
 const { createAuthToken } = require('../auth/jwt');
 const { authValidations } = require('../auth/authValidations');
 const { securityVariablesConfig, globalVariablesConfig } = require('../../config/appConfig');
-const { isValidEmail, isStrongPassword } = require('../../utils/utils');
+const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
 
 const bcrypt = require('bcrypt');
 

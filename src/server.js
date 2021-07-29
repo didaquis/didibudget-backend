@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 
 const { enviromentVariablesConfig } = require('./config/appConfig');
 const expenseCategories = require('./config/defaultData');
-const { logger, endLogger } = require('./utils/logger');
-const { requestDevLogger } = require('./utils/requestDevLogger');
-const { upsertDBWithExpenseCategories } = require('./utils/upsertDatabase');
+const { logger, endLogger } = require('./helpers/logger');
+const { requestDevLogger } = require('./helpers/requestDevLogger');
+const { upsertDBWithExpenseCategories } = require('./helpers/upsertDatabase');
 
 
 const mongooseConnectOptions = { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false };
@@ -55,7 +55,7 @@ const initApplication = () => {
 	const typeDefs = require('./gql/schemas/index');
 	const resolvers = require('./gql/resolvers/index');
 
-	const { getListOfIPV4Address } = require('./utils/utils');
+	const { getListOfIPV4Address } = require('./helpers/utils');
 	const routesManager = require('./routes/routesManager');
 
 	const app = express();
