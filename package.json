@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.5.13",
+  "version": "0.5.14",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {
@@ -25,12 +25,12 @@
   "author": "Dídac García (https://didaquis.github.io/)",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "7.30.0",
+    "eslint": "7.31.0",
     "eslint-plugin-no-lenght": "1.0.2-0",
     "husky": "4.3.8",
     "jest": "27.0.6",
     "jsonfile": "6.1.0",
-    "nodemon": "2.0.9",
+    "nodemon": "2.0.12",
     "rimraf": "3.0.2"
   },
   "dependencies": {
@@ -44,7 +44,7 @@
     "jsonwebtoken": "8.5.1",
     "lodash.merge": "4.6.2",
     "log4js": "6.3.0",
-    "mongoose": "5.13.2",
+    "mongoose": "5.13.4",
     "serve-favicon": "2.5.0",
     "uuid": "8.3.2"
   },
