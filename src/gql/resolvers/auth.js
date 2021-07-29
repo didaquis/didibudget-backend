@@ -1,12 +1,12 @@
 'use strict';
 
-const { ValidationError, UserInputError } = require('apollo-server-express');
+const { UserInputError } = require('apollo-server-express');
 
 const { Users } = require('../../data/models/index');
 const { createAuthToken } = require('../auth/jwt');
 const { authValidations } = require('../auth/authValidations');
 const { securityVariablesConfig, globalVariablesConfig } = require('../../config/appConfig');
-const { isValidEmail, isStrongPassword } = require('../../utils/utils');
+const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
 
 const bcrypt = require('bcrypt');
 
@@ -36,9 +36,7 @@ module.exports = {
 
 			const numberOfCurrentlyUsersRegistered = await Users.find().estimatedDocumentCount();
 
-			if (authValidations.isLimitOfUsersReached(numberOfCurrentlyUsersRegistered, globalVariablesConfig.limitOfUsersRegistered)) {
-				throw new ValidationError('The maximum number of users allowed has been reached. You must contact the administrator of the service in order to register');
-			}
+			authValidations.ensureLimitOfUsersIsNotReached(numberOfCurrentlyUsersRegistered, globalVariablesConfig.limitOfUsersRegistered);
 
 			const isAnEmailAlreadyRegistered = await Users.findOne({email});
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../helpers/logger');
 
 const { MonthlyBalance } = require('../../data/models/index');
 const { authValidations } = require('../auth/authValidations');
