@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config();
+const { ENVIRONMENT } = require('./environment');
 
 /* Home doc */
 /**
@@ -30,7 +31,7 @@ const enviromentVariablesConfig = Object.freeze({
 	database: process.env.MONGO_DB || 'didibudget_database',
 	mongoUser: process.env.MONGO_USER || '',
 	mongoPass: process.env.MONGO_PASS || '',
-	enviroment: (process.env.ENVIROMENT === 'development') ? process.env.ENVIROMENT : 'production',
+	enviroment: (process.env.ENVIROMENT === ENVIRONMENT.DEVELOPMENT) ? ENVIRONMENT.DEVELOPMENT : ENVIRONMENT.PRODUCTION,
 	port: Number(process.env.PORT) || serverPortByDefault
 });
 

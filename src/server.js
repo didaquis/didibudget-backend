@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 
+const { ENVIRONMENT } = require('./config/environment');
 const { enviromentVariablesConfig } = require('./config/appConfig');
 const expenseCategories = require('./config/defaultData');
 const { logger, endLogger } = require('./helpers/logger');
@@ -26,7 +27,7 @@ db.on('error', (err) => {
 });
 
 db.once('open', () => {
-	if (enviromentVariablesConfig.enviroment !== 'development') {
+	if (enviromentVariablesConfig.enviroment !== ENVIRONMENT.DEVELOPMENT) {
 		logger.info('Connected with MongoDB service (production mode)');
 	} else {
 		if (enviromentVariablesConfig.formatConnection === 'DNSseedlist' && enviromentVariablesConfig.mongoDNSseedlist !== '') {
@@ -67,9 +68,9 @@ const initApplication = () => {
 		typeDefs,
 		resolvers,
 		context: setContext,
-		introspection: (enviromentVariablesConfig.enviroment === 'production') ? false : true, // Set to "true" only in development mode
-		playground: (enviromentVariablesConfig.enviroment === 'production') ? false : true, // Set to "true" only in development mode
-		plugins: (enviromentVariablesConfig.enviroment === 'production') ? [] : [requestDevLogger], // Log all querys and their responses (do not use in production)
+		introspection: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
+		playground: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
+		plugins: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? [] : [requestDevLogger], // Log all querys and their responses (do not use in production)
 	});
 
 	server.applyMiddleware({app});
@@ -81,7 +82,7 @@ const initApplication = () => {
 	app.listen(enviromentVariablesConfig.port, () => {
 		getListOfIPV4Address().forEach(ip => {
 			logger.info(`Application running on: http://${ip}:${enviromentVariablesConfig.port}`);
-			if (enviromentVariablesConfig.enviroment !== 'production') {
+			if (enviromentVariablesConfig.enviroment !== ENVIRONMENT.PRODUCTION) {
 				logger.info(`GraphQL Playground running on: http://${ip}:${enviromentVariablesConfig.port}${server.graphqlPath}`);
 			}
 		});
