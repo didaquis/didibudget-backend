@@ -8,7 +8,7 @@ const { monthlyBalanceDTO } = require('../../dto/monthlyBalanceDTO');
 
 /**
  * All resolvers related to monthly balances
- * @type {Object}
+ * @typedef {Object}
  */
 module.exports = {
 	Query: {

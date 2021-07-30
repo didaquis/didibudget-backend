@@ -12,7 +12,7 @@ const bcrypt = require('bcrypt');
 
 /**
  * All resolvers related to auth
- * @type {Object}
+ * @typedef {Object}
  */
 module.exports = {
 	Query: {
