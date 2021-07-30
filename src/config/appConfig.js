@@ -5,21 +5,21 @@ const { ENVIRONMENT } = require('./environment');
 
 /* Home doc */
 /**
- * @file Enviroment variables configuration for the application
+ * @file Environment variables configuration for the application
  * @see module:appConfig
  */
 
 /* Module doc */
 /**
- * Enviroment variables configuration for the application
+ * Environment variables configuration for the application
  * @module appConfig
  */
 
 const serverPortByDefault = 4000;
-const limitOfUsersRegistered = 0; /* Set the value to 0 to not use the limit. Remember put the same value on the enviroment variables */
+const limitOfUsersRegistered = 0; /* Set the value to 0 to not use the limit. Remember put the same value on the environment variables */
 
 /**
- * Enviroment variables configuration
+ * Environment variables configuration
  * @typedef {Object} enviromentVariablesConfig
  */
 const enviromentVariablesConfig = Object.freeze({
