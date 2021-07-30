@@ -20,8 +20,7 @@ const limitOfUsersRegistered = 0; /* Set the value to 0 to not use the limit. Re
 
 /**
  * Enviroment variables configuration
- * @typedef enviromentVariablesConfig
- * @type {Object}
+ * @typedef {Object} enviromentVariablesConfig
  */
 const enviromentVariablesConfig = Object.freeze({
 	formatConnection: process.env.MONGO_FORMAT_CONNECTION || 'standard',
@@ -37,8 +36,7 @@ const enviromentVariablesConfig = Object.freeze({
 
 /**
  * Security variables configuration
- * @typedef securityVariablesConfig
- * @type {Object}
+ * @typedef {Object} securityVariablesConfig
  */
 const securityVariablesConfig = Object.freeze({
 	secret: process.env.SECRET || 'yoursecret',
@@ -47,8 +45,7 @@ const securityVariablesConfig = Object.freeze({
 
 /**
  * Global variables configuration
- * @typedef globalVariablesConfig
- * @type {Object}
+ * @typedef {Object} globalVariablesConfig
  */
 const globalVariablesConfig = Object.freeze({
 	limitOfUsersRegistered: Number(process.env.LIMIT_USERS_REGISTERED) || limitOfUsersRegistered

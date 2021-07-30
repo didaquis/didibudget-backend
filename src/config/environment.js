@@ -3,20 +3,19 @@
 /* Home doc */
 /**
  * @file Environment options available for the application
- * @see module:enrironment
+ * @see module:environment
  */
 
 /* Module doc */
 /**
  * Environment options available for the application
- * @module enrironment
+ * @module environment
  */
 
 
 /**
  *  Environments options
- * @typedef ENVIRONMENT
- * @type {Object}
+ * @typedef {Object} ENVIRONMENT
  */
 const ENVIRONMENT = Object.freeze({
 	DEVELOPMENT: 'development',
