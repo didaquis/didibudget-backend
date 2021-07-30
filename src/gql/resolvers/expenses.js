@@ -8,7 +8,7 @@ const { expenseDTO } = require('../../dto/expenseDTO');
 
 /**
  * All resolvers related to exxpenses
- * @type {Object}
+ * @typedef {Object}
  */
 module.exports = {
 	Query: {

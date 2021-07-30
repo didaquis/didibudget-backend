@@ -7,7 +7,7 @@ const { authValidations } = require('../auth/authValidations');
 
 /**
  * All resolvers related to Expense Category
- * @type {Object}
+ * @typedef {Object}
  */
 module.exports = {
 	Query: {

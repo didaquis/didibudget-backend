@@ -5,7 +5,7 @@ const { authValidations } = require('../auth/authValidations');
 
 /**
  * All resolvers related to users
- * @type {Object}
+ * @typedef {Object}
  */
 module.exports = {
 	Query: {
