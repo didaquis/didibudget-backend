@@ -51,7 +51,7 @@ const initApplication = () => {
 	const cors = require('cors');
 
 	const { ApolloServer } = require('apollo-server-express');
-	const { setContext } = require('./gql/auth/context');
+	const { setContext } = require('./gql/auth/setContext');
 	const typeDefs = require('./gql/schemas/index');
 	const resolvers = require('./gql/resolvers/index');
 
