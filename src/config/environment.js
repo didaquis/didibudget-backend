@@ -15,7 +15,7 @@
 
 /**
  *  Environments options
- * @typedef {Object} ENVIRONMENT
+ * @typedef {Object}
  */
 const ENVIRONMENT = Object.freeze({
 	DEVELOPMENT: 'development',
