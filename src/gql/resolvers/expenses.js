@@ -15,7 +15,7 @@ module.exports = {
 		/**
 		 * Get all data of expenses by user
 		 */
-		getExpenses: async (root, args, context) => {
+		getExpenses: async (parent, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);
@@ -34,7 +34,7 @@ module.exports = {
 		/**
 		 * Register expense
 		 */
-		registerExpense: async (root, { category, subcategory, quantity, date }, context) => {
+		registerExpense: async (parent, { category, subcategory, quantity, date }, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);
@@ -49,7 +49,7 @@ module.exports = {
 		/**
 		 * Delete one registry of expense
 		 */
-		deleteExpense: async (root, { uuid }, context) => {
+		deleteExpense: async (parent, { uuid }, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);
@@ -64,7 +64,7 @@ module.exports = {
 		/**
 		 * Delete all registries of expense
 		 */
-		deleteAllExpenses: async (root, args, context) => {
+		deleteAllExpenses: async (parent, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);

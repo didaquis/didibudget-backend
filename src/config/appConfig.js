@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config();
+const { ENVIRONMENT } = require('./environment');
 
 /* Home doc */
 /**
@@ -19,7 +20,7 @@ const limitOfUsersRegistered = 0; /* Set the value to 0 to not use the limit. Re
 
 /**
  * Enviroment variables configuration
- * @type {object}
+ * @typedef {Object} enviromentVariablesConfig
  */
 const enviromentVariablesConfig = Object.freeze({
 	formatConnection: process.env.MONGO_FORMAT_CONNECTION || 'standard',
@@ -29,13 +30,13 @@ const enviromentVariablesConfig = Object.freeze({
 	database: process.env.MONGO_DB || 'didibudget_database',
 	mongoUser: process.env.MONGO_USER || '',
 	mongoPass: process.env.MONGO_PASS || '',
-	enviroment: (process.env.ENVIROMENT === 'development') ? process.env.ENVIROMENT : 'production',
+	enviroment: (process.env.ENVIROMENT === ENVIRONMENT.DEVELOPMENT) ? ENVIRONMENT.DEVELOPMENT : ENVIRONMENT.PRODUCTION,
 	port: Number(process.env.PORT) || serverPortByDefault
 });
 
 /**
  * Security variables configuration
- * @type {object}
+ * @typedef {Object} securityVariablesConfig
  */
 const securityVariablesConfig = Object.freeze({
 	secret: process.env.SECRET || 'yoursecret',
@@ -44,7 +45,7 @@ const securityVariablesConfig = Object.freeze({
 
 /**
  * Global variables configuration
- * @type {object}
+ * @typedef {Object} globalVariablesConfig
  */
 const globalVariablesConfig = Object.freeze({
 	limitOfUsersRegistered: Number(process.env.LIMIT_USERS_REGISTERED) || limitOfUsersRegistered

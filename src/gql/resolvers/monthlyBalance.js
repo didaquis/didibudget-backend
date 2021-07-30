@@ -15,7 +15,7 @@ module.exports = {
 		/**
 		 * Get all data of monthly balance by user
 		 */
-		getMonthlyBalance: async (root, args, context) => {
+		getMonthlyBalance: async (parent, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);
@@ -34,7 +34,7 @@ module.exports = {
 		/**
 		 * Register monthly balance
 		 */
-		registerMonthlyBalance: async (root, { balance, date }, context) => {
+		registerMonthlyBalance: async (parent, { balance, date }, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);
@@ -49,7 +49,7 @@ module.exports = {
 		/**
 		 * Delete one registry of monthly balance
 		 */
-		deleteMonthlyBalance: async (root, { uuid }, context) => {
+		deleteMonthlyBalance: async (parent, { uuid }, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);
@@ -64,7 +64,7 @@ module.exports = {
 		/**
 		 * Delete all registries of monthly balance
 		 */
-		deleteAllMonthlyBalances: async (root, args, context) => {
+		deleteAllMonthlyBalances: async (parent, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			const user = await authValidations.getUser(context);

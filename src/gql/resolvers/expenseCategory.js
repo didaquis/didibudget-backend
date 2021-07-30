@@ -14,7 +14,7 @@ module.exports = {
 		/**
 		 * Get all expense categories and subcategories
 		 */
-		getExpenseCategory: async (root, args, context) => {
+		getExpenseCategory: async (parent, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			try {
