@@ -1,8 +1,8 @@
 'use strict';
 
 const { validateAuthToken } = require('./jwt');
-//const { logger } = require('../../helpers/logger');
-
+const { enviromentVariablesConfig } = require('../../config/appConfig');
+const { logger } = require('../../helpers/logger');
 
 /**
  * Context function from Apollo Server
@@ -18,7 +18,9 @@ const setContext = async ({ req }) => {
 			const user = await validateAuthToken(token);
 			return { user }; // Add to Apollo Server context the user who is doing the request if auth token is provided and it's a valid token
 		} catch (error) {
-			//logger.debug(error);
+			if (enviromentVariablesConfig.enviroment !== 'production') {
+				logger.debug(error.message);
+			}
 		}
 	}
 };
