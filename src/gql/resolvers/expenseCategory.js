@@ -22,7 +22,7 @@ module.exports = {
 
 				return allExpenseCategories || [];
 			} catch (error) {
-				logger.error(error);
+				logger.error(error.message);
 				return null;
 			}
 		}
