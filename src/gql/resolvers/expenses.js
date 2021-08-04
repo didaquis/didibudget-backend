@@ -25,7 +25,7 @@ module.exports = {
 
 				return allExpenses.map((expense) => expenseDTO(expense));
 			} catch (error) {
-				logger.error(error);
+				logger.error(error.message);
 				return null;
 			}
 		}
@@ -42,7 +42,7 @@ module.exports = {
 			return new Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
 				.then(expense => expenseDTO(expense))
 				.catch(error => {
-					logger.error(error);
+					logger.error(error.message);
 					return null;
 				});
 		},
@@ -57,7 +57,7 @@ module.exports = {
 			return Expenses.findOneAndDelete({ uuid, user_id: user._id })
 				.then(expense => expenseDTO(expense))
 				.catch(error => {
-					logger.error(error);
+					logger.error(error.message);
 					return null;
 				});
 		},
@@ -72,7 +72,7 @@ module.exports = {
 			try {
 				return await Expenses.deleteMany({ user_id: user._id });
 			} catch (error) {
-				logger.error(error);
+				logger.error(error.message);
 				return null;
 			}
 		}

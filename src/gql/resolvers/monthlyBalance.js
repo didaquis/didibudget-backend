@@ -25,7 +25,7 @@ module.exports = {
 
 				return allMonthlyBalance.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
 			} catch (error) {
-				logger.error(error);
+				logger.error(error.message);
 				return null;
 			}
 		}
@@ -42,7 +42,7 @@ module.exports = {
 			return new MonthlyBalance({ user_id: user._id, balance, date }).save()
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance))
 				.catch(error => {
-					logger.error(error);
+					logger.error(error.message);
 					return null;
 				});
 		},
@@ -57,7 +57,7 @@ module.exports = {
 			return MonthlyBalance.findOneAndDelete({ uuid, user_id: user._id })
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance))
 				.catch(error => {
-					logger.error(error);
+					logger.error(error.message);
 					return null;
 				});
 		},
@@ -72,7 +72,7 @@ module.exports = {
 			try {
 				return await MonthlyBalance.deleteMany({ user_id: user._id });
 			} catch (error) {
-				logger.error(error);
+				logger.error(error.message);
 				return null;
 			}
 		}
