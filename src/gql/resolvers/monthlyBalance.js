@@ -2,7 +2,6 @@
 
 const { logger } = require('../../helpers/logger');
 
-const { MonthlyBalance } = require('../../data/models/index');
 const { authValidations } = require('../auth/authValidations');
 const { monthlyBalanceDTO } = require('../../dto/monthlyBalanceDTO');
 
@@ -21,7 +20,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			try {
-				const allMonthlyBalance = await MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
+				const allMonthlyBalance = await context.di.models.MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
 				return allMonthlyBalance.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
 			} catch (error) {
@@ -39,7 +38,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			return new MonthlyBalance({ user_id: user._id, balance, date }).save()
+			return new context.di.models.MonthlyBalance({ user_id: user._id, balance, date }).save()
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance))
 				.catch(error => {
 					logger.error(error.message);
@@ -54,7 +53,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			return MonthlyBalance.findOneAndDelete({ uuid, user_id: user._id })
+			return context.di.models.MonthlyBalance.findOneAndDelete({ uuid, user_id: user._id })
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance))
 				.catch(error => {
 					logger.error(error.message);
@@ -70,7 +69,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			try {
-				return await MonthlyBalance.deleteMany({ user_id: user._id });
+				return await context.di.models.MonthlyBalance.deleteMany({ user_id: user._id });
 			} catch (error) {
 				logger.error(error.message);
 				return null;

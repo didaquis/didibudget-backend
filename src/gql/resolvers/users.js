@@ -1,6 +1,5 @@
 'use strict';
 
-const { Users } = require('../../data/models/index');
 const { authValidations } = require('../auth/authValidations');
 
 /**
@@ -10,14 +9,14 @@ const { authValidations } = require('../auth/authValidations');
 module.exports = {
 	Query: {
 		/**
-		 * It allows to administrators users to list all users registered
+		 * It allows to administrators to list all users registered
 		 */
 		listAllUsers:  async (parent, args, context) => {
 			authValidations.ensureThatUserIsLogged(context);
 
 			authValidations.ensureThatUserIsAdministrator(context);
 
-			const allUsers = await Users.find({}).lean();
+			const allUsers = await context.di.models.Users.find({}).lean();
 			return allUsers;
 		}
 	},

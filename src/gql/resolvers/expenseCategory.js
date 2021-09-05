@@ -2,7 +2,6 @@
 
 const { logger } = require('../../helpers/logger');
 
-const { ExpenseCategory } = require('../../data/models/index');
 const { authValidations } = require('../auth/authValidations');
 
 /**
@@ -18,7 +17,7 @@ module.exports = {
 			authValidations.ensureThatUserIsLogged(context);
 
 			try {
-				const allExpenseCategories = await ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
+				const allExpenseCategories = await context.di.models.ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
 
 				return allExpenseCategories || [];
 			} catch (error) {

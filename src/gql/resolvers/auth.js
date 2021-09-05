@@ -2,7 +2,6 @@
 
 const { UserInputError } = require('apollo-server-express');
 
-const { Users } = require('../../data/models/index');
 const { createAuthToken } = require('../auth/jwt');
 const { authValidations } = require('../auth/authValidations');
 const { securityVariablesConfig, globalVariablesConfig } = require('../../config/appConfig');
@@ -21,7 +20,7 @@ module.exports = {
 		/**
 		 * It allows to users to register as long as the limit of allowed users has not been reached
 		 */
-		registerUser: async (parent, { email, password }) => {
+		registerUser: async (parent, { email, password }, context) => {
 			if (!email || !password) {
 				throw new UserInputError('Data provided is not valid');
 			}
@@ -34,19 +33,19 @@ module.exports = {
 				throw new UserInputError('The password is not secure enough');
 			}
 
-			const numberOfCurrentlyUsersRegistered = await Users.find().estimatedDocumentCount();
+			const numberOfCurrentlyUsersRegistered = await context.di.models.Users.find().estimatedDocumentCount();
 
 			authValidations.ensureLimitOfUsersIsNotReached(numberOfCurrentlyUsersRegistered, globalVariablesConfig.limitOfUsersRegistered);
 
-			const isAnEmailAlreadyRegistered = await Users.findOne({email});
+			const isAnEmailAlreadyRegistered = await context.di.models.Users.findOne({email});
 
 			if (isAnEmailAlreadyRegistered) {
 				throw new UserInputError('Data provided is not valid');
 			}
 
-			await new Users({email, password}).save();
+			await new context.di.models.Users({email, password}).save();
 
-			const user = await Users.findOne({email});
+			const user = await context.di.models.Users.findOne({email});
 
 			return {
 				token: createAuthToken({ email: user.email, isAdmin: user.isAdmin, isActive: user.isActive, uuid: user.uuid }, securityVariablesConfig.secret, securityVariablesConfig.timeExpiration)
@@ -55,12 +54,12 @@ module.exports = {
 		/**
 		 * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When an user authenticates the value of lastLogin will be updated
 		 */
-		authUser: async (parent, { email, password }) => {
+		authUser: async (parent, { email, password }, context) => {
 			if (!email || !password) {
 				throw new UserInputError('Invalid credentials');
 			}
 
-			const user = await Users.findOne({email, isActive: true});
+			const user = await context.di.models.Users.findOne({email, isActive: true});
 
 			if (!user) {
 				throw new UserInputError('User not found or login not allowed');
@@ -72,7 +71,7 @@ module.exports = {
 				throw new UserInputError('Invalid credentials');
 			}
 
-			await Users.findOneAndUpdate({email}, { lastLogin: new Date().toISOString() }, { new: true });
+			await context.di.models.Users.findOneAndUpdate({email}, { lastLogin: new Date().toISOString() }, { new: true });
 
 			return {
 				token: createAuthToken({ email: user.email, isAdmin: user.isAdmin, isActive: user.isActive, uuid: user.uuid }, securityVariablesConfig.secret, securityVariablesConfig.timeExpiration)
