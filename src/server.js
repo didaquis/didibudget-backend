@@ -10,14 +10,13 @@ const { requestDevLogger } = require('./helpers/requestDevLogger');
 const { upsertDBWithExpenseCategories } = require('./helpers/upsertDatabase');
 
 
-const mongooseConnectOptions = { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false };
 if (enviromentVariablesConfig.formatConnection === 'DNSseedlist' && enviromentVariablesConfig.mongoDNSseedlist !== '') {
-	mongoose.connect(enviromentVariablesConfig.mongoDNSseedlist, mongooseConnectOptions);
+	mongoose.connect(enviromentVariablesConfig.mongoDNSseedlist);
 } else {
 	if (enviromentVariablesConfig.mongoUser !== '' && enviromentVariablesConfig.mongoPass !== '') {
-		mongoose.connect(`mongodb://${enviromentVariablesConfig.mongoUser}:${enviromentVariablesConfig.mongoPass}@${enviromentVariablesConfig.dbHost}:${enviromentVariablesConfig.dbPort}/${enviromentVariablesConfig.database}`, mongooseConnectOptions);
+		mongoose.connect(`mongodb://${enviromentVariablesConfig.mongoUser}:${enviromentVariablesConfig.mongoPass}@${enviromentVariablesConfig.dbHost}:${enviromentVariablesConfig.dbPort}/${enviromentVariablesConfig.database}`);
 	} else {
-		mongoose.connect(`mongodb://${enviromentVariablesConfig.dbHost}:${enviromentVariablesConfig.dbPort}/${enviromentVariablesConfig.database}`, mongooseConnectOptions);
+		mongoose.connect(`mongodb://${enviromentVariablesConfig.dbHost}:${enviromentVariablesConfig.dbPort}/${enviromentVariablesConfig.database}`);
 	}
 }
 
@@ -45,13 +44,15 @@ db.once('open', () => {
 	initApplication();
 });
 
-const initApplication = () => {
+const initApplication = async () => {
 	const express = require('express');
 	const favicon = require('serve-favicon');
 	const path = require('path');
 	const cors = require('cors');
 
 	const { ApolloServer } = require('apollo-server-express');
+	const { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
+
 	const { setContext } = require('./gql/auth/setContext');
 	const typeDefs = require('./gql/schemas/index');
 	const resolvers = require('./gql/resolvers/index');
@@ -69,9 +70,10 @@ const initApplication = () => {
 		resolvers,
 		context: setContext,
 		introspection: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
-		playground: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
-		plugins: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? [] : [requestDevLogger], // Log all querys and their responses (do not use in production)
+		plugins: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
 	});
+
+	await server.start();
 
 	server.applyMiddleware({app});
 
