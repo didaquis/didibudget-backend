@@ -1,7 +1,18 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const express = require('express');
+const favicon = require('serve-favicon');
+const path = require('path');
+const cors = require('cors');
+const { ApolloServer } = require('apollo-server-express');
+const { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
 
+const { setContext } = require('./gql/auth/setContext');
+const typeDefs = require('./gql/schemas/index');
+const resolvers = require('./gql/resolvers/index');
+const { getListOfIPV4Address } = require('./helpers/getListOfIPV4Address');
+const routesManager = require('./routes/routesManager');
 const { ENVIRONMENT } = require('./config/environment');
 const { environmentVariablesConfig } = require('./config/appConfig');
 const expenseCategories = require('./config/defaultData');
@@ -45,21 +56,6 @@ db.once('open', () => {
 });
 
 const initApplication = async () => {
-	const express = require('express');
-	const favicon = require('serve-favicon');
-	const path = require('path');
-	const cors = require('cors');
-
-	const { ApolloServer } = require('apollo-server-express');
-	const { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
-
-	const { setContext } = require('./gql/auth/setContext');
-	const typeDefs = require('./gql/schemas/index');
-	const resolvers = require('./gql/resolvers/index');
-
-	const { getListOfIPV4Address } = require('./helpers/getListOfIPV4Address');
-	const routesManager = require('./routes/routesManager');
-
 	const app = express();
 	app.use(cors({ credentials: true }));
 	app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
