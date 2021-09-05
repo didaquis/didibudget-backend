@@ -1,7 +1,7 @@
 'use strict';
 
 const { validateAuthToken } = require('./jwt');
-const { enviromentVariablesConfig } = require('../../config/appConfig');
+const { environmentVariablesConfig } = require('../../config/appConfig');
 const { ENVIRONMENT } = require('../../config/environment');
 const { logger } = require('../../helpers/logger');
 
@@ -13,7 +13,7 @@ const models = require('../../data/models/index');
 const setContext = async ({ req }) => {
 	const context = {
 		di: {
-			models: {
+			model: {
 				...models
 			}
 		}
@@ -30,7 +30,7 @@ const setContext = async ({ req }) => {
 			const user = await validateAuthToken(token);
 			context.user = user; // Add to Apollo Server context the user who is doing the request if auth token is provided and it's a valid token
 		} catch (error) {
-			if (enviromentVariablesConfig.enviroment !== ENVIRONMENT.PRODUCTION) {
+			if (environmentVariablesConfig.enviroment !== ENVIRONMENT.PRODUCTION) {
 				logger.debug(error.message);
 			}
 		}

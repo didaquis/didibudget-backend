@@ -20,7 +20,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			try {
-				const allExpenses = await context.di.models.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
+				const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
 				return allExpenses.map((expense) => expenseDTO(expense));
 			} catch (error) {
@@ -38,7 +38,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			return new context.di.models.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
+			return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
 				.then(expense => expenseDTO(expense))
 				.catch(error => {
 					logger.error(error.message);
@@ -53,7 +53,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			return context.di.models.Expenses.findOneAndDelete({ uuid, user_id: user._id })
+			return context.di.model.Expenses.findOneAndDelete({ uuid, user_id: user._id })
 				.then(expense => expenseDTO(expense))
 				.catch(error => {
 					logger.error(error.message);
@@ -69,7 +69,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			try {
-				return await context.di.models.Expenses.deleteMany({ user_id: user._id });
+				return await context.di.model.Expenses.deleteMany({ user_id: user._id });
 			} catch (error) {
 				logger.error(error.message);
 				return null;
