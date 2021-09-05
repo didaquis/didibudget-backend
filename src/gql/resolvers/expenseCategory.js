@@ -17,7 +17,7 @@ module.exports = {
 			authValidations.ensureThatUserIsLogged(context);
 
 			try {
-				const allExpenseCategories = await context.di.models.ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
+				const allExpenseCategories = await context.di.model.ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
 
 				return allExpenseCategories || [];
 			} catch (error) {

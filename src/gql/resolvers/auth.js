@@ -33,19 +33,19 @@ module.exports = {
 				throw new UserInputError('The password is not secure enough');
 			}
 
-			const numberOfCurrentlyUsersRegistered = await context.di.models.Users.find().estimatedDocumentCount();
+			const numberOfCurrentlyUsersRegistered = await context.di.model.Users.find().estimatedDocumentCount();
 
 			authValidations.ensureLimitOfUsersIsNotReached(numberOfCurrentlyUsersRegistered, globalVariablesConfig.limitOfUsersRegistered);
 
-			const isAnEmailAlreadyRegistered = await context.di.models.Users.findOne({email});
+			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({email});
 
 			if (isAnEmailAlreadyRegistered) {
 				throw new UserInputError('Data provided is not valid');
 			}
 
-			await new context.di.models.Users({email, password}).save();
+			await new context.di.model.Users({email, password}).save();
 
-			const user = await context.di.models.Users.findOne({email});
+			const user = await context.di.model.Users.findOne({email});
 
 			return {
 				token: createAuthToken({ email: user.email, isAdmin: user.isAdmin, isActive: user.isActive, uuid: user.uuid }, securityVariablesConfig.secret, securityVariablesConfig.timeExpiration)
@@ -59,7 +59,7 @@ module.exports = {
 				throw new UserInputError('Invalid credentials');
 			}
 
-			const user = await context.di.models.Users.findOne({email, isActive: true});
+			const user = await context.di.model.Users.findOne({email, isActive: true});
 
 			if (!user) {
 				throw new UserInputError('User not found or login not allowed');
@@ -71,7 +71,7 @@ module.exports = {
 				throw new UserInputError('Invalid credentials');
 			}
 
-			await context.di.models.Users.findOneAndUpdate({email}, { lastLogin: new Date().toISOString() }, { new: true });
+			await context.di.model.Users.findOneAndUpdate({email}, { lastLogin: new Date().toISOString() }, { new: true });
 
 			return {
 				token: createAuthToken({ email: user.email, isAdmin: user.isAdmin, isActive: user.isActive, uuid: user.uuid }, securityVariablesConfig.secret, securityVariablesConfig.timeExpiration)

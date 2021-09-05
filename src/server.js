@@ -3,20 +3,20 @@
 const mongoose = require('mongoose');
 
 const { ENVIRONMENT } = require('./config/environment');
-const { enviromentVariablesConfig } = require('./config/appConfig');
+const { environmentVariablesConfig } = require('./config/appConfig');
 const expenseCategories = require('./config/defaultData');
 const { logger, endLogger } = require('./helpers/logger');
 const { requestDevLogger } = require('./helpers/requestDevLogger');
 const { upsertDBWithExpenseCategories } = require('./helpers/upsertDatabase');
 
 
-if (enviromentVariablesConfig.formatConnection === 'DNSseedlist' && enviromentVariablesConfig.mongoDNSseedlist !== '') {
-	mongoose.connect(enviromentVariablesConfig.mongoDNSseedlist);
+if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environmentVariablesConfig.mongoDNSseedlist !== '') {
+	mongoose.connect(environmentVariablesConfig.mongoDNSseedlist);
 } else {
-	if (enviromentVariablesConfig.mongoUser !== '' && enviromentVariablesConfig.mongoPass !== '') {
-		mongoose.connect(`mongodb://${enviromentVariablesConfig.mongoUser}:${enviromentVariablesConfig.mongoPass}@${enviromentVariablesConfig.dbHost}:${enviromentVariablesConfig.dbPort}/${enviromentVariablesConfig.database}`);
+	if (environmentVariablesConfig.mongoUser !== '' && environmentVariablesConfig.mongoPass !== '') {
+		mongoose.connect(`mongodb://${environmentVariablesConfig.mongoUser}:${environmentVariablesConfig.mongoPass}@${environmentVariablesConfig.dbHost}:${environmentVariablesConfig.dbPort}/${environmentVariablesConfig.database}`);
 	} else {
-		mongoose.connect(`mongodb://${enviromentVariablesConfig.dbHost}:${enviromentVariablesConfig.dbPort}/${enviromentVariablesConfig.database}`);
+		mongoose.connect(`mongodb://${environmentVariablesConfig.dbHost}:${environmentVariablesConfig.dbPort}/${environmentVariablesConfig.database}`);
 	}
 }
 
@@ -26,13 +26,13 @@ db.on('error', (err) => {
 });
 
 db.once('open', () => {
-	if (enviromentVariablesConfig.enviroment !== ENVIRONMENT.DEVELOPMENT) {
+	if (environmentVariablesConfig.enviroment !== ENVIRONMENT.DEVELOPMENT) {
 		logger.info(`Connected with MongoDB service (${ENVIRONMENT.PRODUCTION} mode)`);
 	} else {
-		if (enviromentVariablesConfig.formatConnection === 'DNSseedlist' && enviromentVariablesConfig.mongoDNSseedlist !== '') {
-			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.mongoDNSseedlist}" using database "${enviromentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+		if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environmentVariablesConfig.mongoDNSseedlist !== '') {
+			logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.mongoDNSseedlist}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
 		} else {
-			logger.info(`Connected with MongoDB service at "${enviromentVariablesConfig.dbHost}" in port "${enviromentVariablesConfig.dbPort}" using database "${enviromentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+			logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.dbHost}" in port "${environmentVariablesConfig.dbPort}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
 		}
 	}
 
@@ -69,8 +69,8 @@ const initApplication = async () => {
 		typeDefs,
 		resolvers,
 		context: setContext,
-		introspection: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
-		plugins: (enviromentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
+		introspection: (environmentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
+		plugins: (environmentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
 	});
 
 	await server.start();
@@ -81,11 +81,11 @@ const initApplication = async () => {
 		res.status(404).send('404'); // eslint-disable-line no-magic-numbers
 	});
 
-	app.listen(enviromentVariablesConfig.port, () => {
+	app.listen(environmentVariablesConfig.port, () => {
 		getListOfIPV4Address().forEach(ip => {
-			logger.info(`Application running on: http://${ip}:${enviromentVariablesConfig.port}`);
-			if (enviromentVariablesConfig.enviroment !== ENVIRONMENT.PRODUCTION) {
-				logger.info(`GraphQL Playground running on: http://${ip}:${enviromentVariablesConfig.port}${server.graphqlPath}`);
+			logger.info(`Application running on: http://${ip}:${environmentVariablesConfig.port}`);
+			if (environmentVariablesConfig.enviroment !== ENVIRONMENT.PRODUCTION) {
+				logger.info(`GraphQL Playground running on: http://${ip}:${environmentVariablesConfig.port}${server.graphqlPath}`);
 			}
 		});
 	});
