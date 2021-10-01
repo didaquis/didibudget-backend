@@ -6,6 +6,7 @@ const { createAuthToken } = require('../auth/jwt');
 const { authValidations } = require('../auth/authValidations');
 const { securityVariablesConfig, globalVariablesConfig } = require('../../config/appConfig');
 const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
+const { logger } = require('../../helpers/logger');
 
 const bcrypt = require('bcrypt');
 
@@ -76,6 +77,21 @@ module.exports = {
 			return {
 				token: createAuthToken({ email: user.email, isAdmin: user.isAdmin, isActive: user.isActive, uuid: user.uuid }, securityVariablesConfig.secret, securityVariablesConfig.timeExpiration)
 			};
+		},
+		/**
+		 * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
+		 */
+		deleteMyUserAccount:  async (parent, args, context) => {
+			authValidations.ensureThatUserIsLogged(context);
+
+			const user = await authValidations.getUser(context);
+
+			try {
+				return await context.di.model.Users.deleteOne({ uuid: user.uuid});
+			} catch (error) {
+				logger.error(error.message);
+				return null;
+			}
 		}
 	}
 };
