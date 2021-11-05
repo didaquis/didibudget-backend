@@ -37,8 +37,8 @@ const authValidations = {
 	/**
 	 * Check if in Apollo Server context contains an user and is an administrator. If user is not in context or user is not an administrator it throws an error
 	 * @param {Object} context 					- The context object of Apollo Server
-	 * @param  {Object} [context.user]  		- The context object data: user data
-	 * @param  {Boolean} [context.user.isAdmin] - The context object data: user data role information
+	 * @param {Object} [context.user]  			- The context object data: user data
+	 * @param {Boolean} [context.user.isAdmin] 	- The context object data: user data role information
 	 */
 	ensureThatUserIsAdministrator: (context) => {
 		if (!context.user || !context.user.isAdmin) {
@@ -49,8 +49,8 @@ const authValidations = {
 	/**
 	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. If user does not exist, it throws an error.
 	 * @async
-	 * @param {Object} context 					- The context object of Apollo Server
-	 * @param  {Object} [context.user]  		- The context object data: user data
+	 * @param {Object} context 				- The context object of Apollo Server
+	 * @param {Object} [context.user]  		- The context object data: user data
 	 * @returns {User}
 	 */
 	getUser: async (context) => {
