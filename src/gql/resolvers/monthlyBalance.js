@@ -1,7 +1,5 @@
 'use strict';
 
-const { logger } = require('../../helpers/logger');
-
 const { authValidations } = require('../auth/authValidations');
 const { monthlyBalanceDTO } = require('../../dto/monthlyBalanceDTO');
 
@@ -19,14 +17,9 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			try {
-				const allMonthlyBalance = await context.di.model.MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
+			const allMonthlyBalance = await context.di.model.MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
-				return allMonthlyBalance.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
-			} catch (error) {
-				logger.error(error.message);
-				return null;
-			}
+			return allMonthlyBalance.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
 		}
 	},
 	Mutation: {
@@ -39,11 +32,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			return new context.di.model.MonthlyBalance({ user_id: user._id, balance, date }).save()
-				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance))
-				.catch(error => {
-					logger.error(error.message);
-					return null;
-				});
+				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance));
 		},
 		/**
 		 * Delete one registry of monthly balance
@@ -54,11 +43,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			return context.di.model.MonthlyBalance.findOneAndDelete({ uuid, user_id: user._id })
-				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance))
-				.catch(error => {
-					logger.error(error.message);
-					return null;
-				});
+				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance));
 		},
 		/**
 		 * Delete all registries of monthly balance
@@ -68,12 +53,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			try {
-				return await context.di.model.MonthlyBalance.deleteMany({ user_id: user._id });
-			} catch (error) {
-				logger.error(error.message);
-				return null;
-			}
+			return await context.di.model.MonthlyBalance.deleteMany({ user_id: user._id });
 		}
 	}
 };

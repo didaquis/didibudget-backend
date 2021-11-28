@@ -6,6 +6,7 @@ const favicon = require('serve-favicon');
 const path = require('path');
 const cors = require('cors');
 const { ApolloServer } = require('apollo-server-express');
+const { UserInputError } = require('apollo-server-errors');
 const { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
 
 const { setContext } = require('./gql/auth/setContext');
@@ -67,6 +68,13 @@ const initApplication = async () => {
 		context: setContext,
 		introspection: (environmentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
 		plugins: (environmentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
+		formatError (error) {
+			if ( !(error.originalError instanceof UserInputError) ) {
+				logger.error(error.message);
+			}
+
+			return error;
+		},
 	});
 
 	await server.start();
