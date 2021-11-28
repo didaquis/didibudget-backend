@@ -1,7 +1,5 @@
 'use strict';
 
-const { logger } = require('../../helpers/logger');
-
 const { authValidations } = require('../auth/authValidations');
 const { expenseDTO } = require('../../dto/expenseDTO');
 
@@ -19,14 +17,9 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			try {
-				const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
+			const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
-				return allExpenses.map((expense) => expenseDTO(expense));
-			} catch (error) {
-				logger.error(error.message);
-				return null;
-			}
+			return allExpenses.map((expense) => expenseDTO(expense));
 		}
 	},
 	Mutation: {
@@ -39,11 +32,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
-				.then(expense => expenseDTO(expense))
-				.catch(error => {
-					logger.error(error.message);
-					return null;
-				});
+				.then(expense => expenseDTO(expense));
 		},
 		/**
 		 * Delete one registry of expense
@@ -54,11 +43,7 @@ module.exports = {
 			const user = await authValidations.getUser(context);
 
 			return context.di.model.Expenses.findOneAndDelete({ uuid, user_id: user._id })
-				.then(expense => expenseDTO(expense))
-				.catch(error => {
-					logger.error(error.message);
-					return null;
-				});
+				.then(expense => expenseDTO(expense));
 		},
 		/**
 		 * Delete all registries of expense
@@ -68,12 +53,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			try {
-				return await context.di.model.Expenses.deleteMany({ user_id: user._id });
-			} catch (error) {
-				logger.error(error.message);
-				return null;
-			}
+			return await context.di.model.Expenses.deleteMany({ user_id: user._id });
 		}
 	}
 };

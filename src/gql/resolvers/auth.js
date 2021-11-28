@@ -1,14 +1,12 @@
 'use strict';
 
 const { UserInputError } = require('apollo-server-express');
-
+const bcrypt = require('bcrypt');
 const { createAuthToken } = require('../auth/jwt');
 const { authValidations } = require('../auth/authValidations');
 const { securityVariablesConfig, globalVariablesConfig } = require('../../config/appConfig');
 const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
-const { logger } = require('../../helpers/logger');
 
-const bcrypt = require('bcrypt');
 
 /**
  * All resolvers related to auth
@@ -86,12 +84,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			try {
-				return await context.di.model.Users.deleteOne({ uuid: user.uuid });
-			} catch (error) {
-				logger.error(error.message);
-				return null;
-			}
+			return await context.di.model.Users.deleteOne({ uuid: user.uuid });
 		}
 	}
 };
