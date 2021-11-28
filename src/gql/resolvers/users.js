@@ -16,8 +16,7 @@ module.exports = {
 
 			authValidations.ensureThatUserIsAdministrator(context);
 
-			const allUsers = await context.di.model.Users.find({}).lean();
-			return allUsers;
+			return await context.di.model.Users.find({}).lean();
 		}
 	},
 	Mutation: {
