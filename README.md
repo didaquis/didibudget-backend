@@ -6,8 +6,8 @@ The proyect is splitted on two repositories: one for the backend and one for the
 This repository is for the backend and is intended to work with [the frontend](https://github.com/didaquis/didibudget-frontend)
 
 ### 📝 Backend Requirements
-* MongoDB 4.4 or higher
-* Node.js 14 or higher
+* MongoDB 5.0 or higher
+* Node.js 14.17 or higher
 
 ### 📚 How to run the application?
 * Use the command: `npm install`. If you are deploying the app in production, it's better to use this command: `npm install --production`

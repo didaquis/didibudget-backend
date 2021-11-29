@@ -17,6 +17,14 @@ module.exports = {
 			const allExpenseCategories = await context.di.model.ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
 
 			return allExpenseCategories || [];
+		},
+		/**
+		 * Get an expense category and their subcategories by category id
+		 */
+		getExpenseCategoryById: async (parent, { category }, context) => {
+			authValidations.ensureThatUserIsLogged(context);
+
+			return await context.di.model.ExpenseCategory.findOne({ _id: category }, null, { sort: { name: 1 } }).populate('subcategories').lean();
 		}
 	},
 };
