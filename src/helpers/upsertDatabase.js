@@ -17,10 +17,10 @@ const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
 
 /**
  * Save on database the default data related to expense categories and subcategories. This function never delete documents on the dabatase, but should generate a new document if content of default data change
- * @param  {Object[]} expenseCategories - A list of literal objects
- * @param  {String} expenseCategories[].name - Name of expense category
- * @param  {Array} expenseCategories[].subcategories - Name of related subcategories. Can be an empty array
- * @param  {String} expenseCategories[].subcategories[].name - Name of subcategory
+ * @param {Object[]} expenseCategories - A list of literal objects
+ * @param {string} expenseCategories[].name - Name of expense category
+ * @param {Array} expenseCategories[].subcategories - Name of related subcategories. Can be an empty array
+ * @param {string} expenseCategories[].subcategories[].name - Name of subcategory
  */
 const upsertDBWithExpenseCategories = ({ expenseCategories } = []) => {
 	expenseCategories.forEach(async (category) => {
