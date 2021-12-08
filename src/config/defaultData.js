@@ -35,7 +35,7 @@ const expenseCategories = [
 		subcategories: [],
 	},
 	{
-		name: 'Medicines, personal hygiene and health care',
+		name: 'Medicines and health care services',
 		subcategories: [],
 	},
 	{
@@ -65,7 +65,7 @@ const expenseCategories = [
 	{
 		name: 'Home',
 		subcategories: [
-			'Groceries, cleaning products, objects, tools and cookware',
+			'Groceries, cleaning products, personal care products, objects, tools and cookware',
 			'Appliances and furniture',
 			'Electricity bill',
 			'Water bill',
