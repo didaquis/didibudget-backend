@@ -65,9 +65,7 @@ const expenseCategories = [
 	{
 		name: 'Home',
 		subcategories: [
-			'Groceries',
-			'Household cleaning products',
-			'Objects, tools, cookware',
+			'Groceries, cleaning products, objects, tools and cookware',
 			'Appliances and furniture',
 			'Electricity bill',
 			'Water bill',
