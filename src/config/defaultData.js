@@ -49,13 +49,27 @@ const expenseCategories = [
 	{
 		name: 'Private vehicles',
 		subcategories: [
-			'Vehicle taxes, technical inspection',
-			'Vehicle insurance',
-			'Spare parts and maintenance',
-			'Garage',
-			'Vehicle cost (renting, leasing, vehicle itself)',
-			'Fuel',
-			'Tolls, parkings and tunnels',
+			{
+				name: 'Vehicle taxes, technical inspection',
+			},
+			{
+				name: 'Vehicle insurance',
+			},
+			{
+				name: 'Spare parts and maintenance',
+			},
+			{
+				name: 'Garage',
+			},
+			{
+				name: 'Vehicle cost (renting, leasing, vehicle itself)',
+			},
+			{
+				name: 'Fuel',
+			},
+			{
+				name: 'Tolls, parkings and tunnels',
+			}
 		],
 	},
 	{
@@ -65,35 +79,73 @@ const expenseCategories = [
 	{
 		name: 'Home',
 		subcategories: [
-			'Groceries, cleaning products, personal care products, objects, tools and cookware',
-			'Appliances and furniture',
-			'Electricity bill',
-			'Water bill',
-			'Gas bill',
-			'ISP provider bill',
-			'Home taxes',
-			'Home insurance',
-			'Taxes of the community of neighbors',
-			'Repairs and home works',
-			'Mortgage',
-			'Rent',
+			{
+				name: 'Groceries, cleaning products, personal care products, objects, tools and cookware',
+			},
+			{
+				name: 'Appliances and furniture',
+			},
+			{
+				name: 'Electricity bill',
+			},
+			{
+				name: 'Water bill',
+			},
+			{
+				name: 'Gas bill',
+			},
+			{
+				name: 'ISP provider bill',
+			},
+			{
+				name: 'Home taxes',
+			},
+			{
+				name: 'Home insurance',
+			},
+			{
+				name: 'Taxes of the community of neighbors',
+			},
+			{
+				name: 'Repairs and home works',
+			},
+			{
+				name: 'Mortgage',
+			},
+			{
+				name: 'Rent',
+			}
 		],
 	},
 	{
 		name: 'Professional career',
 		subcategories: [
-			'English classes',
-			'Books, events, conferences, formative courses, certifications',
+			{
+				name: 'English classes',
+			},
+			{
+				name: 'Books, events, conferences, formative courses, certifications',
+			}
 		],
 	},
 	{
 		name: 'Recreational activities',
 		subcategories: [
-			'Bar, restaurants and pubs',
-			'Gym and climbing wall',
-			'Books, events, cinema, music, concerts, museums, and other cultural activities',
-			'Camping, shelter',
-			'Recreational courses and formative sessions (cooking, alpinism...)',
+			{
+				name: 'Bar, restaurants and pubs',
+			},
+			{
+				name: 'Gym and climbing wall',
+			},
+			{
+				name: 'Books, events, cinema, music, concerts, museums, and other cultural activities',
+			},
+			{
+				name: 'Camping, shelter',
+			},
+			{
+				name: 'Recreational courses and formative sessions (cooking, alpinism...)',
+			}
 		],
 	},
 	{
