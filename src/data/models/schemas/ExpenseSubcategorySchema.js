@@ -15,6 +15,11 @@ const ExpenseSubcategorySchema = new Schema({
 		required: true,
 		trim: true
 	},
+	inmutableKey: {
+		type: String,
+		required: true,
+		unique: true,
+	},
 	uuid: {
 		type: String,
 		required: true,

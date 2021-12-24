@@ -16,22 +16,23 @@
 const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
 
 /**
- * Save on database the default data related to expense categories and subcategories. This function never delete documents on the dabatase, but should generate a new document if content of default data change
- * @param {Object[]} expenseCategories - A list of literal objects
- * @param {string} expenseCategories[].name - Name of expense category
- * @param {Array} expenseCategories[].subcategories - Name of related subcategories. Can be an empty array
- * @param {string} expenseCategories[].subcategories[].name - Name of subcategory
+ * Save on the database the default data related to expense categories and subcategories. This function never delete documents on the dabatase, but should generate a new document if content of default data change
+ * @param {Array.<Object>} expenseCategories - A list of literal objects
+ * @param {string} expenseCategories.name - Name of expense category
+ * @param {string} expenseCategories.inmutableKey - A static and private identifier for every expense category. The value should be consistent across differents environments or persistence layer.
+ * @param {Array.<{name: string, inmutableKey: string}>} expenseCategories.subcategories - A list of literal objects. Every object should contain the properties name and inmutableKey. May be an empty array
  */
 const upsertDBWithExpenseCategories = ({ expenseCategories } = []) => {
 	expenseCategories.forEach(async (category) => {
 		const upsertSubcategories = category.subcategories.map((subcategory) => {
-			return ExpenseSubcategory.findOneAndUpdate({ name: subcategory }, { name: subcategory }, { upsert: true, new: true, setDefaultsOnInsert: true });
+			return ExpenseSubcategory.findOneAndUpdate({ name: subcategory.name }, { name: subcategory.name, inmutableKey: subcategory.inmutableKey }, { upsert: true, new: true, setDefaultsOnInsert: true });
 		});
 
 		const listOfSubcategories = await Promise.all(upsertSubcategories);
 
 		const listOfSubcategoriesId = listOfSubcategories.map((subcategory) => subcategory._id);
-		await ExpenseCategory.findOneAndUpdate({ name: category.name }, { name: category.name, subcategories: listOfSubcategoriesId }, { upsert: true, new: true, setDefaultsOnInsert: true });
+
+		await ExpenseCategory.findOneAndUpdate({ name: category.name }, { name: category.name, inmutableKey: category.inmutableKey, subcategories: listOfSubcategoriesId }, { upsert: true, new: true, setDefaultsOnInsert: true });
 	});
 };
 
