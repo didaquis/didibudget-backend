@@ -20,30 +20,37 @@
 const expenseCategories = [
 	{
 		name: 'Computers, smartphones and electronic devices',
+		inmutableKey: '1dc0abadd6f2356c6914',
 		subcategories: [],
 	},
 	{
 		name: 'Mobile phone cost (calls and internet cost, not devices)',
+		inmutableKey: '12ad85ba7fc3558e2ba6',
 		subcategories: [],
 	},
 	{
 		name: 'Applications, software and subscriptions to online services',
+		inmutableKey: '24e8a627aabdd4370447',
 		subcategories: [],
 	},
 	{
 		name: 'Presents, gifts',
+		inmutableKey: 'c5bf0c86462c81bbf19d',
 		subcategories: [],
 	},
 	{
 		name: 'Medicines and health care services',
+		inmutableKey: '9026b3ddcbc54ce40d06',
 		subcategories: [],
 	},
 	{
 		name: 'Clothes and shoes',
+		inmutableKey: '5994fff85b0d42de2275',
 		subcategories: [],
 	},
 	{
 		name: 'Public transport',
+		inmutableKey: 'c54d86b43ff86c7af807',
 		subcategories: [],
 	},
 	{
@@ -81,6 +88,7 @@ const expenseCategories = [
 	},
 	{
 		name: 'Travels & holidays & weekend breaks',
+		inmutableKey: 'c7f2653ce6672c5b1e52',
 		subcategories: [],
 	},
 	{
@@ -176,26 +184,32 @@ const expenseCategories = [
 	},
 	{
 		name: 'Sports equipment (including boots and jackets)',
+		inmutableKey: '7bc8a8ada1b72ddaffe9',
 		subcategories: [],
 	},
 	{
 		name: 'Other expenses',
+		inmutableKey: '2e1927ef52320e0e1507',
 		subcategories: [],
 	},
 	{
 		name: 'Bank charges (commissions)',
+		inmutableKey: 'dd388ee7192bcc12a247',
 		subcategories: [],
 	},
 	{
 		name: 'Government taxes',
+		inmutableKey: '404e021b5b22684ab693',
 		subcategories: [],
 	},
 	{
 		name: 'Personal insurance (sport, life...)',
+		inmutableKey: '34a770c7aaecba94391f',
 		subcategories: [],
 	},
 	{
 		name: 'Retirement plan and savings plan',
+		inmutableKey: 'ecc399bcb94fbd2cfd6b',
 		subcategories: [],
 	},
 ];

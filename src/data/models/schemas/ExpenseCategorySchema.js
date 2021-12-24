@@ -17,6 +17,11 @@ const ExpenseCategorySchema = new Schema({
 		trim: true
 	},
 	subcategories: [{ type: Schema.Types.ObjectId, ref: 'expensesubcategory' }],
+	inmutableKey: {
+		type: String,
+		required: true,
+		unique: true,
+	},
 	uuid: {
 		type: String,
 		required: true,
