@@ -19,6 +19,7 @@ const ExpenseSubcategorySchema = new Schema({
 		type: String,
 		required: true,
 		unique: true,
+		index: true
 	},
 	uuid: {
 		type: String,

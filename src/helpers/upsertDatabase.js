@@ -23,6 +23,8 @@ const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
  * @param {Array.<{name: string, inmutableKey: string}>} expenseCategories.subcategories - A list of literal objects. Every object should contain the properties name and inmutableKey. May be an empty array
  */
 const upsertDBWithExpenseCategories = ({ expenseCategories } = []) => {
+	ExpenseCategory.createIndexes();
+	ExpenseSubcategory.createIndexes();
 	expenseCategories.forEach(async (category) => {
 		const upsertSubcategories = category.subcategories.map((subcategory) => {
 			return ExpenseSubcategory.findOneAndUpdate({ inmutableKey: subcategory.inmutableKey }, { name: subcategory.name, inmutableKey: subcategory.inmutableKey }, { upsert: true, new: true, setDefaultsOnInsert: true });
