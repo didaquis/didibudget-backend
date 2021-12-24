@@ -37,7 +37,7 @@ db.on('error', (err) => {
 	logger.error(`Connection error with database. ${err}`);
 });
 
-db.once('open', () => {
+db.once('open', async () => {
 	if (environmentVariablesConfig.enviroment !== ENVIRONMENT.DEVELOPMENT) {
 		logger.info(`Connected with MongoDB service (${ENVIRONMENT.PRODUCTION} mode)`);
 	} else {
@@ -50,7 +50,7 @@ db.once('open', () => {
 
 
 	logger.info('Trying to upsert the database with default values...');
-	upsertDBWithExpenseCategories(expenseCategories);
+	await upsertDBWithExpenseCategories(expenseCategories);
 	logger.info('The upsert of database has been finished.');
 
 	initApplication();
