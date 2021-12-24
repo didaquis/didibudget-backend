@@ -55,6 +55,7 @@ const expenseCategories = [
 	},
 	{
 		name: 'Private vehicles',
+		inmutableKey: '15cd0a1ee1d250239b19',
 		subcategories: [
 			{
 				name: 'Vehicle taxes, technical inspection',
@@ -93,6 +94,7 @@ const expenseCategories = [
 	},
 	{
 		name: 'Home',
+		inmutableKey: '80a6d32180f700494c59',
 		subcategories: [
 			{
 				name: 'Groceries, cleaning products, personal care products, objects, tools and cookware',
@@ -146,6 +148,7 @@ const expenseCategories = [
 	},
 	{
 		name: 'Professional career',
+		inmutableKey: 'bb8c65f28a8aa0bf5c7b',
 		subcategories: [
 			{
 				name: 'English classes',
@@ -159,6 +162,7 @@ const expenseCategories = [
 	},
 	{
 		name: 'Recreational activities',
+		inmutableKey: 'e2e8bfc9317cb340353a',
 		subcategories: [
 			{
 				name: 'Bar, restaurants and pubs',
