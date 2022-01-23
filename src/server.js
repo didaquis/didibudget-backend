@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const express = require('express');
+const helmet = require('helmet');
 const favicon = require('serve-favicon');
 const path = require('path');
 const cors = require('cors');
@@ -58,6 +59,7 @@ db.once('open', async () => {
 
 const initApplication = async () => {
 	const app = express();
+	app.use(helmet());
 	app.use(cors({ credentials: true }));
 	app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 	app.use('', routesManager);
