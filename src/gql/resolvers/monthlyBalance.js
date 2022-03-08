@@ -53,7 +53,7 @@ module.exports = {
 
 			const user = await authValidations.getUser(context);
 
-			return await context.di.model.MonthlyBalance.deleteMany({ user_id: user._id });
+			return context.di.model.MonthlyBalance.deleteMany({ user_id: user._id });
 		}
 	}
 };
