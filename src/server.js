@@ -11,7 +11,7 @@ const { UserInputError } = require('apollo-server-errors');
 const { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
 
 const { setContext } = require('./gql/auth/setContext');
-const typeDefs = require('./gql/schemas/index');
+const typeDefs = require('./gql/types/index');
 const resolvers = require('./gql/resolvers/index');
 const { getListOfIPV4Address } = require('./helpers/getListOfIPV4Address');
 const routesManager = require('./routes/routesManager');
@@ -59,7 +59,12 @@ db.once('open', async () => {
 
 const initApplication = async () => {
 	const app = express();
-	app.use(helmet());
+	if (environmentVariablesConfig.enviroment === ENVIRONMENT.PRODUCTION) {
+		app.use(helmet());
+	} else {
+		// Allow GraphQL Playground on development environments
+		app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+	}
 	app.use(cors({ credentials: true }));
 	app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 	app.use('', routesManager);
