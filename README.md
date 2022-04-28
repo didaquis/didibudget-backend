@@ -1,7 +1,7 @@
 # 💰 didibudget-backend
 
 This is an app to manage your money.
-The proyect is splitted on two repositories: one for the backend and one for the frontend application. 
+The project is splitted on two repositories: one for the backend and one for the frontend application. 
 
 This repository is for the backend and is intended to work with [the frontend](https://github.com/didaquis/didibudget-frontend)
 
