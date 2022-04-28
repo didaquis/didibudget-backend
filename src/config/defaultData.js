@@ -117,7 +117,7 @@ const expenseCategories = [
 				inmutableKey: '09a4d2883e9605de3af5'
 			},
 			{
-				name: 'ISP provider bill',
+				name: 'ISP provider bill (including TV, landline, and mobile phone)',
 				inmutableKey: '649f5bae610a88cfafba'
 			},
 			{
