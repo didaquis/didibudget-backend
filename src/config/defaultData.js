@@ -66,7 +66,7 @@ const expenseCategories = [
 				inmutableKey: '55ba8bddc746c078ebc6'
 			},
 			{
-				name: 'Spare parts and maintenance',
+				name: 'Spare parts, maintenance and cleaning costs',
 				inmutableKey: '0176bf56861cfc5ef72d'
 			},
 			{
