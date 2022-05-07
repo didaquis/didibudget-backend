@@ -1,6 +1,6 @@
 {
   "name": "didibudget-backend",
-  "version": "0.5.35",
+  "version": "0.5.36",
   "description": "didibudget-backend",
   "main": "src/server.js",
   "engines": {
@@ -26,28 +26,28 @@
   "author": "Dídac García (https://didaquis.github.io/)",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "8.14.0",
+    "eslint": "8.15.0",
     "eslint-plugin-no-lenght": "1.0.2-0",
     "husky": "7.0.4",
     "jest": "27.5.1",
     "jsonfile": "6.1.0",
-    "nodemon": "2.0.15",
+    "nodemon": "2.0.16",
     "rimraf": "3.0.2"
   },
   "dependencies": {
     "@graphql-tools/load-files": "6.5.3",
     "@graphql-tools/merge": "8.2.10",
-    "apollo-server-express": "3.6.7",
+    "apollo-server-express": "3.7.0",
     "bcrypt": "5.0.1",
     "cors": "2.8.5",
     "dotenv": "16.0.0",
-    "express": "4.18.0",
+    "express": "4.18.1",
     "graphql": "16.4.0",
     "helmet": "5.0.2",
     "jsonwebtoken": "8.5.1",
     "lodash.merge": "4.6.2",
     "log4js": "6.4.6",
-    "mongoose": "6.3.1",
+    "mongoose": "6.3.2",
     "serve-favicon": "2.5.0",
     "uuid": "8.3.2"
   }
