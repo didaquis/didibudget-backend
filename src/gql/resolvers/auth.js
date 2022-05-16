@@ -2,7 +2,6 @@
 
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
-const { authValidations } = require('../auth/authValidations');
 const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
 
 
@@ -30,9 +29,9 @@ module.exports = {
 				throw new UserInputError('The password is not secure enough');
 			}
 
-			const numberOfCurrentlyUsersRegistered = await context.di.model.Users.find().estimatedDocumentCount();
+			const registeredUsersCount = await context.di.model.Users.find().estimatedDocumentCount();
 
-			authValidations.ensureLimitOfUsersIsNotReached(numberOfCurrentlyUsersRegistered);
+			context.di.authValidation.ensureLimitOfUsersIsNotReached(registeredUsersCount);
 
 			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({ email });
 
@@ -78,9 +77,9 @@ module.exports = {
 		 * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
 		 */
 		deleteMyUserAccount:  async (parent, args, context) => {
-			authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.Users.deleteOne({ uuid: user.uuid });
 		}

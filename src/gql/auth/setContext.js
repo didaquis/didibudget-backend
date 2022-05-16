@@ -2,6 +2,7 @@
 
 const { validateAuthToken, createAuthToken } = require('./jwt');
 const { environmentVariablesConfig } = require('../../config/appConfig');
+const { authValidations } = require('../auth/authValidations');
 const { ENVIRONMENT } = require('../../config/environment');
 const { logger } = require('../../helpers/logger');
 
@@ -15,6 +16,9 @@ const setContext = async ({ req }) => {
 		di: {
 			model: {
 				...models
+			},
+			authValidation: {
+				...authValidations
 			},
 			jwt: {
 				createAuthToken: createAuthToken
