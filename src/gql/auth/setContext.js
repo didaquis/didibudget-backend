@@ -1,6 +1,6 @@
 'use strict';
 
-const { validateAuthToken } = require('./jwt');
+const { validateAuthToken, createAuthToken } = require('./jwt');
 const { environmentVariablesConfig } = require('../../config/appConfig');
 const { ENVIRONMENT } = require('../../config/environment');
 const { logger } = require('../../helpers/logger');
@@ -15,6 +15,9 @@ const setContext = async ({ req }) => {
 		di: {
 			model: {
 				...models
+			},
+			jwt: {
+				createAuthToken: createAuthToken
 			}
 		}
 	};
