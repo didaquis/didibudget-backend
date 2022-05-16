@@ -3,7 +3,6 @@
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 const { authValidations } = require('../auth/authValidations');
-const { securityVariablesConfig } = require('../../config/appConfig');
 const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
 
 
@@ -46,7 +45,7 @@ module.exports = {
 			const user = await context.di.model.Users.findOne({ email });
 
 			return {
-				token: context.di.jwt.createAuthToken({ email: user.email, isAdmin: user.isAdmin, isActive: user.isActive, uuid: user.uuid }, securityVariablesConfig.secret, securityVariablesConfig.timeExpiration)
+				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
 			};
 		},
 		/**
@@ -72,7 +71,7 @@ module.exports = {
 			await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date().toISOString() }, { new: true });
 
 			return {
-				token: context.di.jwt.createAuthToken({ email: user.email, isAdmin: user.isAdmin, isActive: user.isActive, uuid: user.uuid }, securityVariablesConfig.secret, securityVariablesConfig.timeExpiration)
+				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
 			};
 		},
 		/**
