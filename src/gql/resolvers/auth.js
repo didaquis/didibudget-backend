@@ -3,7 +3,7 @@
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 const { authValidations } = require('../auth/authValidations');
-const { securityVariablesConfig, globalVariablesConfig } = require('../../config/appConfig');
+const { securityVariablesConfig } = require('../../config/appConfig');
 const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
 
 
@@ -33,7 +33,7 @@ module.exports = {
 
 			const numberOfCurrentlyUsersRegistered = await context.di.model.Users.find().estimatedDocumentCount();
 
-			authValidations.ensureLimitOfUsersIsNotReached(numberOfCurrentlyUsersRegistered, globalVariablesConfig.limitOfUsersRegistered);
+			authValidations.ensureLimitOfUsersIsNotReached(numberOfCurrentlyUsersRegistered);
 
 			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({ email });
 
