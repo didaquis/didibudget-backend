@@ -1,6 +1,5 @@
 'use strict';
 
-const { authValidations } = require('../auth/authValidations');
 const { monthlyBalanceDTO } = require('../../dto/monthlyBalanceDTO');
 
 /**
@@ -13,9 +12,9 @@ module.exports = {
 		 * Get all data of monthly balance by user
 		 */
 		getMonthlyBalance: async (parent, args, context) => {
-			authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			const allMonthlyBalance = await context.di.model.MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
 
@@ -24,12 +23,12 @@ module.exports = {
 	},
 	Mutation: {
 		/**
-		 * Register monthly balance
+		 * Register a monthly balance
 		 */
 		registerMonthlyBalance: async (parent, { balance, date }, context) => {
-			authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return new context.di.model.MonthlyBalance({ user_id: user._id, balance, date }).save()
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance));
@@ -38,9 +37,9 @@ module.exports = {
 		 * Delete one registry of monthly balance
 		 */
 		deleteMonthlyBalance: async (parent, { uuid }, context) => {
-			authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.MonthlyBalance.findOneAndDelete({ uuid, user_id: user._id })
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance));
@@ -49,9 +48,9 @@ module.exports = {
 		 * Delete all registries of monthly balance
 		 */
 		deleteAllMonthlyBalances: async (parent, args, context) => {
-			authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.MonthlyBalance.deleteMany({ user_id: user._id });
 		}

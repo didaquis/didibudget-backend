@@ -1,7 +1,5 @@
 'use strict';
 
-const { authValidations } = require('../auth/authValidations');
-
 /**
  * All resolvers related to users
  * @typedef {Object}
@@ -12,9 +10,9 @@ module.exports = {
 		 * It allows to administrators to list all users registered
 		 */
 		listAllUsers:  async (parent, args, context) => {
-			authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			authValidations.ensureThatUserIsAdministrator(context);
+			context.di.authValidation.ensureThatUserIsAdministrator(context);
 
 			return context.di.model.Users.find({}).lean();
 		}
