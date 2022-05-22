@@ -13,9 +13,17 @@ module.exports = /* GraphQL */ gql`
 		uuid: String!
 	}
 
+	type PaginatedExpenses {
+		expenses: [Expense]
+		paging: PaginationData
+	}
+
 	type Query {
-		""" Get list of all expense registers from an specific user """
+		""" Get list of all expenses registers from an specific user """
 		getExpenses: [Expense]
+
+		""" Get list of expenses registers using pagination """
+		getSomeExpenses(offset: Int!, limit: Int!): PaginatedExpenses
 	}
 
 	type Mutation {

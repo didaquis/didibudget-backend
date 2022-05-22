@@ -7,4 +7,10 @@ module.exports = /* GraphQL */ gql`
 	type DeleteResult {
 		deletedCount: Int!
 	}
+
+	""" Pagination data """
+	type PaginationData {
+		count: Int!
+		totalCount: Int!
+	}
 `;
