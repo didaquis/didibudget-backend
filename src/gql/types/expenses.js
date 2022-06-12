@@ -15,7 +15,7 @@ module.exports = /* GraphQL */ gql`
 
 	type PaginatedExpenses {
 		expenses: [Expense]
-		paging: PaginationData
+		pagination: PaginationData
 	}
 
 	type Query {
@@ -23,7 +23,9 @@ module.exports = /* GraphQL */ gql`
 		getExpenses: [Expense]
 
 		""" Get list of expenses registers using pagination """
-		getSomeExpenses(offset: Int!, limit: Int!): PaginatedExpenses
+		getExpensesWithPagination(page: Int!, pageSize: Int!): PaginatedExpenses
+		# """ Get list of expenses registers using pagination """
+		# getSomeExpenses(offset: Int!, limit: Int!): PaginatedExpenses
 	}
 
 	type Mutation {

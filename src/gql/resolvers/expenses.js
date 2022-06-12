@@ -1,6 +1,7 @@
 'use strict';
 
 const { expenseDTO } = require('../../dto/expenseDTO');
+const { getOffset, getNumberOfPages } = require('../../helpers/pagingUtilities');
 
 /**
  * All resolvers related to exxpenses
@@ -23,24 +24,47 @@ module.exports = {
 		/**
 		 * Get expenses by user using pagination
 		 */
-		getSomeExpenses: async (parent, { offset, limit }, context) => {
+		getExpensesWithPagination: async (parent, { page, pageSize }, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.pagingValidations.ensurePageValueIsValid(page);
+			context.di.pagingValidations.ensurePageSizeValueIsValid(pageSize);
 
 			const user = await context.di.authValidation.getUser(context);
 
+			const offset = getOffset(page, pageSize);
+
 			const getTotalCount = context.di.model.Expenses.countDocuments({ user_id: user._id });
-			const getExpenses = context.di.model.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).skip(offset).limit(limit).lean();
+			const getExpenses = context.di.model.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).skip(offset).limit(pageSize).lean();
 
 			const [totalCount, expenses] = await Promise.all([getTotalCount, getExpenses]);
 
 			return {
 				expenses: expenses.map((expense) => expenseDTO(expense)),
-				paging: {
-					count: expenses.length,
+				pagination: {
+					currentPage: page,
+					totalPages: getNumberOfPages(totalCount, pageSize),
 					totalCount: totalCount,
 				}
 			};
 		}
+		// getSomeExpenses: async (parent, { offset, limit }, context) => {
+		// 	context.di.authValidation.ensureThatUserIsLogged(context);
+
+		// 	const user = await context.di.authValidation.getUser(context);
+
+		// 	const getTotalCount = context.di.model.Expenses.countDocuments({ user_id: user._id });
+		// 	const getExpenses = context.di.model.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).skip(offset).limit(limit).lean();
+
+		// 	const [totalCount, expenses] = await Promise.all([getTotalCount, getExpenses]);
+
+		// 	return {
+		// 		expenses: expenses.map((expense) => expenseDTO(expense)),
+		// 		paging: {
+		// 			count: expenses.length,
+		// 			totalCount: totalCount,
+		// 		}
+		// 	};
+		// }
 	},
 	Mutation: {
 		/**

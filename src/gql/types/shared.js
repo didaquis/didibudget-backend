@@ -10,7 +10,13 @@ module.exports = /* GraphQL */ gql`
 
 	""" Pagination data """
 	type PaginationData {
-		count: Int!
+		currentPage: Int!
+		totalPages: Int!
 		totalCount: Int!
 	}
+	# """ Pagination data """
+	# type PaginationData {
+	# 	count: Int!
+	# 	totalCount: Int!
+	# }
 `;
