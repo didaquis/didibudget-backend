@@ -17,8 +17,8 @@ const getOffset = (page, pageSize) => {
  * @param {number} pageSize		- The page size
  * @returns {number}
  */
-const getNumberOfPages = (totalCount, pageSize) => {
+const getTotalPagesNumber = (totalCount, pageSize) => {
 	return Math.ceil(totalCount / pageSize);
 };
 
-module.exports = { getOffset, getNumberOfPages };
+module.exports = { getOffset, getTotalPagesNumber };

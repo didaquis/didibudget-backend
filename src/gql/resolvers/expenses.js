@@ -1,7 +1,7 @@
 'use strict';
 
 const { expenseDTO } = require('../../dto/expenseDTO');
-const { getOffset, getNumberOfPages } = require('../../helpers/pagingUtilities');
+const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
 
 /**
  * All resolvers related to exxpenses
@@ -40,11 +40,13 @@ module.exports = {
 
 			const [totalCount, expenses] = await Promise.all([getTotalCount, getExpenses]);
 
+			const totalPages = getTotalPagesNumber(totalCount, pageSize);
+
 			return {
 				expenses: expenses.map((expense) => expenseDTO(expense)),
 				pagination: {
 					currentPage: page,
-					totalPages: getNumberOfPages(totalCount, pageSize),
+					totalPages: totalPages,
 					totalCount: totalCount,
 				}
 			};
