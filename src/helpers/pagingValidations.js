@@ -1,6 +1,6 @@
 'use strict';
 
-const { SyntaxError } = require('apollo-server-express');
+const { UserInputError } = require('apollo-server-express');
 
 /**
  * Paging validations repository
@@ -9,11 +9,11 @@ const { SyntaxError } = require('apollo-server-express');
 const pagingValidations = {
 	/**
 	 * Check if the page value is valid. Should be greather than zero
-	 * @param {number} page 	- The number of page
+	 * @param {number} page - The number of page
 	 */
 	ensurePageValueIsValid: (page) => {
 		if (!Number.isInteger(page) || Number(page) <= 0) {
-			throw new SyntaxError('The page value should be an integer greather than 0');
+			throw new UserInputError('The page value should be an integer greather than 0');
 		}
 	},
 
@@ -25,7 +25,7 @@ const pagingValidations = {
 		const minPageSizeAllowed = 20;
 		const maxPageSizeAllowed = 100;
 		if (!Number.isInteger(pageSize) || Number(pageSize) < minPageSizeAllowed || Number(pageSize) > maxPageSizeAllowed) {
-			throw new SyntaxError(`The page size value should be an integer between ${minPageSizeAllowed} and ${maxPageSizeAllowed}`);
+			throw new UserInputError(`The page size value should be an integer between ${minPageSizeAllowed} and ${maxPageSizeAllowed}`);
 		}
 	},
 };
