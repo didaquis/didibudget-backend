@@ -1,6 +1,7 @@
 'use strict';
 
 const { expenseDTO } = require('../../dto/expenseDTO');
+const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
 
 /**
  * All resolvers related to exxpenses
@@ -16,9 +17,39 @@ module.exports = {
 
 			const user = await context.di.authValidation.getUser(context);
 
-			const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
+			const sortCriteria = { date: 'asc' };
+			const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).lean();
 
 			return allExpenses.map((expense) => expenseDTO(expense));
+		},
+		/**
+		 * Get expenses by user using pagination
+		 */
+		getExpensesWithPagination: async (parent, { page, pageSize }, context) => {
+			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.pagingValidations.ensurePageValueIsValid(page);
+			context.di.pagingValidations.ensurePageSizeValueIsValid(pageSize);
+
+			const user = await context.di.authValidation.getUser(context);
+
+			const offset = getOffset(page, pageSize);
+			const sortCriteria = { date: 'desc' };
+
+			const getTotalCount = context.di.model.Expenses.countDocuments({ user_id: user._id });
+			const getExpenses = context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();
+
+			const [totalCount, expenses] = await Promise.all([getTotalCount, getExpenses]);
+
+			const totalPages = getTotalPagesNumber(totalCount, pageSize);
+
+			return {
+				expenses: expenses.map((expense) => expenseDTO(expense)),
+				pagination: {
+					currentPage: page,
+					totalPages: totalPages,
+					totalCount: totalCount,
+				}
+			};
 		}
 	},
 	Mutation: {
