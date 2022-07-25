@@ -16,7 +16,9 @@ module.exports = {
 
 			const user = await context.di.authValidation.getUser(context);
 
-			const allMonthlyBalance = await context.di.model.MonthlyBalance.find({ user_id: user._id }, null, { sort: { date: 1 } }).lean();
+
+			const sortCriteria = { date: 'asc' };
+			const allMonthlyBalance = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
 
 			return allMonthlyBalance.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
 		}

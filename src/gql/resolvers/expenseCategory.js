@@ -12,7 +12,8 @@ module.exports = {
 		getExpenseCategory: async (parent, args, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const allExpenseCategories = await context.di.model.ExpenseCategory.find({ }, null, { sort: { name: 1 } }).populate('subcategories').lean();
+			const sortCriteria = { name: 'asc' };
+			const allExpenseCategories = await context.di.model.ExpenseCategory.find().sort(sortCriteria).populate('subcategories').lean();
 
 			return allExpenseCategories || [];
 		},
@@ -22,7 +23,8 @@ module.exports = {
 		getExpenseCategoryById: async (parent, { category }, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			return context.di.model.ExpenseCategory.findOne({ _id: category }, null, { sort: { name: 1 } }).populate('subcategories').lean();
+			const sortCriteria = { name: 'asc' };
+			return context.di.model.ExpenseCategory.findOne({ _id: category }).sort(sortCriteria).populate('subcategories').lean();
 		}
 	},
 };
