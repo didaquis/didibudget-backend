@@ -33,7 +33,7 @@ module.exports = {
 
 			context.di.authValidation.ensureLimitOfUsersIsNotReached(registeredUsersCount);
 
-			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({ email });
+			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({ email }).lean();
 
 			if (isAnEmailAlreadyRegistered) {
 				throw new UserInputError('Data provided is not valid');
@@ -41,7 +41,7 @@ module.exports = {
 
 			await new context.di.model.Users({ email, password }).save();
 
-			const user = await context.di.model.Users.findOne({ email });
+			const user = await context.di.model.Users.findOne({ email }).lean();
 
 			return {
 				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
@@ -55,7 +55,7 @@ module.exports = {
 				throw new UserInputError('Invalid credentials');
 			}
 
-			const user = await context.di.model.Users.findOne({ email, isActive: true });
+			const user = await context.di.model.Users.findOne({ email, isActive: true }).lean();
 
 			if (!user) {
 				throw new UserInputError('User not found or login not allowed');
@@ -67,7 +67,7 @@ module.exports = {
 				throw new UserInputError('Invalid credentials');
 			}
 
-			await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date().toISOString() }, { new: true });
+			await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date().toISOString() }, { new: true }).lean();
 
 			return {
 				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)

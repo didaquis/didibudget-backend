@@ -60,7 +60,7 @@ const authValidations = {
 		}
 	
 		const userUUID = context.user.uuid || null;
-		const user = await Users.findOne({ uuid: userUUID });
+		const user = await Users.findOne({ uuid: userUUID }).lean();
 		if (!user) {
 			throw new AuthenticationError('You must be logged in to perform this action');
 		}
