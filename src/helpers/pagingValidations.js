@@ -18,11 +18,11 @@ const pagingValidations = {
 	},
 
 	/**
-	 * Check if the page size value is valid. Should be an integer between twenty and one hundred
+	 * Check if the page size value is valid. Should be an integer within the supported range
 	 * @param {number} pageSize	- The page size
 	 */
 	ensurePageSizeValueIsValid: (pageSize) => {
-		const minPageSizeAllowed = 20;
+		const minPageSizeAllowed = 10;
 		const maxPageSizeAllowed = 100;
 		if (!Number.isInteger(pageSize) || Number(pageSize) < minPageSizeAllowed || Number(pageSize) > maxPageSizeAllowed) {
 			throw new UserInputError(`The page size value should be an integer between ${minPageSizeAllowed} and ${maxPageSizeAllowed}`);
