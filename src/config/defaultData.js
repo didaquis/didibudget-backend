@@ -121,7 +121,7 @@ const expenseCategories = [
 				inmutableKey: '649f5bae610a88cfafba'
 			},
 			{
-				name: 'Home taxes',
+				name: 'Home taxes (includes garage)',
 				inmutableKey: 'd074eabc7b8e111bc6a5'
 			},
 			{
@@ -129,7 +129,7 @@ const expenseCategories = [
 				inmutableKey: '79b8bc873e8aaf93e0d7'
 			},
 			{
-				name: 'Taxes of the community of neighbors',
+				name: 'Taxes of the community of neighbors (includes garage)',
 				inmutableKey: 'c9382b5849da8fb87c4b'
 			},
 			{
