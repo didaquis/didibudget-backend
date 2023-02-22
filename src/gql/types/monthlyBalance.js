@@ -13,7 +13,7 @@ module.exports = /* GraphQL */ gql`
 
 	type Query {
 		""" Get list of all monthly balance registers from an specific user """
-		getMonthlyBalance: [MonthlyBalance]
+		getMonthlyBalances: [MonthlyBalance]
 	}
 
 	type Mutation {

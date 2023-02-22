@@ -11,7 +11,7 @@ module.exports = {
 		/**
 		 * Get all data of monthly balance by user
 		 */
-		getMonthlyBalance: async (parent, args, context) => {
+		getMonthlyBalances: async (parent, args, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 
 			const user = await context.di.authValidation.getUser(context);
