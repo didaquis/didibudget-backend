@@ -11,9 +11,17 @@ module.exports = /* GraphQL */ gql`
 		uuid: String!
 	}
 
+	type PaginatedMonthlyBalances {
+		monthlyBalances: [MonthlyBalance]
+		pagination: PaginationData
+	}
+
 	type Query {
-		""" Get list of all monthly balance registers from an specific user """
+		""" Get list of all monthly balances registers from an specific user """
 		getMonthlyBalances: [MonthlyBalance]
+
+		""" Get list of monthly balances registers from an specific user using pagination """
+		getMonthlyBalancesWithPagination(page: Int!, pageSize: Int!): PaginatedMonthlyBalances
 	}
 
 	type Mutation {
