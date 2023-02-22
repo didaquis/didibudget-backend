@@ -11,19 +11,27 @@ module.exports = /* GraphQL */ gql`
 		uuid: String!
 	}
 
+	type PaginatedMonthlyBalances {
+		monthlyBalances: [MonthlyBalance]
+		pagination: PaginationData
+	}
+
 	type Query {
-		""" Get list of all monthly balance registers from an specific user """
+		""" Get list of monthly balances for a specific user """
 		getMonthlyBalances: [MonthlyBalance]
+
+		""" Get list of monthly balances for a specific user using paging """
+		getMonthlyBalancesWithPagination(page: Int!, pageSize: Int!): PaginatedMonthlyBalances
 	}
 
 	type Mutation {
 		""" It allows register a monthly balance """
 		registerMonthlyBalance(balance: Float!, date: String!): MonthlyBalance
 
-		""" It allows delete a register of monthly balance """
+		""" It allows delete a monthly balance """
 		deleteMonthlyBalance(uuid: String!): MonthlyBalance
 
-		""" It allows delete all registers of monthly balance """
+		""" It allows delete all monthly balances """
 		deleteAllMonthlyBalances: DeleteResult
 	}
 `;

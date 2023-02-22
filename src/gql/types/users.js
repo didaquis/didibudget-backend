@@ -13,18 +13,7 @@ module.exports = /* GraphQL */ gql`
 	}
 
 	type Query {
-		""" Get list of all users registered on database """
+		""" Get list of users """
 		listAllUsers: [User]
-	}
-
-	type Mutation {
-		""" It allows register a monthly balance """
-		registerMonthlyBalance(balance: Float!, date: String!): MonthlyBalance
-
-		""" It allows delete a register of monthly balance """
-		deleteMonthlyBalance(uuid: String!): MonthlyBalance
-
-		""" It allows delete all registers of monthly balance """
-		deleteAllMonthlyBalances: DeleteResult
 	}
 `;

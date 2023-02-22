@@ -19,10 +19,10 @@ module.exports = /* GraphQL */ gql`
 	}
 
 	type Query {
-		""" Get list of all expenses registers from an specific user """
+		""" Get list of expenses for a specific user """
 		getExpenses: [Expense]
 
-		""" Get list of expenses registers using pagination """
+		""" Get list of expenses for a specific user using pagination """
 		getExpensesWithPagination(page: Int!, pageSize: Int!): PaginatedExpenses
 	}
 
@@ -30,10 +30,10 @@ module.exports = /* GraphQL */ gql`
 		""" It allows register an expense """
 		registerExpense(category: ID!, subcategory: ID, quantity: Float!, date: String!): Expense
 
-		""" It allows delete a register of expense """
+		""" It allows delete an expense """
 		deleteExpense(uuid: String!): Expense
 
-		""" It allows delete all registers of expense """
+		""" It allows delete all expenses """
 		deleteAllExpenses: DeleteResult
 	}
 `;

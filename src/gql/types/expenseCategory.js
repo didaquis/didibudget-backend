@@ -17,7 +17,7 @@ module.exports = /* GraphQL */ gql`
 	}
 
   	type Query {
-		""" Get list of all expense category """
+		""" Get list of expense categories """
 		getExpenseCategory: [ExpenseCategory]
 
 		""" Get an expense category by id """

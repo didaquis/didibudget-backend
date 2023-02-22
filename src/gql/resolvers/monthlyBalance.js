@@ -1,6 +1,7 @@
 'use strict';
 
 const { monthlyBalanceDTO } = require('../../dto/monthlyBalanceDTO');
+const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
 
 /**
  * All resolvers related to monthly balances
@@ -9,7 +10,7 @@ const { monthlyBalanceDTO } = require('../../dto/monthlyBalanceDTO');
 module.exports = {
 	Query: {
 		/**
-		 * Get all data of monthly balance by user
+		 * Get all monthly balances by user
 		 */
 		getMonthlyBalances: async (parent, args, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
@@ -18,9 +19,38 @@ module.exports = {
 
 
 			const sortCriteria = { date: 'asc' };
-			const allMonthlyBalance = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
+			const allMonthlyBalances = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
 
-			return allMonthlyBalance.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
+			return allMonthlyBalances.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
+		},
+		/**
+		 * Get monthly balances by user using pagination
+		 */
+		getMonthlyBalancesWithPagination: async (parent, { page, pageSize }, context) => {
+			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.pagingValidations.ensurePageValueIsValid(page);
+			context.di.pagingValidations.ensurePageSizeValueIsValid(pageSize);
+
+			const user = await context.di.authValidation.getUser(context);
+
+			const offset = getOffset(page, pageSize);
+			const sortCriteria = { date: 'desc' };
+
+			const getTotalCount = context.di.model.MonthlyBalance.countDocuments({ user_id: user._id });
+			const getMonthlyBalances = context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();
+
+			const [totalCount, monthlyBalances] = await Promise.all([getTotalCount, getMonthlyBalances]);
+
+			const totalPages = getTotalPagesNumber(totalCount, pageSize);
+
+			return {
+				monthlyBalances: monthlyBalances.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance)),
+				pagination: {
+					currentPage: page,
+					totalPages: totalPages,
+					totalCount: totalCount,
+				}
+			};
 		}
 	},
 	Mutation: {
