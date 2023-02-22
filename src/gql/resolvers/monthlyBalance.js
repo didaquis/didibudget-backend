@@ -9,7 +9,7 @@ const { monthlyBalanceDTO } = require('../../dto/monthlyBalanceDTO');
 module.exports = {
 	Query: {
 		/**
-		 * Get all data of monthly balance by user
+		 * Get all monthly balances by user
 		 */
 		getMonthlyBalances: async (parent, args, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
@@ -18,9 +18,9 @@ module.exports = {
 
 
 			const sortCriteria = { date: 'asc' };
-			const allMonthlyBalance = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
+			const allMonthlyBalances = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
 
-			return allMonthlyBalance.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
+			return allMonthlyBalances.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
 		}
 	},
 	Mutation: {
