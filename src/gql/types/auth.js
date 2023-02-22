@@ -8,13 +8,13 @@ module.exports = /* GraphQL */ gql`
 	}
 
 	type Mutation {
-		""" It allows users to register """
+		""" It allows register an user """
 		registerUser(email: String!, password: String!): Token
 
 		""" It allows users to authenticate """
 		authUser(email: String!, password: String!): Token
 
-		""" It allows to user to delete their account permanently """
+		""" It allows users to delete their account permanently """
 		deleteMyUserAccount: DeleteResult
 	}
 `;
