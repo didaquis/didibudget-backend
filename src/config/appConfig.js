@@ -22,15 +22,15 @@ const limitOfUsersRegistered = 0; /* Set the value to 0 to not use the limit. Re
  * Environment variables configuration
  * @readonly
  * @type {Object}
- * @property {string} [formatConnection='standard'] - The format of connection with MongoDB service
- * @property {string} [mongoDNSseedlist=''] - The DNSseedlist connection format
- * @property {string} [dbHost='localhost'] - Host of the database
- * @property {string} [dbPort='27017'] - Port of the database
- * @property {string} [database='didibudget_database'] - Nane of database
- * @property {string} [mongoUser=''] - Username of MongoDB
- * @property {string} [mongoPass=''] - Password of MongoDB
- * @property {string} [environment='production'] - Application execution environment
- * @property {number} [port=8080] - The port for running this application
+ * @property {string} formatConnection - The format of connection with MongoDB service
+ * @property {string} mongoDNSseedlist - The DNSseedlist connection format
+ * @property {string} dbHost - Host of the database
+ * @property {string} dbPort - Port of the database
+ * @property {string} database - Name of the database
+ * @property {string} mongoUser - Username of MongoDB
+ * @property {string} mongoPass - Password of MongoDB
+ * @property {string} environment - Application execution environment
+ * @property {number} port - The port for running this application
  */
 const environmentVariablesConfig = Object.freeze({
 	formatConnection: process.env.MONGO_FORMAT_CONNECTION || 'standard',
