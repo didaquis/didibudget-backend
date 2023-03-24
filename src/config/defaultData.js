@@ -15,7 +15,12 @@
 
 /**
  * Default categories and subcategories for expenses
- * @typedef {Object[]}
+ * @type {Array<Object>}
+ * @property {string} name - The name of the expense category
+ * @property {string} inmutableKey - The immutable key of the expense category
+ * @property {Array<Object>} subcategories - An array of subcategories for the expense category
+ * @property {string} subcategories.name - The name of the subcategory
+ * @property {string} subcategories.inmutableKey - The immutable key of the subcategory
  */
 const expenseCategories = [
 	{
@@ -214,6 +219,11 @@ const expenseCategories = [
 	{
 		name: 'Retirement plan and savings plan',
 		inmutableKey: 'ecc399bcb94fbd2cfd6b',
+		subcategories: [],
+	},
+	{
+		name: 'Lawyers and public notaries',
+		inmutableKey: '6308b902aef65f9fa489',
 		subcategories: [],
 	},
 ];

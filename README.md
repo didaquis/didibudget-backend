@@ -46,3 +46,17 @@ To make a user an administrator you must access to the database and search its r
 * Delete all log files: `npm run clean`
 * Run the test, mode watch: `npm run test:watch`
 
+### How to add default expenses categories?
+To add new expense categories or subcategories, you must create a totally random and unique `inmutableKey`. 
+
+Use this snippet to obtain a new value:
+```javascript
+import crypto from 'crypto';
+
+const randomValue = () => {
+	const numberOfBytes = 10;
+	return crypto.randomBytes(numberOfBytes).toString('hex');
+};
+
+randomValue();
+```
