@@ -20,7 +20,7 @@ const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
  * @async
  * @param {Array.<Object>} expenseCategories - A list of literal objects
  * @param {string} expenseCategories.name - Name of expense category
- * @param {string} expenseCategories.inmutableKey - A static and private identifier for every expense category. The value should be consistent across differents environments or persistence layer.
+ * @param {string} expenseCategories.inmutableKey - A static and private identifier for every expense category. The value should be consistent across differents environments or persistence layers.
  * @param {Array.<{name: string, inmutableKey: string}>} expenseCategories.subcategories - A list of literal objects. Every object should contain the properties name and inmutableKey. May be an empty array
  */
 const upsertDBWithExpenseCategories = async ({ expenseCategories } = []) => {
