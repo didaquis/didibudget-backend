@@ -216,6 +216,11 @@ const expenseCategories = [
 		inmutableKey: 'ecc399bcb94fbd2cfd6b',
 		subcategories: [],
 	},
+	{
+		name: 'Lawyers and public notaries',
+		inmutableKey: '6308b902aef65f9fa489',
+		subcategories: [],
+	},
 ];
 
 /** Default data for database */
