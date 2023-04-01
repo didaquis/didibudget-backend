@@ -60,7 +60,7 @@ const securityVariablesConfig = Object.freeze({
  * Global variables configuration
  * @readonly
  * @type {Object}
- * @property {number} limitOfUsersRegistered - Set the maximum number of users that can register
+ * @property {number} limitOfUsersRegistered - The maximum number of users that can register
  */
 const globalVariablesConfig = Object.freeze({
 	limitOfUsersRegistered: Number(process.env.LIMIT_USERS_REGISTERED) || limitOfUsersRegistered
