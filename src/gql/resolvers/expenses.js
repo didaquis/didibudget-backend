@@ -33,7 +33,7 @@ module.exports = {
 			const user = await context.di.authValidation.getUser(context);
 
 			const offset = getOffset(page, pageSize);
-			const sortCriteria = { date: 'desc' };
+			const sortCriteria = { date: 'desc', _id: 'desc' };
 
 			const getTotalCount = context.di.model.Expenses.countDocuments({ user_id: user._id });
 			const getExpenses = context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();
