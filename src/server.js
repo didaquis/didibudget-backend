@@ -22,6 +22,7 @@ const { logger, endLogger } = require('./helpers/logger');
 const { requestDevLogger } = require('./helpers/requestDevLogger');
 const { upsertDBWithExpenseCategories } = require('./helpers/upsertDatabase');
 
+mongoose.set('strictQuery', true);
 
 if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environmentVariablesConfig.mongoDNSseedlist !== '') {
 	mongoose.connect(environmentVariablesConfig.mongoDNSseedlist);
