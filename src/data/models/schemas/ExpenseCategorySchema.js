@@ -23,6 +23,10 @@ const ExpenseCategorySchema = new Schema({
 		unique: true,
 		index: true
 	},
+	emojis: {
+		type: [mongoose.SchemaTypes.String],
+		required: true,
+	},
 	uuid: {
 		type: String,
 		required: true,

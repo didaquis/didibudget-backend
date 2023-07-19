@@ -7,12 +7,14 @@ module.exports = /* GraphQL */ gql`
 		_id: ID!
 		name: String!
 		subcategories: [ExpenseSubcategory]!
+		emojis: [String]!
 		uuid: String!
 	}
 
 	type ExpenseSubcategory {
 		_id: ID!
 		name: String!
+		emojis: [String]!
 		uuid: String!
 	}
 
