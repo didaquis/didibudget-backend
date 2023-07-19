@@ -111,7 +111,7 @@ const expenseCategories = [
 		name: 'Travels & holidays & weekend breaks',
 		inmutableKey: 'c7f2653ce6672c5b1e52',
 		subcategories: [],
-		emojis: ['✈️'],
+		emojis: ['🧳'],
 	},
 	{
 		name: 'Home',
