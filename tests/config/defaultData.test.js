@@ -10,17 +10,29 @@ describe('defaultData', () => {
 			expect(category).toHaveProperty('name');
 			expect(category).toHaveProperty('inmutableKey');
 			expect(category).toHaveProperty('subcategories');
+			expect(category).toHaveProperty('emojis');
 
 			expect(typeof category.name).toBe('string');
 			expect(typeof category.inmutableKey).toBe('string');
 			expect(Array.isArray(category.subcategories)).toBe(true);
+			expect(Array.isArray(category.emojis)).toBe(true);
 
 			category.subcategories.forEach(subcategory => {
 				expect(subcategory).toHaveProperty('name');
 				expect(subcategory).toHaveProperty('inmutableKey');
+				expect(subcategory).toHaveProperty('emojis');
 
 				expect(typeof subcategory.name).toBe('string');
 				expect(typeof subcategory.inmutableKey).toBe('string');
+				expect(Array.isArray(subcategory.emojis)).toBe(true);
+
+				subcategory.emojis.forEach(emoji => {
+					expect(typeof emoji).toBe('string');
+				});
+			});
+
+			category.emojis.forEach(emoji => {
+				expect(typeof emoji).toBe('string');
 			});
 		});
 	});
