@@ -87,7 +87,7 @@ const expenseCategories = [
 			{
 				name: 'Garage',
 				inmutableKey: '2bcd348acfe1bf3e7aec',
-				emojis: [],
+				emojis: ['🏢'],
 			},
 			{
 				name: 'Vehicle cost (renting, leasing, vehicle itself)',
@@ -170,12 +170,12 @@ const expenseCategories = [
 			{
 				name: 'Mortgage',
 				inmutableKey: 'f6e025e8988d541e6e64',
-				emojis: [],
+				emojis: ['🏠'],
 			},
 			{
 				name: 'Rent',
 				inmutableKey: '212d8beddfc1981bf3d2',
-				emojis: [],
+				emojis: ['🏠'],
 			}
 		],
 		emojis: ['🏠'],
@@ -239,7 +239,7 @@ const expenseCategories = [
 		name: 'Other expenses',
 		inmutableKey: '2e1927ef52320e0e1507',
 		subcategories: [],
-		emojis: [],
+		emojis: ['🕳️'],
 	},
 	{
 		name: 'Bank charges (commissions)',
