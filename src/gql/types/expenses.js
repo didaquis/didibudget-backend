@@ -24,6 +24,9 @@ module.exports = /* GraphQL */ gql`
 
 		""" Get list of expenses for a specific user using pagination """
 		getExpensesWithPagination(page: Int!, pageSize: Int!): PaginatedExpenses
+
+		""" Get list of expenses for a specific user between two dates """
+		getExpensesBetweenDates(startDate: String!, endDate: String!): [Expense]
 	}
 
 	type Mutation {
