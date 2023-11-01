@@ -50,6 +50,20 @@ module.exports = {
 					totalCount: totalCount,
 				}
 			};
+		},
+		/**
+		 * Get list of expenses for a specific user between two dates
+		 */
+		getExpensesBetweenDates: async (parent, { startDate, endDate }, context) => {
+			context.di.authValidation.ensureThatUserIsLogged(context);
+
+			const user = await context.di.authValidation.getUser(context);
+
+			const sortCriteria = { date: 'desc', _id: 'desc' };
+
+			const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: { $gte: startDate, $lt: endDate } }).sort(sortCriteria).lean();
+
+			return expenses.map((expense) => expenseDTO(expense));
 		}
 	},
 	Mutation: {
