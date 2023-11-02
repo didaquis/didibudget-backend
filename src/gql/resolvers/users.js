@@ -10,9 +10,9 @@ module.exports = {
 		 * It allows to administrators to list all users registered
 		 */
 		listAllUsers:  async (parent, args, context) => {
-			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.authValidations.ensureThatUserIsLogged(context);
 
-			context.di.authValidation.ensureThatUserIsAdministrator(context);
+			context.di.authValidations.ensureThatUserIsAdministrator(context);
 
 			const sortCriteria = { isAdmin: 'desc', registrationDate: 'asc' };
 			return context.di.model.Users.find().sort(sortCriteria).lean();

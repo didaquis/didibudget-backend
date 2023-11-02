@@ -18,7 +18,7 @@ const setContext = async ({ req }) => {
 			model: {
 				...models
 			},
-			authValidation: {
+			authValidations: {
 				...authValidations
 			},
 			jwt: {
