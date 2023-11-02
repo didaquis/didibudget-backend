@@ -13,9 +13,9 @@ module.exports = {
 		 * Get all monthly balances by user
 		 */
 		getMonthlyBalances: async (parent, args, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 
 			const sortCriteria = { date: 'asc' };
@@ -27,11 +27,11 @@ module.exports = {
 		 * Get monthly balances by user using pagination
 		 */
 		getMonthlyBalancesWithPagination: async (parent, { page, pageSize }, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
-			context.di.pagingValidations.ensurePageValueIsValid(page);
-			context.di.pagingValidations.ensurePageSizeValueIsValid(pageSize);
+			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.pagingValidation.ensurePageValueIsValid(page);
+			context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			const offset = getOffset(page, pageSize);
 			const sortCriteria = { date: 'desc' };
@@ -58,10 +58,10 @@ module.exports = {
 		 * Register a monthly balance
 		 */
 		registerMonthlyBalance: async (parent, { balance, date }, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
-			context.di.datetimeValidations.ensureDateIsValid(date);
+			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.datetimeValidation.ensureDateIsValid(date);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return new context.di.model.MonthlyBalance({ user_id: user._id, balance, date }).save()
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance));
@@ -70,9 +70,9 @@ module.exports = {
 		 * Delete one registry of monthly balance
 		 */
 		deleteMonthlyBalance: async (parent, { uuid }, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.MonthlyBalance.findOneAndDelete({ uuid, user_id: user._id })
 				.then(monthlyBalance => monthlyBalanceDTO(monthlyBalance));
@@ -81,9 +81,9 @@ module.exports = {
 		 * Delete all registries of monthly balance
 		 */
 		deleteAllMonthlyBalances: async (parent, args, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.MonthlyBalance.deleteMany({ user_id: user._id });
 		}

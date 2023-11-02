@@ -13,9 +13,9 @@ module.exports = {
 		 * Get all data of expenses by user
 		 */
 		getExpenses: async (parent, args, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			const sortCriteria = { date: 'asc' };
 			const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).lean();
@@ -26,11 +26,11 @@ module.exports = {
 		 * Get expenses by user using pagination
 		 */
 		getExpensesWithPagination: async (parent, { page, pageSize }, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
-			context.di.pagingValidations.ensurePageValueIsValid(page);
-			context.di.pagingValidations.ensurePageSizeValueIsValid(pageSize);
+			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.pagingValidation.ensurePageValueIsValid(page);
+			context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			const offset = getOffset(page, pageSize);
 			const sortCriteria = { date: 'desc', _id: 'desc' };
@@ -55,12 +55,12 @@ module.exports = {
 		 * Get list of expenses for a specific user between two dates
 		 */
 		getExpensesBetweenDates: async (parent, { startDate, endDate }, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
-			context.di.datetimeValidations.ensureDateIsValid(startDate);
-			context.di.datetimeValidations.ensureDateIsValid(endDate);
-			context.di.datetimeValidations.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
+			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.datetimeValidation.ensureDateIsValid(startDate);
+			context.di.datetimeValidation.ensureDateIsValid(endDate);
+			context.di.datetimeValidation.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			const sortCriteria = { date: 'desc', _id: 'desc' };
 
@@ -74,10 +74,10 @@ module.exports = {
 		 * Register an expense
 		 */
 		registerExpense: async (parent, { category, subcategory, quantity, date }, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
-			context.di.datetimeValidations.ensureDateIsValid(date);
+			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.datetimeValidation.ensureDateIsValid(date);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
 				.then(expense => expenseDTO(expense));
@@ -86,9 +86,9 @@ module.exports = {
 		 * Delete one registry of expense
 		 */
 		deleteExpense: async (parent, { uuid }, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.Expenses.findOneAndDelete({ uuid, user_id: user._id })
 				.then(expense => expenseDTO(expense));
@@ -97,9 +97,9 @@ module.exports = {
 		 * Delete all registries of expense
 		 */
 		deleteAllExpenses: async (parent, args, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.Expenses.deleteMany({ user_id: user._id });
 		}
