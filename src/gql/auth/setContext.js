@@ -19,16 +19,16 @@ const setContext = async ({ req }) => {
 			model: {
 				...models
 			},
-			authValidations: {
-				...authValidations
-			},
 			jwt: {
 				createAuthToken: createAuthToken
 			},
-			pagingValidations: {
+			authValidation: {
+				...authValidations
+			},
+			pagingValidation: {
 				...pagingValidations
 			},
-			datetimeValidations: {
+			datetimeValidation: {
 				...datetimeValidations
 			},
 		}

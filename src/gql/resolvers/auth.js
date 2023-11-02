@@ -31,7 +31,7 @@ module.exports = {
 
 			const registeredUsersCount = await context.di.model.Users.find().estimatedDocumentCount();
 
-			context.di.authValidations.ensureLimitOfUsersIsNotReached(registeredUsersCount);
+			context.di.authValidation.ensureLimitOfUsersIsNotReached(registeredUsersCount);
 
 			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({ email }).lean();
 
@@ -77,9 +77,9 @@ module.exports = {
 		 * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
 		 */
 		deleteMyUserAccount:  async (parent, args, context) => {
-			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.authValidation.ensureThatUserIsLogged(context);
 
-			const user = await context.di.authValidations.getUser(context);
+			const user = await context.di.authValidation.getUser(context);
 
 			return context.di.model.Users.deleteOne({ uuid: user.uuid });
 		}
