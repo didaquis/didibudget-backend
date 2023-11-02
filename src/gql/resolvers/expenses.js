@@ -56,6 +56,9 @@ module.exports = {
 		 */
 		getExpensesBetweenDates: async (parent, { startDate, endDate }, context) => {
 			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.datetimeValidations.ensureDateIsValid(startDate);
+			context.di.datetimeValidations.ensureDateIsValid(endDate);
+			context.di.datetimeValidations.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
 
 			const user = await context.di.authValidations.getUser(context);
 
@@ -72,6 +75,7 @@ module.exports = {
 		 */
 		registerExpense: async (parent, { category, subcategory, quantity, date }, context) => {
 			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.datetimeValidations.ensureDateIsValid(date);
 
 			const user = await context.di.authValidations.getUser(context);
 

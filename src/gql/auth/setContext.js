@@ -4,6 +4,7 @@ const { validateAuthToken, createAuthToken } = require('./jwt');
 const { environmentVariablesConfig } = require('../../config/appConfig');
 const { authValidations } = require('../auth/authValidations');
 const { pagingValidations } = require('../../helpers/pagingValidations');
+const { datetimeValidations } = require('../../helpers/datetimeValidations');
 const { ENVIRONMENT } = require('../../config/environment');
 const { logger } = require('../../helpers/logger');
 
@@ -26,6 +27,9 @@ const setContext = async ({ req }) => {
 			},
 			pagingValidations: {
 				...pagingValidations
+			},
+			datetimeValidations: {
+				...datetimeValidations
 			},
 		}
 	};
