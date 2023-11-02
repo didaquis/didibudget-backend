@@ -22,8 +22,8 @@ const datetimeValidations = {
 
 	/**
 	 * Check if a date is earlier than other
-	 * @param {Date} startDate - A date value
-	 * @param {Date} endDate - A date value
+	 * @param {Date|string} startDate - A date value. It would be a string if the other parameter is also a string with the same format
+	 * @param {Date|string} endDate - A date value. It would be a string if the other parameter is also a string with the same format
 	 */
 	ensureStartDateIsEarlierThanEndDate: (startDate, endDate) => {
 		if (startDate >= endDate) {

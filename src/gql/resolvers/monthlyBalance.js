@@ -59,6 +59,7 @@ module.exports = {
 		 */
 		registerMonthlyBalance: async (parent, { balance, date }, context) => {
 			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.datetimeValidations.ensureDateIsValid(date);
 
 			const user = await context.di.authValidations.getUser(context);
 

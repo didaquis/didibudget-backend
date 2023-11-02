@@ -75,6 +75,7 @@ module.exports = {
 		 */
 		registerExpense: async (parent, { category, subcategory, quantity, date }, context) => {
 			context.di.authValidations.ensureThatUserIsLogged(context);
+			context.di.datetimeValidations.ensureDateIsValid(date);
 
 			const user = await context.di.authValidations.getUser(context);
 
