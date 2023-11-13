@@ -148,6 +148,11 @@ const expenseCategories = [
 				emojis: ['🌐'],
 			},
 			{
+				name: 'Down payment for the house',
+				inmutableKey: '58c16c7f1b255d90dd3d',
+				emojis: ['🔑', '🏠'],
+			},
+			{
 				name: 'Home taxes (includes garage)',
 				inmutableKey: 'd074eabc7b8e111bc6a5',
 				emojis: ['🧾'],
