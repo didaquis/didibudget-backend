@@ -173,9 +173,14 @@ const expenseCategories = [
 				emojis: ['🏠'],
 			},
 			{
+				name: 'Mortgage amortization',
+				inmutableKey: '3a559a96cc40fd784196',
+				emojis: ['🏠', '⏩'],
+			},
+			{
 				name: 'Rent',
 				inmutableKey: '212d8beddfc1981bf3d2',
-				emojis: ['🏠'],
+				emojis: ['🔑'],
 			}
 		],
 		emojis: ['🏠'],
