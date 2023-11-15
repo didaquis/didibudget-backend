@@ -90,9 +90,14 @@ const expenseCategories = [
 				emojis: ['🏢'],
 			},
 			{
-				name: 'Vehicle cost (renting, leasing, vehicle itself)',
+				name: 'Vehicle cost (renting, leasing, bank loan)',
 				inmutableKey: '3fd1f7e8e2f828cbe212',
 				emojis: ['🚙'],
+			},
+			{
+				name: 'Down payment for the vehicle',
+				inmutableKey: 'bc0670da0b15f4b6c201',
+				emojis: ['🔑', '🚙'],
 			},
 			{
 				name: 'Fuel',
