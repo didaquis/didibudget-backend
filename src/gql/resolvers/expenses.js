@@ -79,7 +79,7 @@ module.exports = {
 
 			const user = await context.di.authValidation.getUser(context);
 
-			return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
+			return context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
 				.then(expense => expenseDTO(expense));
 		},
 		/**
