@@ -39,7 +39,7 @@ module.exports = {
 				throw new UserInputError('Data provided is not valid');
 			}
 
-			await new context.di.model.Users({ email, password }).save();
+			await context.di.model.Users({ email, password }).save();
 
 			const user = await context.di.model.Users.findOne({ email }).lean();
 
