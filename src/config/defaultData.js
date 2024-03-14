@@ -213,7 +213,7 @@ const expenseCategories = [
 		emojis: ['👷🏻'],
 	},
 	{
-		name: 'Recreational activities',
+		name: 'Leisure activities',
 		inmutableKey: 'e2e8bfc9317cb340353a',
 		subcategories: [
 			{
@@ -227,9 +227,9 @@ const expenseCategories = [
 				emojis: ['🤸🏻'],
 			},
 			{
-				name: 'Books, events, cinema, music, concerts, museums, and other cultural activities',
+				name: 'Cinema, concerts, museums, and other cultural activities',
 				inmutableKey: '8764609f8c1456aa10ff',
-				emojis: ['📚', '🍿', '🎺'],
+				emojis: ['🍿', '🎺'],
 			},
 			{
 				name: 'Camping, shelter',
@@ -247,7 +247,34 @@ const expenseCategories = [
 				emojis: ['👨‍👩‍👧‍👦', '🎳', '🥂'],
 			}
 		],
-		emojis: ['🎉', '🎳'],
+		emojis: ['🍿', '🎳'],
+	},
+	{
+		name: 'Leisure items',
+		inmutableKey: '1d4edab5238364fbd183',
+		subcategories: [
+			{
+				name: 'Books, music albums, videogames',
+				inmutableKey: '55627d062a7a11a8c1c8',
+				emojis: ['📚', '💿', '👾'],
+			},
+			{
+				name: 'Puzzles, board games',
+				inmutableKey: 'a6dea8416e7616662843',
+				emojis: ['🧩', '♟️'],
+			},
+			{
+				name: 'Collectibles, hobby items',
+				inmutableKey: 'f40a284425ea71685ab5',
+				emojis: ['🪙', '🪆']
+			},
+			{
+				name: 'Adult toys, pleasure goods',
+				inmutableKey: '4962cd0b5929cdf151ee',
+				emojis: ['🌶️']
+			}
+		],
+		emojis: ['📚', '🧩'],
 	},
 	{
 		name: 'Sports equipment (including boots and jackets)',
