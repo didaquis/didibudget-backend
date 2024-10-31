@@ -1,5 +1,11 @@
 const { logger } = require('./logger');
 
+const formatResponse = (requestContext) => {
+	const space = 2;
+	return JSON.stringify(requestContext.response.data, null, space);
+};
+
+
 const requestDevLogger = {
 	// Fires whenever a GraphQL request is received from a client
 	requestDidStart (requestContext) {
@@ -23,7 +29,7 @@ const requestDevLogger = {
 			// Fires whenever Apollo Server is about to send a response for a GraphQL operation
 			willSendResponse (requestContext) {
 				logger.debug('Response data:');
-				logger.debug(requestContext.response.data);
+				logger.debug(formatResponse(requestContext));
 
 				if (requestContext.response.errors) {
 					logger.debug(`Response errors (number of errors: ${requestContext.response.errors.length}):`);
