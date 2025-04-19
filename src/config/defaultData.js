@@ -237,7 +237,7 @@ const expenseCategories = [
 				emojis: ['⛺️'],
 			},
 			{
-				name: 'Recreational courses and formative sessions (cooking, alpinism...)',
+				name: 'Recreational courses and formative sessions (cooking, alpinism, chess...)',
 				inmutableKey: 'b2cbe8b45593c0b39b5e',
 				emojis: ['🧑🏻‍🎓'],
 			},
