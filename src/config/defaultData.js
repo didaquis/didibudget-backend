@@ -108,6 +108,11 @@ const expenseCategories = [
 				name: 'Tolls, parkings and tunnels',
 				inmutableKey: 'a54b87aab3bf45fa393b',
 				emojis: ['🅿️'],
+			},
+			{
+				name: 'Traffic fine',
+				inmutableKey: 'f498df31992c29f633d8',
+				emojis: ['🔖', '⚠️'],
 			}
 		],
 		emojis: ['🚙'],
