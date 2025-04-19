@@ -108,6 +108,11 @@ const expenseCategories = [
 				name: 'Tolls, parkings and tunnels',
 				inmutableKey: 'a54b87aab3bf45fa393b',
 				emojis: ['🅿️'],
+			},
+			{
+				name: 'Traffic fine',
+				inmutableKey: 'f498df31992c29f633d8',
+				emojis: ['🔖', '⚠️'],
 			}
 		],
 		emojis: ['🚙'],
@@ -237,7 +242,7 @@ const expenseCategories = [
 				emojis: ['⛺️'],
 			},
 			{
-				name: 'Recreational courses and formative sessions (cooking, alpinism...)',
+				name: 'Recreational courses and formative sessions (cooking, alpinism, chess...)',
 				inmutableKey: 'b2cbe8b45593c0b39b5e',
 				emojis: ['🧑🏻‍🎓'],
 			},
