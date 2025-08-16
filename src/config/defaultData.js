@@ -128,9 +128,9 @@ const expenseCategories = [
 		inmutableKey: '80a6d32180f700494c59',
 		subcategories: [
 			{
-				name: 'Groceries, cleaning products, personal care products, objects, tools and cookware',
+				name: 'Cleaning products, objects, tools and cookware',
 				inmutableKey: '3e8e136c59a6d961c0cd',
-				emojis: ['🍋', '🧹'],
+				emojis: ['🧹', '🍴', '🪴'],
 			},
 			{
 				name: 'Appliances and furniture',
@@ -322,6 +322,12 @@ const expenseCategories = [
 		inmutableKey: '6308b902aef65f9fa489',
 		subcategories: [],
 		emojis: ['🧑🏻‍⚖️'],
+	},
+	{
+		name: 'Groceries, personal care products',
+		inmutableKey: 'ab457aafab30faba7f34',
+		subcategories: [],
+		emojis: ['🍋', '🪥'],
 	},
 ];
 
