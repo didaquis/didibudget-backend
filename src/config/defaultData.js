@@ -327,7 +327,7 @@ const expenseCategories = [
 		name: 'Groceries, personal care products',
 		inmutableKey: 'ab457aafab30faba7f34',
 		subcategories: [],
-		emojis: ['🍋', '🍎', '🪥'],
+		emojis: ['🍋', '🪥'],
 	},
 ];
 
