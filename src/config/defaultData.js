@@ -300,7 +300,7 @@ const expenseCategories = [
 		emojis: ['🏦'],
 	},
 	{
-		name: 'Government taxes',
+		name: 'Government taxes & fees',
 		inmutableKey: '404e021b5b22684ab693',
 		subcategories: [],
 		emojis: ['🧾'],
