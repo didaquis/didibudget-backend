@@ -329,6 +329,12 @@ const expenseCategories = [
 		subcategories: [],
 		emojis: ['🍋', '🪥'],
 	},
+	{
+		name: 'Lotteries, bets, and gambling',
+		inmutableKey: '4948e614541c4f4fee8e',
+		subcategories: [],
+		emojis: ['🎲', '🍀'],
+	},
 ];
 
 /** Default data for database */
