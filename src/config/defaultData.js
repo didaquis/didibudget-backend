@@ -312,7 +312,7 @@ const expenseCategories = [
 		emojis: ['🧾'],
 	},
 	{
-		name: 'Retirement plan and savings plan',
+		name: 'Retirement plan',
 		inmutableKey: 'ecc399bcb94fbd2cfd6b',
 		subcategories: [],
 		emojis: ['💰'],
