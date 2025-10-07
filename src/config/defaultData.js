@@ -385,7 +385,7 @@ const expenseCategories = [
 		inmutableKey: 'ecc399bcb94fbd2cfd6b',
 		subcategories: [],
 		emojis: ['💰', '👴🏻'],
-		categoryType: CategoryType.SAVING,
+		categoryType: CategoryType.PENSION_PLAN,
 	},
 	{
 		name: 'Lawyers and public notaries',
