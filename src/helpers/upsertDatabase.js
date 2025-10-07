@@ -29,14 +29,14 @@ const upsertDBWithExpenseCategories = async ({ expenseCategories } = []) => {
 	await ExpenseSubcategory.createIndexes();
 	expenseCategories.forEach(async (category) => {
 		const upsertSubcategories = category.subcategories.map((subcategory) => {
-			return ExpenseSubcategory.findOneAndUpdate({ inmutableKey: subcategory.inmutableKey }, { name: subcategory.name, inmutableKey: subcategory.inmutableKey, emojis: subcategory.emojis }, { upsert: true, new: true, setDefaultsOnInsert: true });
+			return ExpenseSubcategory.findOneAndUpdate({ inmutableKey: subcategory.inmutableKey }, { name: subcategory.name, inmutableKey: subcategory.inmutableKey, emojis: subcategory.emojis, categoryType: category.categoryType }, { upsert: true, new: true, setDefaultsOnInsert: true });
 		});
 
 		const listOfSubcategories = await Promise.all(upsertSubcategories);
 
 		const listOfSubcategoriesId = listOfSubcategories.map((subcategory) => subcategory._id);
 
-		await ExpenseCategory.findOneAndUpdate({ inmutableKey: category.inmutableKey }, { name: category.name, inmutableKey: category.inmutableKey, subcategories: listOfSubcategoriesId, emojis: category.emojis }, { upsert: true, new: true, setDefaultsOnInsert: true });
+		await ExpenseCategory.findOneAndUpdate({ inmutableKey: category.inmutableKey }, { name: category.name, inmutableKey: category.inmutableKey, subcategories: listOfSubcategoriesId, emojis: category.emojis, categoryType: category.categoryType }, { upsert: true, new: true, setDefaultsOnInsert: true });
 	});
 };
 
