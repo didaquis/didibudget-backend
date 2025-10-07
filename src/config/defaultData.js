@@ -381,7 +381,7 @@ const expenseCategories = [
 		categoryType: CategoryType.EXPENSE,
 	},
 	{
-		name: 'Retirement plan',
+		name: 'Pension plan',
 		inmutableKey: 'ecc399bcb94fbd2cfd6b',
 		subcategories: [],
 		emojis: ['💰', '👴🏻'],
