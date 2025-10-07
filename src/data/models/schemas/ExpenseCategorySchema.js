@@ -5,6 +5,8 @@ const Schema = mongoose.Schema;
 
 const { v4: uuidv4 } = require('uuid');
 
+const { CategoryType } = require('../../CategoryType');
+
 /**
  * Expense category schema
  * @constructor Expense category model constructor
@@ -32,7 +34,12 @@ const ExpenseCategorySchema = new Schema({
 		required: true,
 		unique: true,
 		default: uuidv4
-	}
+	},
+	categoryType: {
+		type: String,
+		enum: Object.values(CategoryType),
+		required: true,
+	},
 });
 
 module.exports = ExpenseCategorySchema;
