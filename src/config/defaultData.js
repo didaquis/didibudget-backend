@@ -21,10 +21,12 @@ const { CategoryType } = require('../data/CategoryType');
  * @property {string} name - The name of the expense category
  * @property {string} inmutableKey - The immutable key of the expense category
  * @property {Array<string>} emojis - Some emojis to identify category
+ * @property {string} categoryType - The type of the expense category (see CategoryType)
  * @property {Array<Object>} subcategories - An array of subcategories for the expense category
  * @property {string} subcategories.name - The name of the subcategory
  * @property {string} subcategories.inmutableKey - The immutable key of the subcategory
  * @property {Array<string>} subcategories.emojis - Some emojis to identify subcategory
+ * @property {string} subcategories.categoryType - The type of the subcategory (see CategoryType)
  */
 const expenseCategories = [
 	{
