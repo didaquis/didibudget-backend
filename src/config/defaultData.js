@@ -372,7 +372,7 @@ const expenseCategories = [
 		name: 'Retirement plan',
 		inmutableKey: 'ecc399bcb94fbd2cfd6b',
 		subcategories: [],
-		emojis: ['💰'],
+		emojis: ['💰', '👴🏻'],
 		categoryType: CategoryType.SAVING,
 	},
 	{
@@ -395,6 +395,13 @@ const expenseCategories = [
 		subcategories: [],
 		emojis: ['🎲', '🍀'],
 		categoryType: CategoryType.EXPENSE,
+	},
+	{
+		name: 'Portfolio investment',
+		inmutableKey: '226d36644d1469f27664',
+		subcategories: [],
+		emojis: ['💰', '💼'],
+		categoryType: CategoryType.INVESTMENT,
 	},
 ];
 
