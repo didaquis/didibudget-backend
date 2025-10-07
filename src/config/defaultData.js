@@ -16,17 +16,27 @@ const { CategoryType } = require('../data/CategoryType');
 
 
 /**
- * Default categories and subcategories for expenses
- * @type {Array<Object>}
- * @property {string} name - The name of the expense category
- * @property {string} inmutableKey - The immutable key of the expense category
- * @property {Array<string>} emojis - Some emojis to identify category
- * @property {string} categoryType - The type of the expense category (see CategoryType)
- * @property {Array<Object>} subcategories - An array of subcategories for the expense category
- * @property {string} subcategories.name - The name of the subcategory
- * @property {string} subcategories.inmutableKey - The immutable key of the subcategory
- * @property {Array<string>} subcategories.emojis - Some emojis to identify subcategory
- * @property {string} subcategories.categoryType - The type of the subcategory (see CategoryType)
+ * @typedef {Object} Subcategory
+ * @property {string} name - Name of the subcategory
+ * @property {string} inmutableKey - Immutable key of the subcategory
+ * @property {Array<string>} emojis - Emojis identifying the subcategory
+ * @property {string} categoryType - Type of the subcategory (see CategoryType)
+ */
+
+/**
+ * @typedef {Object} ExpenseCategory
+ * @property {string} name - Name of the expense category
+ * @property {string} inmutableKey - Static and private identifier for the category, consistent across environments/persistence layers
+ * @property {Array<string>} emojis - Emojis identifying the category
+ * @property {string} categoryType - Type of the expense category (see CategoryType)
+ * @property {Array<Subcategory>} subcategories - Array of subcategory objects (may be empty)
+ */
+
+/**
+ * Default categories and subcategories for expenses.
+ * Each category has a list of emojis, a type (see CategoryType), and optional subcategories.
+ *
+ * @type {Array<ExpenseCategory>}
  */
 const expenseCategories = [
 	{

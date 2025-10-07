@@ -2,7 +2,7 @@ const { expenseCategories } = require('../../src/config/defaultData');
 const { CategoryType } = require('../../src/data/CategoryType');
 
 describe('defaultData', () => {
-	it('should be an array with expense categories and subcategories', () => {
+	it('should be a valid array with expense categories and subcategories', () => {
 		expect(Array.isArray(expenseCategories)).toBe(true);
 
 		expect(expenseCategories.length).toBeGreaterThan(0);

@@ -15,16 +15,32 @@
 
 const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
 
+
 /**
- * Save on the database the default data related to expense categories and subcategories. This function never delete documents on the dabatase, but should generate a new document if content of default data change
- * @async
- * @param {Array.<Object>} expenseCategories - A list of literal objects
- * @param {string} expenseCategories.name - Name of expense category
- * @param {string} expenseCategories.inmutableKey - A static and private identifier for every expense category. The value should be consistent across differents environments or persistence layers.
- * @param {Array.<{name: string, inmutableKey: string, emojis: Array.<string>}>} expenseCategories.subcategories - A list of literal objects. Every object should contain the properties name, inmutableKey and emojis. May be an empty array
- * @param {Array.<string>} expenseCategories.emojis - A list of emojis. May be an empty array
+ * @typedef {Object} Subcategory
+ * @property {string} name - Name of the subcategory
+ * @property {string} inmutableKey - Immutable key of the subcategory
+ * @property {Array<string>} emojis - Emojis identifying the subcategory
+ * @property {string} categoryType - Type of the subcategory (see CategoryType)
  */
-const upsertDBWithExpenseCategories = async ({ expenseCategories } = []) => {
+
+/**
+ * @typedef {Object} ExpenseCategory
+ * @property {string} name - Name of the expense category
+ * @property {string} inmutableKey - Static and private identifier for the category, consistent across environments/persistence layers
+ * @property {Array<string>} emojis - Emojis identifying the category
+ * @property {string} categoryType - Type of the expense category (see CategoryType)
+ * @property {Array<Subcategory>} subcategories - Array of subcategory objects (may be empty)
+ */
+
+/**
+ * Save default data of expense categories and subcategories to the database.
+ * This function never deletes documents, but creates new documents if the default data changes.
+ *
+ * @async
+ * @param {Array<ExpenseCategory>} expenseCategories - List of expense categories to upsert
+ */
+const upsertDBWithExpenseCategories = async (expenseCategories = []) => {
 	await ExpenseCategory.createIndexes();
 	await ExpenseSubcategory.createIndexes();
 	expenseCategories.forEach(async (category) => {
