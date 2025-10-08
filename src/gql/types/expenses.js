@@ -13,6 +13,12 @@ module.exports = /* GraphQL */ gql`
 		uuid: String!
 	}
 
+	type ExpenseSumByType {
+		categoryType: String!
+		currencyISO: String!
+		sum: Float!
+	}
+
 	type PaginatedExpenses {
 		expenses: [Expense]
 		pagination: PaginationData
@@ -27,6 +33,9 @@ module.exports = /* GraphQL */ gql`
 
 		""" Get list of expenses for a specific user between two dates """
 		getExpensesBetweenDates(startDate: String!, endDate: String!): [Expense]
+		
+		""" Get the total expenses of a specific type for a specific user """
+		getExpensesSumByType(categoryType: String!): ExpenseSumByType!
 	}
 
 	type Mutation {

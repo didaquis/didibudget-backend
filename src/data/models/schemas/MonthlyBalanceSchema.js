@@ -5,6 +5,8 @@ const Schema = mongoose.Schema;
 
 const { v4: uuidv4 } = require('uuid');
 
+const { CurrencyISO } = require('../../CurrencyISO');
+
 /**
  * Monthly Balance schema
  * @constructor Monthly Balance model constructor
@@ -26,7 +28,7 @@ const MonthlyBalanceSchema = new Schema({
 	currencyISO: {
 		type: String,
 		required: true,
-		default: 'EUR'
+		default: CurrencyISO.EUR
 	},
 	uuid: {
 		type: String,
