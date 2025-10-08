@@ -67,6 +67,51 @@ module.exports = {
 			const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: { $gte: startDate, $lt: endDate } }).sort(sortCriteria).lean();
 
 			return expenses.map((expense) => expenseDTO(expense));
+		},
+		/**
+		 * Get the total expenses of a specific type for a specific user
+		 */
+		getExpensesSumByType: async (parent, { categoryType }, context) => {
+			context.di.authValidation.ensureThatUserIsLogged(context);
+
+			const user = await context.di.authValidation.getUser(context);
+
+			const fromCollection = context.di.model.ExpenseCategory.collection.name;
+
+			const aggregationResult = await context.di.model.Expenses.aggregate([
+				{ $match: { user_id: user._id } },
+				{
+					$lookup: {
+						from: fromCollection,
+						localField: 'category',
+						foreignField: '_id',
+						as: 'categoryDetails'
+					}
+				},
+				{ $unwind: '$categoryDetails' },
+				{ $match: { 'categoryDetails.categoryType': categoryType } },
+				{ $addFields: { quantityNum: { $toDouble: '$quantity' } } },
+				{
+					$group: {
+						_id: '$currencyISO',
+						totalSum: { $sum: '$quantityNum' }
+					}
+				},
+				{ $project: { _id: 0, currencyISO: '$_id', sum: '$totalSum' } }
+			]);
+
+			if (!aggregationResult.length) {
+				return null;
+			}
+
+
+			const firstCurrencyGroup = aggregationResult[0];
+
+			return {
+				categoryType,
+				currencyISO: firstCurrencyGroup.currencyISO,
+				sum: firstCurrencyGroup.sum
+			};
 		}
 	},
 	Mutation: {
