@@ -35,7 +35,7 @@ module.exports = /* GraphQL */ gql`
 		getExpensesBetweenDates(startDate: String!, endDate: String!): [Expense]
 		
 		""" Get the total expenses of a specific type for a specific user """
-		getExpensesSumByType(categoryType: String!): ExpenseSumByType
+		getExpensesSumByType(categoryType: String!): ExpenseSumByType!
 	}
 
 	type Mutation {

@@ -4,6 +4,7 @@ const { expenseDTO } = require('../../dto/expenseDTO');
 const { expenseSumByTypeDTO } = require('../../dto/expenseSumByTypeDTO');
 const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
 const { CategoryType } = require('../../data/CategoryType');
+const { CurrencyISO } = require('../../data/CurrencyISO');
 
 /**
  * All resolvers related to exxpenses
@@ -104,7 +105,7 @@ module.exports = {
 			]);
 
 			if (!aggregationResult.length) {
-				return null;
+				return expenseSumByTypeDTO(categoryType, CurrencyISO.EUR, 0);
 			}
 
 
