@@ -5,8 +5,6 @@ const Schema = mongoose.Schema;
 
 const { v4: uuidv4 } = require('uuid');
 
-const { CategoryType } = require('../../CategoryType');
-
 /**
  * Expense subcategory schema
  * @constructor Expense subcategory model constructor
