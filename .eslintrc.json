@@ -33,7 +33,7 @@
         ],
         "no-console": "warn",
         "no-alert": "warn",
-        "no-unused-vars": "warn",
+        "no-unused-vars": "error",
         "keyword-spacing": ["error", { "before": true, "after": true }],
         "space-infix-ops": ["error", {"int32Hint": false}],
         "comma-spacing": ["error"],
