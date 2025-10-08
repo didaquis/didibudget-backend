@@ -5,6 +5,7 @@ const { environmentVariablesConfig } = require('../../config/appConfig');
 const { authValidations } = require('../auth/authValidations');
 const { pagingValidations } = require('../../helpers/pagingValidations');
 const { datetimeValidations } = require('../../helpers/datetimeValidations');
+const { parameterValidations } = require('../../helpers/parameterValidations');
 const { ENVIRONMENT } = require('../../config/environment');
 const { logger } = require('../../helpers/logger');
 
@@ -30,6 +31,9 @@ const setContext = async ({ req }) => {
 			},
 			datetimeValidation: {
 				...datetimeValidations
+			},
+			parameterValidations: {
+				...parameterValidations
 			},
 		}
 	};

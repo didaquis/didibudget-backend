@@ -2,6 +2,7 @@
 
 const { expenseDTO } = require('../../dto/expenseDTO');
 const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
+const { CategoryType } = require('../../data/CategoryType');
 
 /**
  * All resolvers related to exxpenses
@@ -73,6 +74,7 @@ module.exports = {
 		 */
 		getExpensesSumByType: async (parent, { categoryType }, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
+			context.di.parameterValidations.isValidEnumValue(categoryType, CategoryType);
 
 			const user = await context.di.authValidation.getUser(context);
 
@@ -107,6 +109,7 @@ module.exports = {
 
 			const firstCurrencyGroup = aggregationResult[0];
 
+			// TODO: esto podría ser un DTO
 			return {
 				categoryType,
 				currencyISO: firstCurrencyGroup.currencyISO,
