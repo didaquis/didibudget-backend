@@ -1,6 +1,7 @@
 'use strict';
 
 const { expenseDTO } = require('../../dto/expenseDTO');
+const { expenseSumByTypeDTO } = require('../../dto/expenseSumByTypeDTO');
 const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
 const { CategoryType } = require('../../data/CategoryType');
 
@@ -109,12 +110,7 @@ module.exports = {
 
 			const firstCurrencyGroup = aggregationResult[0];
 
-			// TODO: esto podría ser un DTO
-			return {
-				categoryType,
-				currencyISO: firstCurrencyGroup.currencyISO,
-				sum: firstCurrencyGroup.sum
-			};
+			return expenseSumByTypeDTO(categoryType, firstCurrencyGroup.currencyISO, firstCurrencyGroup.sum);
 		}
 	},
 	Mutation: {
