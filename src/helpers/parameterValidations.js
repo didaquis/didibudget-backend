@@ -8,9 +8,10 @@ const { UserInputError } = require('apollo-server-express');
 */
 const parameterValidations = {
 	/**
-	* Check if the parameter is include on enum pattern object
+	* Check if the parameter is include in enum pattern object
 	* @param {any} value - value to validate
 	* @param {object} enumObj - object with valid values (enum pattern)
+	* @throws {UserInputError} If value is not included in the enum object
 	*/
 	isValidEnumValue: (value, enumObj) => {
 		if (!Object.values(enumObj).includes(value)) {

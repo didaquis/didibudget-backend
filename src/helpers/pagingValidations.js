@@ -10,6 +10,7 @@ const pagingValidations = {
 	/**
 	 * Check if the page value is valid. Should be greather than zero
 	 * @param {number} page - The number of page
+	 * @throws {UserInputError} If value is not allowed
 	 */
 	ensurePageValueIsValid: (page) => {
 		if (!Number.isInteger(page) || Number(page) <= 0) {
@@ -20,6 +21,7 @@ const pagingValidations = {
 	/**
 	 * Check if the page size value is valid. Should be an integer within the supported range
 	 * @param {number} pageSize	- The page size
+	 * @throws {UserInputError} If value is not allowed
 	 */
 	ensurePageSizeValueIsValid: (pageSize) => {
 		const minPageSizeAllowed = 10;

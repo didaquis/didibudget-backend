@@ -11,6 +11,7 @@ const datetimeValidations = {
 	/**
 	 * Check if date provided is valid
 	 * @param {Date|string|number} value - A date value
+	 * @throws {UserInputError} If value is not allowed
 	 */
 	ensureDateIsValid: (value) => {
 		const date = new Date(value);
@@ -24,6 +25,7 @@ const datetimeValidations = {
 	 * Check if a date is earlier than other
 	 * @param {Date|string} startDate - A date value. It would be a string if the other parameter is also a string with the same format
 	 * @param {Date|string} endDate - A date value. It would be a string if the other parameter is also a string with the same format
+	 * @throws {UserInputError} If start date is not earlier than end date
 	 */
 	ensureStartDateIsEarlierThanEndDate: (startDate, endDate) => {
 		if (startDate >= endDate) {
