@@ -21,7 +21,6 @@ const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
  * @property {string} name - Name of the subcategory
  * @property {string} inmutableKey - Immutable key of the subcategory
  * @property {Array<string>} emojis - Emojis identifying the subcategory
- * @property {string} categoryType - Type of the subcategory (see CategoryType)
  */
 
 /**
@@ -45,7 +44,7 @@ const upsertDBWithExpenseCategories = async (expenseCategories = []) => {
 	await ExpenseSubcategory.createIndexes();
 	expenseCategories.forEach(async (category) => {
 		const upsertSubcategories = category.subcategories.map((subcategory) => {
-			return ExpenseSubcategory.findOneAndUpdate({ inmutableKey: subcategory.inmutableKey }, { name: subcategory.name, inmutableKey: subcategory.inmutableKey, emojis: subcategory.emojis, categoryType: category.categoryType }, { upsert: true, new: true, setDefaultsOnInsert: true });
+			return ExpenseSubcategory.findOneAndUpdate({ inmutableKey: subcategory.inmutableKey }, { name: subcategory.name, inmutableKey: subcategory.inmutableKey, emojis: subcategory.emojis }, { upsert: true, new: true, setDefaultsOnInsert: true });
 		});
 
 		const listOfSubcategories = await Promise.all(upsertSubcategories);

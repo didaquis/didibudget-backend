@@ -33,11 +33,6 @@ const ExpenseSubcategorySchema = new Schema({
 		unique: true,
 		default: uuidv4
 	},
-	categoryType: {
-		type: String,
-		enum: Object.values(CategoryType),
-		required: true,
-	},
 });
 
 module.exports = ExpenseSubcategorySchema;
