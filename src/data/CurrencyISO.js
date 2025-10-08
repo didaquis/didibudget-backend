@@ -4,7 +4,7 @@
  * Available currencies
  * @readonly
  * @enum {string}
- * @property {string} EUR    	- EUR
+ * @property {string} EUR - EUR
  */
 const CurrencyISO = Object.freeze({
 	EUR: 'EUR',
