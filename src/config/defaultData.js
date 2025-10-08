@@ -20,7 +20,6 @@ const { CategoryType } = require('../data/CategoryType');
  * @property {string} name - Name of the subcategory
  * @property {string} inmutableKey - Immutable key of the subcategory
  * @property {Array<string>} emojis - Emojis identifying the subcategory
- * @property {string} categoryType - Type of the subcategory (see CategoryType)
  */
 
 /**
@@ -96,55 +95,46 @@ const expenseCategories = [
 				name: 'Vehicle taxes, technical inspection',
 				inmutableKey: '2c0f7ea86b62582c2308',
 				emojis: ['🧾'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Vehicle insurance',
 				inmutableKey: '55ba8bddc746c078ebc6',
 				emojis: ['🧾'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Spare parts, maintenance and cleaning costs',
 				inmutableKey: '0176bf56861cfc5ef72d',
 				emojis: ['🔧'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Garage',
 				inmutableKey: '2bcd348acfe1bf3e7aec',
 				emojis: ['🏢'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Vehicle cost (renting, leasing, bank loan)',
 				inmutableKey: '3fd1f7e8e2f828cbe212',
 				emojis: ['🚙'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Down payment for the vehicle',
 				inmutableKey: 'bc0670da0b15f4b6c201',
 				emojis: ['🔑', '🚙'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Fuel',
 				inmutableKey: '6f4ab3b2b1b3268d9138',
 				emojis: ['⛽️'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Tolls, parkings and tunnels',
 				inmutableKey: 'a54b87aab3bf45fa393b',
 				emojis: ['🅿️'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Traffic fine',
 				inmutableKey: 'f498df31992c29f633d8',
 				emojis: ['🔖', '⚠️'],
-				categoryType: CategoryType.EXPENSE,
 			}
 		],
 		emojis: ['🚙'],
@@ -165,85 +155,71 @@ const expenseCategories = [
 				name: 'Cleaning products, objects, tools and cookware',
 				inmutableKey: '3e8e136c59a6d961c0cd',
 				emojis: ['🧹', '🍴', '🪴'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Appliances and furniture',
 				inmutableKey: '67020bb5be8f6f358be9',
 				emojis: ['🪑', '📺'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Electricity bill',
 				inmutableKey: '2795466d19a02edf91a2',
 				emojis: ['⚡️'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Water bill',
 				inmutableKey: '367152c689521a741912',
 				emojis: ['💧'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Gas bill',
 				inmutableKey: '09a4d2883e9605de3af5',
 				emojis: ['💨'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'ISP provider bill (including TV, landline, and mobile phone)',
 				inmutableKey: '649f5bae610a88cfafba',
 				emojis: ['🌐'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Down payment for the house',
 				inmutableKey: '58c16c7f1b255d90dd3d',
 				emojis: ['🔑', '🏠'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Home taxes (includes garage)',
 				inmutableKey: 'd074eabc7b8e111bc6a5',
 				emojis: ['🧾'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Home insurance',
 				inmutableKey: '79b8bc873e8aaf93e0d7',
 				emojis: ['🧾'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Taxes of the community of neighbors (includes garage)',
 				inmutableKey: 'c9382b5849da8fb87c4b',
 				emojis: ['🧾'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Repairs and home works',
 				inmutableKey: '6596560424b5a62054bb',
 				emojis: ['🛠️'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Mortgage',
 				inmutableKey: 'f6e025e8988d541e6e64',
 				emojis: ['🏠'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Mortgage amortization',
 				inmutableKey: '3a559a96cc40fd784196',
 				emojis: ['🏠', '⏩'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Rent',
 				inmutableKey: '212d8beddfc1981bf3d2',
 				emojis: ['🔑'],
-				categoryType: CategoryType.EXPENSE,
 			}
 		],
 		emojis: ['🏠'],
@@ -257,13 +233,11 @@ const expenseCategories = [
 				name: 'English classes',
 				inmutableKey: '0cdbdd7f2050a17778c9',
 				emojis: ['🇬🇧'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Books, events, conferences, formative courses, certifications',
 				inmutableKey: 'db5fa3a569a72dca9079',
 				emojis: ['📚', '🎟️'],
-				categoryType: CategoryType.EXPENSE,
 			}
 		],
 		emojis: ['👷🏻'],
@@ -277,37 +251,31 @@ const expenseCategories = [
 				name: 'Bar, restaurants and pubs',
 				inmutableKey: 'a90ae2812b970bd8d6f5',
 				emojis: ['🍺'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Gym and climbing wall',
 				inmutableKey: '1f2db29fbcc94835f5ec',
 				emojis: ['🤸🏻'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Cinema, concerts, museums, and other cultural activities',
 				inmutableKey: '8764609f8c1456aa10ff',
 				emojis: ['🍿', '🎺'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Camping, shelter',
 				inmutableKey: 'd40c102031f4e79e23bc',
 				emojis: ['⛺️'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Recreational courses and formative sessions (cooking, alpinism, chess...)',
 				inmutableKey: 'b2cbe8b45593c0b39b5e',
 				emojis: ['🧑🏻‍🎓'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Social gathering',
 				inmutableKey: 'c5e7cadebd4b038ee612',
 				emojis: ['👨‍👩‍👧‍👦', '🎳', '🥂'],
-				categoryType: CategoryType.EXPENSE,
 			}
 		],
 		emojis: ['🍿', '🎳'],
@@ -321,25 +289,21 @@ const expenseCategories = [
 				name: 'Books, music albums, videogames',
 				inmutableKey: '55627d062a7a11a8c1c8',
 				emojis: ['📚', '💿', '👾'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Puzzles, board games',
 				inmutableKey: 'a6dea8416e7616662843',
 				emojis: ['🧩', '♟️'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Collectibles, hobby items',
 				inmutableKey: 'f40a284425ea71685ab5',
 				emojis: ['🪙', '🪆'],
-				categoryType: CategoryType.EXPENSE,
 			},
 			{
 				name: 'Adult toys, pleasure goods',
 				inmutableKey: '4962cd0b5929cdf151ee',
 				emojis: ['🌶️'],
-				categoryType: CategoryType.EXPENSE,
 			}
 		],
 		emojis: ['📚', '🧩'],

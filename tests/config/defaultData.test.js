@@ -25,13 +25,11 @@ describe('defaultData', () => {
 				expect(subcategory).toHaveProperty('name');
 				expect(subcategory).toHaveProperty('inmutableKey');
 				expect(subcategory).toHaveProperty('emojis');
-				expect(subcategory).toHaveProperty('categoryType');
+				expect(subcategory).not.toHaveProperty('categoryType');
 
 				expect(typeof subcategory.name).toBe('string');
 				expect(typeof subcategory.inmutableKey).toBe('string');
 				expect(Array.isArray(subcategory.emojis)).toBe(true);
-				expect(typeof subcategory.categoryType).toBe('string');
-				expect(Object.values(CategoryType)).toContain(subcategory.categoryType);
 
 				subcategory.emojis.forEach(emoji => {
 					expect(typeof emoji).toBe('string');
