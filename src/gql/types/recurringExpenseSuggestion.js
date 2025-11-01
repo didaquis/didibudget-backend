@@ -4,7 +4,6 @@ const { gql } = require('apollo-server-express');
 
 module.exports = /* GraphQL */ gql`
 	type RecurringExpenseSuggestion {
-		user_id: ID!
 		isActive: Boolean!
 		startDay: Int!
 		endDay: Int!
@@ -23,8 +22,14 @@ module.exports = /* GraphQL */ gql`
 		getRecurringExpenseSuggestion: [RecurringExpenseSuggestion]
 	}
 
+	input SuggestedExpenseInput {
+		category: ID!
+		subcategory: ID
+		quantity: Float!
+	}
+
 	type Mutation {
 		""" It allows register a recurring expense suggestion """
-		registerRecurringExpenseSuggestion(): RecurringExpenseSuggestion
+		registerRecurringExpenseSuggestion(isActive: Boolean!, startDay: Int!, endDay: Int!, suggestedExpense: SuggestedExpenseInput!): RecurringExpenseSuggestion
 	}
 `;

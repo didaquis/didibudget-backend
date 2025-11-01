@@ -7,7 +7,7 @@ const { CategoryType } = require('../../data/CategoryType');
 const { CurrencyISO } = require('../../data/CurrencyISO');
 
 /**
- * All resolvers related to exxpenses
+ * All resolvers related to expenses
  * @typedef {Object}
  */
 module.exports = {
