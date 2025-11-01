@@ -5,8 +5,6 @@ const Schema = mongoose.Schema;
 
 const { v4: uuidv4 } = require('uuid');
 
-const { CurrencyISO } = require('../../CurrencyISO');
-
 /**
  * Recurring Expense Suggestion schema
  * @constructor Recurring Expense Suggestion model constructor
@@ -52,7 +50,7 @@ const RecurringExpenseSuggestionSchema = new Schema({
 		unique: true,
 		default: uuidv4
 	},
-	suggestion: {
+	suggestedExpense: {
 		category: {
 			type: mongoose.SchemaTypes.ObjectId,
 			ref: 'expensescategory',
@@ -66,11 +64,6 @@ const RecurringExpenseSuggestionSchema = new Schema({
 		quantity: {
 			type: mongoose.Schema.Types.Decimal128,
 			required: true,
-		},
-		currencyISO: {
-			type: String,
-			required: true,
-			default: CurrencyISO.EUR
 		}
 	},
 });
