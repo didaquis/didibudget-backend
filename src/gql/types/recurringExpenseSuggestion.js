@@ -19,10 +19,10 @@ module.exports = /* GraphQL */ gql`
 
 	type Query {
 		""" Get list of recurring expense suggestion for a specific user """
-		getRecurringExpenseSuggestion: [RecurringExpenseSuggestion]
+		getRecurringExpenseSuggestions: [RecurringExpenseSuggestion]
 
 		""" Get list of active recurring expense suggestions for a user for a specific day of the month """
-		getRecurringExpenseSuggestionByDay (day: Int!): [RecurringExpenseSuggestion]
+		getRecurringExpenseSuggestionsByDay (day: Int!): [RecurringExpenseSuggestion]
 	}
 
 	input SuggestedExpenseInput {

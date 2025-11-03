@@ -11,7 +11,7 @@ module.exports = {
 		/**
 		* Get all recurring expense suggestions for an user
 		*/
-		getRecurringExpenseSuggestion: async (parent, args, context) => {
+		getRecurringExpenseSuggestions: async (parent, args, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 
 			const user = await context.di.authValidation.getUser(context);
@@ -23,7 +23,7 @@ module.exports = {
 		/**
 		* Get the active recurring expense suggestions for an user for a specific day of the month
 		*/
-		getRecurringExpenseSuggestionByDay: async (parent, { day }, context) => {
+		getRecurringExpenseSuggestionsByDay: async (parent, { day }, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 			const minDay = 1;
 			const maxDay = 31;
