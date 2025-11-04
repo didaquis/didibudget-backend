@@ -16,7 +16,10 @@ module.exports = {
 
 			const user = await context.di.authValidation.getUser(context);
 
-			const allSuggestions = await context.di.model.RecurringExpenseSuggestion.find({ user_id: user._id }).lean();
+			const allSuggestions = await context.di.model.RecurringExpenseSuggestion.find({ user_id: user._id })
+				.populate({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
+				.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
+				.lean();
 
 			return allSuggestions.map(suggestion => recurringExpenseSuggestionDTO(suggestion));
 		},
@@ -55,7 +58,10 @@ module.exports = {
 						}
 					]
 				}
-			}).lean();
+			})
+				.populate({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
+				.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
+				.lean();
 
 			return allSuggestions.map(suggestion => recurringExpenseSuggestionDTO(suggestion));
 		},
@@ -69,7 +75,7 @@ module.exports = {
 
 			const user = await context.di.authValidation.getUser(context);
 
-			return context.di.model.RecurringExpenseSuggestion({
+			const saved = await context.di.model.RecurringExpenseSuggestion.create({
 				user_id: user._id,
 				isActive: isActive,
 				startDay: startDay,
@@ -79,7 +85,13 @@ module.exports = {
 					subcategory: suggestedExpense.subcategory,
 					quantity: suggestedExpense.quantity
 				}
-			}).save().then(recurringExpenseSuggestion => recurringExpenseSuggestionDTO(recurringExpenseSuggestion));
+			});
+
+			const populated = await context.di.model.RecurringExpenseSuggestion.findById(saved._id)
+				.populate({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
+				.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
+				.lean();
+			return recurringExpenseSuggestionDTO(populated);
 		},
 	}
 };

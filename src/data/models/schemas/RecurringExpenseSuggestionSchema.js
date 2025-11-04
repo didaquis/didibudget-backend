@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const { v4: uuidv4 } = require('uuid');
+const SuggestedExpenseSchema = require('./SuggestedExpenseSchema.js');
 
 /**
  * Recurring Expense Suggestion schema
@@ -50,22 +51,7 @@ const RecurringExpenseSuggestionSchema = new Schema({
 		unique: true,
 		default: uuidv4
 	},
-	suggestedExpense: {
-		category: {
-			type: mongoose.SchemaTypes.ObjectId,
-			ref: 'expensescategory',
-			required: true,
-		},
-		subcategory: {
-			type: mongoose.SchemaTypes.ObjectId,
-			ref: 'expensesubcategory',
-			required: false,
-		},
-		quantity: {
-			type: mongoose.Schema.Types.Decimal128,
-			required: true,
-		}
-	},
+	suggestedExpense: { type: SuggestedExpenseSchema, required: true },
 });
 
 module.exports = RecurringExpenseSuggestionSchema;

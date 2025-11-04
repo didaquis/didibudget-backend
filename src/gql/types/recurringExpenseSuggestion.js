@@ -15,6 +15,10 @@ module.exports = /* GraphQL */ gql`
 		category: ID!
 		subcategory: ID
 		quantity: Float!
+		categoryName: String!
+		categoryEmojis: [String]!,
+		subcategoryName: String,
+		subcategoryEmojis: [String]!,
 	}
 
 	type Query {

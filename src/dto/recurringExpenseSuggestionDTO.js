@@ -17,9 +17,13 @@ const recurringExpenseSuggestionDTO = (recurringExpenseSuggestion) => {
 
 const buildSuggestedExpenseDTO = (suggestedExpense) => {
 	return {
-		category: suggestedExpense.category,
-		subcategory: suggestedExpense.subcategory,
-		quantity: suggestedExpense.quantity.toString()
+		category: suggestedExpense.category._id,
+		categoryName: suggestedExpense.category.name || null,
+		categoryEmojis: suggestedExpense.category.emojis || [],
+		subcategory: suggestedExpense.subcategory?._id || null,
+		subcategoryName: suggestedExpense.subcategory?.name || null,
+		subcategoryEmojis: suggestedExpense.subcategory?.emojis || [],
+		quantity: suggestedExpense.quantity.toString(),
 	};
 };
 
