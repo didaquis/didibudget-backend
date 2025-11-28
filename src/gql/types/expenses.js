@@ -19,6 +19,11 @@ module.exports = /* GraphQL */ gql`
 		sum: Float!
 	}
 
+	type ExpensesMonthlyAverage {
+		average: Float!
+		currencyISO: String!
+	}
+
 	type PaginatedExpenses {
 		expenses: [Expense]
 		pagination: PaginationData
@@ -34,8 +39,11 @@ module.exports = /* GraphQL */ gql`
 		""" Get list of expenses for a specific user between two dates """
 		getExpensesBetweenDates(startDate: String!, endDate: String!): [Expense]
 		
-		""" Get the total expenses of a specific type for a specific user """
-		getExpensesSumByType(categoryType: String!): ExpenseSumByType!
+		""" Get the total expenses of a specific type for a user """
+		getExpensesSumByType(categoryType: CategoryType!): ExpenseSumByType!
+
+		""" Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types. """
+		getExpensesMonthlyAverage(lastNMonths: Int!, excludedCategoryTypes: [CategoryType!]!): ExpensesMonthlyAverage!
 	}
 
 	type Mutation {
