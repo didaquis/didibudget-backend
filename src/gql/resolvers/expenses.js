@@ -2,8 +2,9 @@
 
 const { expenseDTO } = require('../../dto/expenseDTO');
 const { expenseSumByTypeDTO } = require('../../dto/expenseSumByTypeDTO');
+const { expenseMonthlyAverageDTO } = require('../../dto/expenseMonthlyAverageDTO');
 const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
-const { CategoryType } = require('../../data/CategoryType');
+const { getLastMonthsRangeExcludingCurrent } = require('../../helpers/getLastMonthsRangeExcludingCurrent');
 const { CurrencyISO } = require('../../data/CurrencyISO');
 
 /**
@@ -72,11 +73,10 @@ module.exports = {
 			return expenses.map((expense) => expenseDTO(expense));
 		},
 		/**
-		 * Get the total expenses of a specific type for a specific user
+		 * Get the total expenses of a specific type for a user
 		 */
 		getExpensesSumByType: async (parent, { categoryType }, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
-			context.di.parameterValidations.isValidEnumValue(categoryType, CategoryType);
 
 			const user = await context.di.authValidation.getUser(context);
 
@@ -112,6 +112,48 @@ module.exports = {
 			const firstCurrencyGroup = aggregationResult[0];
 
 			return expenseSumByTypeDTO(categoryType, firstCurrencyGroup.currencyISO, firstCurrencyGroup.sum);
+		},
+		/**
+		 * Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types.
+		 */
+		getExpensesMonthlyAverage: async (parent, { lastNMonths, excludedCategoryTypes = [] }, context) => {
+			context.di.authValidation.ensureThatUserIsLogged(context);
+
+			const minMonths = 1;
+			const maxMonths = 240;
+			context.di.parameterValidations.isIntegerBetween(lastNMonths, minMonths, maxMonths);
+
+			const user = await context.di.authValidation.getUser(context);
+
+			const { startDate, endDate } = getLastMonthsRangeExcludingCurrent(lastNMonths);
+
+			const fromCollection = context.di.model.ExpenseCategory.collection.name;
+
+			const aggregationResult = await context.di.model.Expenses.aggregate([
+				{ $match: { user_id: user._id, date: { $gte: startDate, $lt: endDate } } },
+				{
+					$lookup: {
+						from: fromCollection,
+						localField: 'category',
+						foreignField: '_id',
+						as: 'categoryDetails'
+					}
+				},
+				{ $unwind: '$categoryDetails' },
+				{ $match: { 'categoryDetails.categoryType': { $nin: excludedCategoryTypes } } },
+				{
+					$group: {
+						_id: null,
+						totalSum: { $sum: { $toDouble: '$quantity' } }
+					}
+				},
+				{ $project: { _id: 0, totalSum: 1 } }
+			]);
+
+			const totalSum = aggregationResult.length ? aggregationResult[0].totalSum : 0;
+			const average = totalSum / lastNMonths;
+
+			return expenseMonthlyAverageDTO(average, CurrencyISO.EUR);
 		}
 	},
 	Mutation: {
