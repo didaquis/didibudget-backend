@@ -126,19 +126,31 @@ module.exports = {
 
 			const { startDate, endDate } = getLastMonthsRangeExcludingCurrent(lastNMonths);
 
-			const expenses = await context.di.model.Expenses.find({
-				user_id: user._id,
-				date: { $gte: startDate, $lt: endDate }
-			}).lean();
+			const fromCollection = context.di.model.ExpenseCategory.collection.name;
 
-			// Filtramos por categoryType. Esto no funconiona en la query de mongoose porque categoryType está en otra colección
-			const filteredExpenses = expenses.filter(exp => 
-				!excludedCategoryTypes.includes(exp.categoryType)
-			);
+			const aggregationResult = await context.di.model.Expenses.aggregate([
+				{ $match: { user_id: user._id, date: { $gte: startDate, $lt: endDate } } },
+				{
+					$lookup: {
+						from: fromCollection,
+						localField: 'category',
+						foreignField: '_id',
+						as: 'categoryDetails'
+					}
+				},
+				{ $unwind: '$categoryDetails' },
+				{ $match: { 'categoryDetails.categoryType': { $nin: excludedCategoryTypes } } },
+				{
+					$group: {
+						_id: null,
+						totalSum: { $sum: { $toDouble: '$quantity' } }
+					}
+				},
+				{ $project: { _id: 0, totalSum: 1 } }
+			]);
 
-			const totalSum = filteredExpenses.reduce((acc, exp) => acc + Number(exp.quantity), 0);
-
-			const average = lastNMonths > 0 ? totalSum / lastNMonths : 0; // TODO: Aquí sobran cositas
+			const totalSum = aggregationResult.length ? aggregationResult[0].totalSum : 0;
+			const average = totalSum / lastNMonths;
 
 			return {
 				average: Number(average.toFixed(2)), // TODO: empujarlo a un DTO
