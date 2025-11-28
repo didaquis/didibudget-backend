@@ -2,6 +2,7 @@
 
 const { expenseDTO } = require('../../dto/expenseDTO');
 const { expenseSumByTypeDTO } = require('../../dto/expenseSumByTypeDTO');
+const { expenseMonthlyAverageDTO } = require('../../dto/expenseMonthlyAverageDTO');
 const { getOffset, getTotalPagesNumber } = require('../../helpers/pagingUtilities');
 const { getLastMonthsRangeExcludingCurrent } = require('../../helpers/getLastMonthsRangeExcludingCurrent');
 const { CurrencyISO } = require('../../data/CurrencyISO');
@@ -152,10 +153,7 @@ module.exports = {
 			const totalSum = aggregationResult.length ? aggregationResult[0].totalSum : 0;
 			const average = totalSum / lastNMonths;
 
-			return {
-				average: Number(average.toFixed(2)), // TODO: empujarlo a un DTO
-				currencyISO: CurrencyISO.EUR
-			};
+			return expenseMonthlyAverageDTO(average, CurrencyISO.EUR);
 		}
 	},
 	Mutation: {
