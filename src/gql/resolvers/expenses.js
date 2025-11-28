@@ -115,7 +115,7 @@ module.exports = {
 		/**
 		 * Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types.
 		 */
-		getExpensesMonthlyAverage: async (parent, { lastNMonths, excludedCategoryTypes }, context) => {
+		getExpensesMonthlyAverage: async (parent, { lastNMonths, excludedCategoryTypes = [] }, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 
 			const minMonths = 1;

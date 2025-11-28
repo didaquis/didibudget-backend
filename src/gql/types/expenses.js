@@ -43,7 +43,7 @@ module.exports = /* GraphQL */ gql`
 		getExpensesSumByType(categoryType: CategoryType!): ExpenseSumByType!
 
 		""" Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types. """
-		getExpensesMonthlyAverage(lastNMonths: Int!, excludedCategoryTypes: [CategoryType!]!): ExpensesMonthlyAverage!
+		getExpensesMonthlyAverage(lastNMonths: Int!, excludedCategoryTypes: [CategoryType!]): ExpensesMonthlyAverage!
 	}
 
 	type Mutation {
