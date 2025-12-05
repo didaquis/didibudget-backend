@@ -44,7 +44,7 @@ module.exports = {
 			const user = await context.di.model.Users.findOne({ email }).lean();
 
 			return {
-				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
+				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate)
 			};
 		},
 		/**
@@ -70,7 +70,7 @@ module.exports = {
 			await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date().toISOString() }, { new: true }).lean();
 
 			return {
-				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
+				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate)
 			};
 		},
 		/**

@@ -6,14 +6,15 @@ const { securityVariablesConfig } = require('../../config/appConfig');
 
 /**
  * Create a new JSON Web Token
- * @param {string}	email		- User email
- * @param {boolean}	isAdmin		- If user is admin or not
- * @param {boolean}	isActive	- If user is active or not
- * @param {string}	uuid		- An uuid token
- * @returns	{string}			- Json Web Token
+ * @param {string}	email				- User email
+ * @param {boolean}	isAdmin				- If user is admin or not
+ * @param {boolean}	isActive			- If user is active or not
+ * @param {string}	uuid				- An uuid token
+ * @param {string}	registrationDate	- User registration date
+ * @returns	{string}					- Json Web Token
  */
-const createAuthToken = (email, isAdmin, isActive, uuid) => {
-	return jwt.sign({ email, isAdmin, isActive, uuid }, securityVariablesConfig.secret, { expiresIn: securityVariablesConfig.timeExpiration });
+const createAuthToken = (email, isAdmin, isActive, uuid, registrationDate) => {
+	return jwt.sign({ email, isAdmin, isActive, uuid, registrationDate }, securityVariablesConfig.secret, { expiresIn: securityVariablesConfig.timeExpiration });
 };
 
 /**
