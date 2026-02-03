@@ -67,70 +67,76 @@ type Mutation {
 
 ### Good Resolver Implementation
 ```javascript
-const expenseResolver = {
+module.exports = {
   Query: {
-    getExpense: async (_, { id }, context) => {
-      // Verify authentication
-      if (!context.user) {
-        throw new Error('Unauthorized');
-      }
+    /**
+     * Get all expenses for authenticated user
+     */
+    getExpenses: async (parent, args, context) => {
+      context.di.authValidation.ensureThatUserIsLogged(context);
 
-      // Fetch from database
-      const expense = await Expense.findById(id);
+      const user = await context.di.authValidation.getUser(context);
 
-      // Check ownership
-      if (expense.userId !== context.user.id) {
-        throw new Error('Forbidden');
-      }
+      const sortCriteria = { date: 'asc' };
+      const allExpenses = await context.di.model.Expenses
+        .find({ user_id: user._id })
+        .sort(sortCriteria)
+        .lean();
 
-      return expense;
+      return allExpenses.map((expense) => expenseDTO(expense));
     },
 
-    listExpenses: async (_, { limit = 20, offset = 0 }, context) => {
-      if (!context.user) {
-        throw new Error('Unauthorized');
-      }
+    /**
+     * Get expenses with pagination for authenticated user
+     */
+    getExpensesWithPagination: async (parent, { page, pageSize }, context) => {
+      context.di.authValidation.ensureThatUserIsLogged(context);
+      context.di.pagingValidation.ensurePageValueIsValid(page);
+      context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
 
-      const expenses = await Expense.find({ userId: context.user.id })
-        .limit(limit)
+      const user = await context.di.authValidation.getUser(context);
+
+      const offset = getOffset(page, pageSize);
+      const expenses = await context.di.model.Expenses
+        .find({ user_id: user._id })
         .skip(offset)
-        .sort({ createdAt: -1 });
+        .limit(pageSize)
+        .lean();
 
-      return expenses;
+      return expenses.map((expense) => expenseDTO(expense));
     }
   },
 
   Mutation: {
-    createExpense: async (_, { input }, context) => {
-      if (!context.user) {
-        throw new Error('Unauthorized');
-      }
+    /**
+     * Register a new expense for authenticated user
+     */
+    registerExpense: async (parent, { category, quantity, date }, context) => {
+      context.di.authValidation.ensureThatUserIsLogged(context);
+      context.di.datetimeValidation.ensureDateIsValid(date);
 
-      const expense = await Expense.create({
-        ...input,
-        userId: context.user.id
-      });
+      const user = await context.di.authValidation.getUser(context);
 
-      return expense;
+      return context.di.model.Expenses({
+        user_id: user._id,
+        category,
+        quantity,
+        date
+      }).save()
+        .then(expense => expenseDTO(expense));
     },
 
-    updateExpense: async (_, { id, input }, context) => {
-      if (!context.user) {
-        throw new Error('Unauthorized');
-      }
+    /**
+     * Delete expense for authenticated user
+     */
+    deleteExpense: async (parent, { uuid }, context) => {
+      context.di.authValidation.ensureThatUserIsLogged(context);
 
-      const expense = await Expense.findById(id);
-      if (!expense || expense.userId !== context.user.id) {
-        throw new Error('Forbidden');
-      }
+      const user = await context.di.authValidation.getUser(context);
 
-      const updated = await Expense.findByIdAndUpdate(
-        id,
-        input,
-        { new: true }
-      );
-
-      return updated;
+      return context.di.model.Expenses
+        .findOneAndDelete({ uuid, user_id: user._id })
+        .then(expense => expenseDTO(expense));
     }
   }
 };
@@ -140,68 +146,116 @@ const expenseResolver = {
 
 ### Authentication Pattern
 ```javascript
-// Context always includes authenticated user
-// Use context.user to check authorization
-if (!context.user) {
-  throw new Error('Unauthorized');
-}
+// In setContext.js (Apollo Server context setup):
+// 1. Extract token from Authorization header
+// 2. Validate token and extract user info
+// 3. Add user to context if valid, otherwise context.user is undefined
 
-// Verify resource ownership
-if (resource.userId !== context.user.id) {
-  throw new Error('Forbidden');
+// In resolvers, use context.di.authValidation helpers to check authentication:
+
+// Check if user is logged in:
+context.di.authValidation.ensureThatUserIsLogged(context);
+
+// Get authenticated user data:
+const user = await context.di.authValidation.getUser(context);
+
+// Check if user is administrator:
+context.di.authValidation.ensureThatUserIsAdministrator(context);
+```
+
+### Example with Authentication Checks
+```javascript
+registerExpense: async (parent, { category, quantity, date }, context) => {
+  // Always check authentication first
+  context.di.authValidation.ensureThatUserIsLogged(context);
+  
+  // Validate input parameters
+  context.di.datetimeValidation.ensureDateIsValid(date);
+
+  // Get authenticated user
+  const user = await context.di.authValidation.getUser(context);
+
+  // Proceed with user_id = user._id to associate expense with this user
+  return context.di.model.Expenses({
+    user_id: user._id,
+    category,
+    quantity,
+    date
+  }).save();
 }
 ```
 
 ### Error Handling
-- Throw meaningful errors that Apollo formats for clients
-- Use descriptive error messages
-- Return appropriate HTTP status codes via Apollo
-- Log errors using log4js (already configured)
-
-### Mongoose Queries
 ```javascript
-// Find with filters
-const expenses = await Expense.find({ userId, category });
+const { AuthenticationError, ForbiddenError, UserInputError, ValidationError } = require('apollo-server-express');
 
-// Sort and pagination
-const list = await Expense
-  .find({ userId })
-  .sort({ createdAt: -1 })
-  .limit(20)
-  .skip(offset);
+// Authentication failed
+throw new AuthenticationError('You must be logged in to perform this action');
 
-// Update
-const updated = await Expense.findByIdAndUpdate(
-  id,
-  { amount, category },
-  { new: true }
-);
+// Permission denied
+throw new ForbiddenError('You must be an administrator to perform this action');
 
-// Delete
-await Expense.findByIdAndDelete(id);
+// Invalid input
+throw new UserInputError('The email is not valid');
+
+// Validation failed
+throw new ValidationError('The maximum number of users allowed has been reached');
+```
+
+### Mongoose Queries with Dependency Injection
+```javascript
+// Find documents for user
+const expenses = await context.di.model.Expenses
+  .find({ user_id: user._id })
+  .lean();
+
+// Count documents
+const count = await context.di.model.Expenses
+  .countDocuments({ user_id: user._id });
+
+// Find one and delete
+const deleted = await context.di.model.Expenses
+  .findOneAndDelete({ uuid, user_id: user._id });
+
+// Using aggregation pipeline
+const result = await context.di.model.Expenses.aggregate([
+  { $match: { user_id: user._id } },
+  { $group: { _id: null, total: { $sum: { $toDouble: '$quantity' } } } }
+]);
+```
+
+### Response Formatting with DTOs
+```javascript
+// Import DTO
+const { expenseDTO } = require('../../dto/expenseDTO');
+
+// Transform data before returning
+return allExpenses.map((expense) => expenseDTO(expense));
 ```
 
 ## File Structure for New Endpoints
 
 When adding new features:
 1. **Define types** in `src/gql/types/myFeature.js`
-2. **Implement resolvers** in `src/gql/resolvers/myFeature.js`
-3. **Add mutations** in `src/gql/mutations/myFeature.js`
-4. **Write service logic** in `src/services/MyFeatureService.js`
-5. **Define model** in `src/models/MyFeature.js`
-6. **Add tests** in `tests/` mirroring the structure
+2. **Implement resolvers** in `src/gql/resolvers/myFeature.js` (use context.di for dependencies)
+3. **Use authValidation helpers** - call `context.di.authValidation.ensureThatUserIsLogged(context)` to protect endpoints
+4. **Get user data** - use `const user = await context.di.authValidation.getUser(context)`
+5. **Query database** - use `context.di.model.YourModel` for Mongoose models
+6. **Transform response** - use DTO functions to format output consistently
+7. **Add tests** in `tests/` mirroring the structure
 
 ## Boundaries
 
 ### ✅ Always Do
-- Write resolvers that authenticate users (check context.user)
-- Verify resource ownership before modifications
-- Use existing service layer for business logic
-- Return proper GraphQL types
+- Use `context.di.authValidation.ensureThatUserIsLogged(context)` to protect endpoints
+- Get user from context using `const user = await context.di.authValidation.getUser(context)`
+- Filter all queries by `user_id: user._id` to ensure data isolation
+- Use dependency injection from context.di for models and validators
+- Transform responses with DTO functions for consistent format
+- Throw proper Apollo errors (AuthenticationError, ForbiddenError, UserInputError, ValidationError)
 - Test endpoints with `npm test`
-- Document complex resolvers with comments
-- Use consistent error messages
-- Follow existing naming conventions
+- Follow existing resolver patterns from `/src/gql/resolvers/`
+- Use JSDoc comments to document resolver parameters and behavior
 
 ### ⚠️ Ask First
 - Before modifying database schemas (Mongoose models)
