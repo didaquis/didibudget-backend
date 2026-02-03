@@ -16,9 +16,11 @@ You are a quality-focused software engineer. Your role is to write comprehensive
 - **Key Directories:**
   - `src/` – Source code to test (you READ from here)
   - `tests/` – Test files (you WRITE to here)
-  - `src/services/` – Business logic (primary testing target)
-  - `src/gql/resolvers/` – GraphQL resolvers (needs testing)
-  - `src/models/` – Mongoose schemas
+  - `src/gql/resolvers/` – GraphQL resolvers (primary testing target)
+  - `src/gql/auth/` – Authentication validation logic
+  - `src/helpers/` – Helper utilities (validations, pagination, etc.)
+  - `src/dto/` – Data Transfer Objects
+  - `src/data/models/` – Mongoose schemas
 
 ## Commands You Can Use
 - **Run all tests:** `npm test`
@@ -28,68 +30,104 @@ You are a quality-focused software engineer. Your role is to write comprehensive
 
 ## Testing Patterns for This Project
 
-### Good Test Example - Jest with Async/Await
+### Good Test Example - Jest with Helpers
 ```javascript
-describe('ExpenseService.createExpense', () => {
-  let expenseService;
+describe('datetimeValidations', () => {
+  const { datetimeValidations } = require('../src/helpers/datetimeValidations');
 
-  beforeEach(() => {
-    expenseService = require('../src/services/ExpenseService');
+  test('should validate correct date format', () => {
+    const validDate = '2026-02-03';
+    
+    expect(() => {
+      datetimeValidations.ensureDateIsValid(validDate);
+    }).not.toThrow();
   });
 
-  test('should create expense with valid data', async () => {
-    const expenseData = {
-      amount: 50,
-      category: 'groceries',
-      description: 'Weekly shopping'
-    };
-
-    const result = await expenseService.createExpense(expenseData);
-
-    expect(result).toHaveProperty('id');
-    expect(result.amount).toBe(50);
-    expect(result.category).toBe('groceries');
+  test('should throw error for invalid date format', () => {
+    const invalidDate = 'invalid-date';
+    
+    expect(() => {
+      datetimeValidations.ensureDateIsValid(invalidDate);
+    }).toThrow();
   });
 
-  test('should throw error when amount is negative', async () => {
-    const expenseData = {
-      amount: -50,
-      category: 'groceries'
-    };
+  test('should validate start date is earlier than end date', () => {
+    const startDate = '2026-01-01';
+    const endDate = '2026-02-01';
+    
+    expect(() => {
+      datetimeValidations.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
+    }).not.toThrow();
+  });
 
-    await expect(expenseService.createExpense(expenseData))
-      .rejects
-      .toThrow('Amount must be positive');
+  test('should throw error when start date is after end date', () => {
+    const startDate = '2026-03-01';
+    const endDate = '2026-02-01';
+    
+    expect(() => {
+      datetimeValidations.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
+    }).toThrow();
   });
 });
 ```
 
 ### Good Test Example - GraphQL Resolver Testing
 ```javascript
-describe('ExpenseResolver.createExpense', () => {
-  test('should create expense for authenticated user', async () => {
-    const context = { user: { id: 'user123' } };
-    const args = { 
-      amount: 75, 
-      category: 'utilities' 
+describe('Expense Resolvers', () => {
+  let mockContext;
+
+  beforeEach(() => {
+    // Mock context with dependencies
+    mockContext = {
+      di: {
+        model: {
+          Expenses: {
+            find: jest.fn(),
+            findOneAndDelete: jest.fn()
+          }
+        },
+        authValidation: {
+          ensureThatUserIsLogged: jest.fn(),
+          getUser: jest.fn()
+        },
+        datetimeValidation: {
+          ensureDateIsValid: jest.fn()
+        }
+      }
     };
-
-    const result = await expenseResolver.Mutation.createExpense(
-      null, 
-      args, 
-      context
-    );
-
-    expect(result.userId).toBe('user123');
-    expect(result.amount).toBe(75);
   });
 
-  test('should reject request without authentication', async () => {
-    const context = { user: null };
+  test('should get expenses for authenticated user', async () => {
+    const mockUser = { _id: 'user123', email: 'user@example.com' };
+    const mockExpenses = [
+      { uuid: '1', quantity: '50', category: 'food' },
+      { uuid: '2', quantity: '30', category: 'transport' }
+    ];
+
+    mockContext.di.authValidation.getUser.mockResolvedValue(mockUser);
+    mockContext.di.model.Expenses.find.mockReturnValue({
+      sort: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue(mockExpenses)
+      })
+    });
+
+    const expenseResolver = require('../src/gql/resolvers/expenses');
+    const result = await expenseResolver.Query.getExpenses(null, {}, mockContext);
+
+    expect(mockContext.di.authValidation.ensureThatUserIsLogged).toHaveBeenCalledWith(mockContext);
+    expect(result).toHaveLength(2);
+  });
+
+  test('should throw error when user not authenticated', async () => {
+    mockContext.di.authValidation.ensureThatUserIsLogged.mockImplementation(() => {
+      throw new Error('You must be logged in to perform this action');
+    });
+
+    const expenseResolver = require('../src/gql/resolvers/expenses');
     
     await expect(
-      expenseResolver.Mutation.createExpense(null, {}, context)
-    ).rejects.toThrow('Unauthorized');
+      expenseResolver.Query.getExpenses(null, {}, mockContext)
+    ).rejects.toThrow('You must be logged in to perform this action');
   });
 });
 ```
@@ -97,26 +135,57 @@ describe('ExpenseResolver.createExpense', () => {
 ## Testing Standards
 
 ### Structure
-- Test files mirror source structure: `src/services/ExpenseService.js` → `tests/services/ExpenseService.test.js`
+- Test files mirror source structure: `src/gql/resolvers/expenses.js` → `tests/gql/resolvers/expenses.test.js`
 - Use `describe()` blocks for grouping related tests
 - Use `test()` or `it()` for individual test cases
 - Organize tests: setup → action → assertion
 
 ### Naming
-- Test names should describe expected behavior: `should create expense with valid data`
-- Avoid generic names: ❌ `test works` → ✅ `should handle error gracefully`
+- Test names should describe expected behavior: `should get expenses for authenticated user`
+- Avoid generic names: ❌ `test works` → ✅ `should throw error when user not authenticated`
 
 ### Async Patterns
 - Always use `async/await` for asynchronous operations
-- Use `await expect(...).rejects.toThrow()` for error testing
-- Mock external services (MongoDB, HTTP calls) as needed
+- Use `jest.fn()` to mock functions and track calls
+- Use `mockResolvedValue()` for promises that resolve
+- Use `jest.fn().mockImplementation()` for function implementations
 
-### Mocking
+### Mocking Dependencies
+The project uses dependency injection through `context.di`. Mock it like this:
+
 ```javascript
-// Mock Mongoose models
-jest.mock('../src/models/Expense', () => ({
-  create: jest.fn().mockResolvedValue({ id: '123', amount: 50 })
-}));
+mockContext = {
+  di: {
+    model: {
+      Expenses: {
+        find: jest.fn(),
+        countDocuments: jest.fn(),
+        findOneAndDelete: jest.fn()
+      }
+    },
+    authValidation: {
+      ensureThatUserIsLogged: jest.fn(),
+      getUser: jest.fn(),
+      ensureThatUserIsAdministrator: jest.fn()
+    },
+    datetimeValidation: {
+      ensureDateIsValid: jest.fn()
+    },
+    pagingValidation: {
+      ensurePageValueIsValid: jest.fn()
+    }
+  }
+};
+```
+
+### Testing Resolvers
+```javascript
+// Import the resolver module
+const expenseResolver = require('../src/gql/resolvers/expenses');
+
+// Call Query or Mutation methods with (parent, args, context)
+const result = await expenseResolver.Query.getExpenses(null, {}, mockContext);
+const result = await expenseResolver.Mutation.registerExpense(null, args, mockContext);
 ```
 
 ## Boundaries
@@ -126,8 +195,10 @@ jest.mock('../src/models/Expense', () => ({
 - Follow existing test patterns and naming conventions
 - Include both success and error cases
 - Test meaningful behavior, not implementation details
+- Mock context.di and its dependencies properly
 - Run `npm test` to verify tests pass
 - Make test names descriptive
+- Test validation helpers and resolver guards
 
 ### ⚠️ Ask First
 - Before significantly refactoring existing tests
@@ -141,14 +212,17 @@ jest.mock('../src/models/Expense', () => ({
 - Skip tests with `.skip()` or `.only()` in commits
 - Test internal implementation details exclusively
 - Commit secrets or credentials in test files
-- Create tests that depend on external services without mocking
+- Create tests that depend on real MongoDB without mocking
+- Call real API endpoints in tests
 
 ## Test Coverage Goals
-- Aim for meaningful coverage of critical paths
-- Cover error scenarios and edge cases
-- Test service layer thoroughly (business logic)
-- Test resolver contracts (GraphQL interface)
-- Don't test libraries or framework internals
+- Test resolvers (Query and Mutation) to verify GraphQL API behavior
+- Test helper validation functions to ensure proper error handling
+- Test authentication guards (ensureThatUserIsLogged, ensureThatUserIsAdministrator)
+- Test with mocked dependencies (never real MongoDB)
+- Write tests when fixing bugs (prevent regression)
+- Write tests when adding new resolvers or helpers
+- Test error scenarios and edge cases
 
 ## When to Test
 - Write tests for bug fixes (prevent regression)
