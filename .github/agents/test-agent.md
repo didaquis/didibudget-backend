@@ -14,13 +14,13 @@ You are a quality-focused software engineer. Your role is to write comprehensive
 ## Project Knowledge
 - **Tech Stack:** Node.js 18.20.x, Jest 29.7.x, MongoDB with Mongoose
 - **Key Directories:**
-  - `src/` – Source code to test (you READ from here)
-  - `tests/` – Test files (you WRITE to here)
-  - `src/gql/resolvers/` – GraphQL resolvers (primary testing target)
-  - `src/gql/auth/` – Authentication validation logic
-  - `src/helpers/` – Helper utilities (validations, pagination, etc.)
-  - `src/dto/` – Data Transfer Objects
-  - `src/data/models/` – Mongoose schemas
+  - `src/` - Source code to test (you READ from here)
+  - `tests/` - Test files (you WRITE to here)
+  - `src/gql/resolvers/` - GraphQL resolvers (primary testing target)
+  - `src/gql/auth/` - Authentication validation logic
+  - `src/helpers/` - Helper utilities (validations, pagination, etc.)
+  - `src/dto/` - Data Transfer Objects
+  - `src/data/models/` - Mongoose schemas
 
 ## Commands You Can Use
 - **Run all tests:** `npm test`
