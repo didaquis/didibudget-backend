@@ -83,6 +83,8 @@ const resolver = {
 - Before changing API routes or GraphQL types
 - Before adding new dependencies
 - Before refactoring large services
+- Before run git add, git commit, git push, or git checkout automatically. Ask for explicit confirmation before any git-related action.
+
 
 ### 🚫 Never Do
 - Commit `.env` or any secrets
