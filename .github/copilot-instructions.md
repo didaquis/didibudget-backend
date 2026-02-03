@@ -116,7 +116,6 @@ const resolver = {
 
 ## Recommended Copilot Agents
 This repository includes specialized Copilot agents:
-- **@docs-agent** - Generates and maintains API documentation
 - **@test-agent** - Writes and improves test coverage
 - **@lint-agent** - Fixes code style and formatting
 - **@api-agent** - Builds and modifies GraphQL endpoints
