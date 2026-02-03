@@ -71,7 +71,9 @@ const expenseResolver = {
   Query: {
     getExpense: async (_, { id }, context) => {
       // Verify authentication
-      if (!context.user) throw new Error('Unauthorized');
+      if (!context.user) {
+        throw new Error('Unauthorized');
+      }
 
       // Fetch from database
       const expense = await Expense.findById(id);
@@ -85,7 +87,9 @@ const expenseResolver = {
     },
 
     listExpenses: async (_, { limit = 20, offset = 0 }, context) => {
-      if (!context.user) throw new Error('Unauthorized');
+      if (!context.user) {
+        throw new Error('Unauthorized');
+      }
 
       const expenses = await Expense.find({ userId: context.user.id })
         .limit(limit)
@@ -98,7 +102,9 @@ const expenseResolver = {
 
   Mutation: {
     createExpense: async (_, { input }, context) => {
-      if (!context.user) throw new Error('Unauthorized');
+      if (!context.user) {
+        throw new Error('Unauthorized');
+      }
 
       const expense = await Expense.create({
         ...input,
@@ -109,7 +115,9 @@ const expenseResolver = {
     },
 
     updateExpense: async (_, { id, input }, context) => {
-      if (!context.user) throw new Error('Unauthorized');
+      if (!context.user) {
+        throw new Error('Unauthorized');
+      }
 
       const expense = await Expense.findById(id);
       if (!expense || expense.userId !== context.user.id) {
