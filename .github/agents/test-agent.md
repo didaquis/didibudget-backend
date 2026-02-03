@@ -32,6 +32,8 @@ You are a quality-focused software engineer. Your role is to write comprehensive
 
 ### Good Test Example - Jest with Helpers
 ```javascript
+'use strict';
+
 describe('datetimeValidations', () => {
   const { datetimeValidations } = require('../src/helpers/datetimeValidations');
 
@@ -73,61 +75,115 @@ describe('datetimeValidations', () => {
 
 ### Good Test Example - GraphQL Resolver Testing
 ```javascript
+'use strict';
+
 describe('Expense Resolvers', () => {
-  let mockContext;
+  let resolvers;
+  let context;
+
+  const mockUser = { _id: 'user123' };
 
   beforeEach(() => {
-    // Mock context with dependencies
-    mockContext = {
+    jest.resetModules();
+
+    context = {
       di: {
-        model: {
-          Expenses: {
-            find: jest.fn(),
-            findOneAndDelete: jest.fn()
-          }
-        },
         authValidation: {
           ensureThatUserIsLogged: jest.fn(),
-          getUser: jest.fn()
+          getUser: jest.fn().mockResolvedValue(mockUser)
         },
-        datetimeValidation: {
-          ensureDateIsValid: jest.fn()
+        model: {
+          ExpenseCategory: {
+            collection: { name: 'expensecategories' }
+          },
+          Expenses: {
+            aggregate: jest.fn()
+          }
         }
       }
     };
+
+    resolvers = require('../src/gql/resolvers/expenses');
   });
 
-  test('should get expenses for authenticated user', async () => {
-    const mockUser = { _id: 'user123', email: 'user@example.com' };
-    const mockExpenses = [
-      { uuid: '1', quantity: '50', category: 'food' },
-      { uuid: '2', quantity: '30', category: 'transport' }
-    ];
+  describe('Query.getExpensesSumByType', () => {
+    const CATEGORY_TYPE = 'FOOD';
 
-    mockContext.di.authValidation.getUser.mockResolvedValue(mockUser);
-    mockContext.di.model.Expenses.find.mockReturnValue({
-      sort: jest.fn().mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockExpenses)
-      })
+    test('returns sum grouped by currency when aggregation has results', async () => {
+      context.di.model.Expenses.aggregate.mockResolvedValue([
+        { currencyISO: 'USD', sum: 150 }
+      ]);
+
+      const result = await resolvers.Query.getExpensesSumByType(
+        null,
+        { categoryType: CATEGORY_TYPE },
+        context
+      );
+
+      // Auth
+      expect(context.di.authValidation.ensureThatUserIsLogged)
+        .toHaveBeenCalledWith(context);
+
+      expect(context.di.authValidation.getUser)
+        .toHaveBeenCalledWith(context);
+
+      // Aggregation
+      expect(context.di.model.Expenses.aggregate)
+        .toHaveBeenCalledTimes(1);
+
+      const pipeline = context.di.model.Expenses.aggregate.mock.calls[0][0];
+
+      expect(pipeline[0]).toEqual({
+        $match: { user_id: mockUser._id }
+      });
+
+      expect(pipeline).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ $lookup: expect.any(Object) }),
+          expect.objectContaining({ $group: expect.any(Object) })
+        ])
+      );
+
+      // Result (DTO real)
+      expect(result).toEqual({
+        categoryType: CATEGORY_TYPE,
+        currencyISO: 'USD',
+        sum: 150
+      });
     });
 
-    const expenseResolver = require('../src/gql/resolvers/expenses');
-    const result = await expenseResolver.Query.getExpenses(null, {}, mockContext);
+    test('returns zero sum when aggregation returns empty array', async () => {
+      context.di.model.Expenses.aggregate.mockResolvedValue([]);
 
-    expect(mockContext.di.authValidation.ensureThatUserIsLogged).toHaveBeenCalledWith(mockContext);
-    expect(result).toHaveLength(2);
-  });
+      const result = await resolvers.Query.getExpensesSumByType(
+        null,
+        { categoryType: CATEGORY_TYPE },
+        context
+      );
 
-  test('should throw error when user not authenticated', async () => {
-    mockContext.di.authValidation.ensureThatUserIsLogged.mockImplementation(() => {
-      throw new Error('You must be logged in to perform this action');
+      expect(result).toEqual({
+        categoryType: CATEGORY_TYPE,
+        currencyISO: 'EUR',
+        sum: 0
+      });
     });
 
-    const expenseResolver = require('../src/gql/resolvers/expenses');
-    
-    await expect(
-      expenseResolver.Query.getExpenses(null, {}, mockContext)
-    ).rejects.toThrow('You must be logged in to perform this action');
+    test('throws if user is not authenticated', async () => {
+      context.di.authValidation.ensureThatUserIsLogged.mockImplementation(() => {
+        throw new Error('Not authenticated');
+      });
+
+      await expect(
+        resolvers.Query.getExpensesSumByType(
+          null,
+          { categoryType: CATEGORY_TYPE },
+          context
+        )
+      ).rejects.toThrow('Not authenticated');
+
+      expect(context.di.model.Expenses.aggregate)
+        .not.toHaveBeenCalled();
+    });
   });
 });
 ```
@@ -150,34 +206,6 @@ describe('Expense Resolvers', () => {
 - Use `mockResolvedValue()` for promises that resolve
 - Use `jest.fn().mockImplementation()` for function implementations
 
-### Mocking Dependencies
-The project uses dependency injection through `context.di`. Mock it like this:
-
-```javascript
-mockContext = {
-  di: {
-    model: {
-      Expenses: {
-        find: jest.fn(),
-        countDocuments: jest.fn(),
-        findOneAndDelete: jest.fn()
-      }
-    },
-    authValidation: {
-      ensureThatUserIsLogged: jest.fn(),
-      getUser: jest.fn(),
-      ensureThatUserIsAdministrator: jest.fn()
-    },
-    datetimeValidation: {
-      ensureDateIsValid: jest.fn()
-    },
-    pagingValidation: {
-      ensurePageValueIsValid: jest.fn()
-    }
-  }
-};
-```
-
 ### Testing Resolvers
 ```javascript
 // Import the resolver module
@@ -199,6 +227,11 @@ const result = await expenseResolver.Mutation.registerExpense(null, args, mockCo
 - Run `npm test` to verify tests pass
 - Make test names descriptive
 - Test validation helpers and resolver guards
+- Always assert side effects (calls to validations and models)
+- Prefer explicit expectations over generic ones
+- Reset module cache between tests
+- Cover error paths and validation failures
+
 
 ### ⚠️ Ask First
 - Before significantly refactoring existing tests
