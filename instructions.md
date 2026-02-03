@@ -93,7 +93,7 @@ const resolver = {
 - Modify ESLint config without discussion
 
 ## Development Workflow
-1. Create feature branch from `main`
+1. Create feature branch from `master`
 2. Make changes following existing patterns
 3. Run `npm run lint --fix` to auto-fix style issues
 4. Run `npm test` to verify tests pass
