@@ -253,6 +253,11 @@ const expenseCategories = [
 				emojis: ['🍺'],
 			},
 			{
+				name: 'Social gathering',
+				inmutableKey: 'c5e7cadebd4b038ee612',
+				emojis: ['👨‍👩‍👧‍👦', '🎳', '🥂'],
+			},
+			{
 				name: 'Gym and climbing wall',
 				inmutableKey: '1f2db29fbcc94835f5ec',
 				emojis: ['🤸🏻'],
@@ -268,14 +273,19 @@ const expenseCategories = [
 				emojis: ['⛺️'],
 			},
 			{
-				name: 'Recreational courses and formative sessions (cooking, chess...)',
+				name: 'Recreational courses & formative sessions (cooking, chess...)',
 				inmutableKey: 'b2cbe8b45593c0b39b5e',
 				emojis: ['🧑🏻‍🎓'],
 			},
 			{
-				name: 'Social gathering',
-				inmutableKey: 'c5e7cadebd4b038ee612',
-				emojis: ['👨‍👩‍👧‍👦', '🎳', '🥂'],
+				name: 'Memberships, federations, clubs',
+				inmutableKey: '663cb5572e52ac1e16bc',
+				emojis: ['🪪', '🤝'],
+			},
+			{
+				name: 'Tournaments, competitions',
+				inmutableKey: '5ad4057ec1e4c7f8472b',
+				emojis: ['🏆'],
 			}
 		],
 		emojis: ['🍿', '🎳'],
