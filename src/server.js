@@ -6,9 +6,11 @@ const helmet = require('helmet');
 const favicon = require('serve-favicon');
 const path = require('path');
 const cors = require('cors');
-const { ApolloServer } = require('apollo-server-express');
-const { UserInputError } = require('apollo-server-errors');
-const { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
+const { ApolloServer } = require('@apollo/server');
+const { UserInputError } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
+const { ApolloServerPluginLandingPageGraphQLPlayground } = require('@apollo/server/plugin/landingPage/graphQLPlayground');
+const { ApolloServerPluginLandingPageDisabled } = require('@apollo/server/plugin/landingPage/disabled');
 
 const { setContext } = require('./gql/auth/setContext');
 const typeDefs = require('./gql/types/index');
@@ -73,7 +75,6 @@ const initApplication = async () => {
 	const server = new ApolloServer({ 
 		typeDefs,
 		resolvers,
-		context: setContext,
 		introspection: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
 		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
 		formatError (error) {
@@ -87,7 +88,13 @@ const initApplication = async () => {
 
 	await server.start();
 
-	server.applyMiddleware({ app });
+	app.use(
+		'/graphql',
+		cors({ credentials: true }),
+		expressMiddleware(server, {
+			context: setContext,
+		})
+	);
 
 	app.use((req, res) => {
 		res.status(404).send('404'); // eslint-disable-line no-magic-numbers
@@ -97,7 +104,7 @@ const initApplication = async () => {
 		getListOfIPV4Address().forEach(ip => {
 			logger.info(`Application running on: http://${ip}:${environmentVariablesConfig.port}`);
 			if (environmentVariablesConfig.environment !== ENVIRONMENT.PRODUCTION) {
-				logger.info(`GraphQL Playground running on: http://${ip}:${environmentVariablesConfig.port}${server.graphqlPath}`);
+				logger.info(`GraphQL Playground running on: http://${ip}:${environmentVariablesConfig.port}/graphql`);
 			}
 		});
 	});
