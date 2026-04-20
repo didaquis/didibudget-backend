@@ -6,7 +6,7 @@ This document serves as the primary context and instruction set for AI assistant
 
 ## 1. Project Overview & Tech Stack
 **didibudget-backend** is a budget management API built with Node.js, Express, GraphQL, and MongoDB.
-- **Runtime:** Node.js 18.20.x
+- **Runtime:** Node.js 24.14.x
 - **Framework:** Express 4.21.x + Apollo Server 3.13.x
 - **Database:** MongoDB 8.0+ (Mongoose ODM)
 - **GraphQL:** GraphQL 16.12.x with schema stitching
