@@ -9,11 +9,8 @@
         "ecmaVersion": 2020,
         "sourceType": "module"
     },
-    "plugins": [
-        "@didaquis/no-lenght"
-    ],
+    "plugins": [],
     "rules": {
-        "@didaquis/no-lenght/no-lenght": "error",
         "indent": [
             "error",
             "tab",
