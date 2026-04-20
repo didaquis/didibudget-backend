@@ -8,7 +8,7 @@ const path = require('path');
 const cors = require('cors');
 const { ApolloServer, ApolloServerPluginLandingPageDisabled } = require('@apollo/server');
 const { UserInputError } = require('@apollo/server');
-const { expressMiddleware } = require('@apollo/server/express4');
+const { expressMiddleware } = require('@as-integrations/express5');
 
 const { setContext } = require('./gql/auth/setContext');
 const typeDefs = require('./gql/types/index');
@@ -66,6 +66,8 @@ const initApplication = async () => {
 		// Allow GraphQL Playground on development environments
 		app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 	}
+	app.use(express.json());
+	app.use(express.urlencoded({ extended: true }));
 	app.use(cors({ credentials: true }));
 	app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 	app.use('', routesManager);
