@@ -1,6 +1,6 @@
 'use strict';
 
-const { UserInputError } = require('apollo-server-express');
+const { UserInputError } = require('@apollo/server');
 const bcrypt = require('bcrypt');
 const { isValidEmail, isStrongPassword } = require('../../helpers/validations');
 

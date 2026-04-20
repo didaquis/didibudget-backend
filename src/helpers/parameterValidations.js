@@ -1,6 +1,6 @@
 'use strict';
 
-const { UserInputError } = require('apollo-server-express');
+const { UserInputError } = require('@apollo/server');
 
 /**
 * Parameter validations repository

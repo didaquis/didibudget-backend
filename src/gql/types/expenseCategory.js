@@ -1,6 +1,6 @@
 'use strict';
 
-const { gql } = require('apollo-server-express');
+const gql = require('graphql-tag');
 
 module.exports = /* GraphQL */ gql`
 	enum CategoryType {

@@ -6,11 +6,9 @@ const helmet = require('helmet');
 const favicon = require('serve-favicon');
 const path = require('path');
 const cors = require('cors');
-const { ApolloServer } = require('@apollo/server');
+const { ApolloServer, ApolloServerPluginLandingPageDisabled } = require('@apollo/server');
 const { UserInputError } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
-const { ApolloServerPluginLandingPageGraphQLPlayground } = require('@apollo/server/plugin/landingPage/graphQLPlayground');
-const { ApolloServerPluginLandingPageDisabled } = require('@apollo/server/plugin/landingPage/disabled');
 
 const { setContext } = require('./gql/auth/setContext');
 const typeDefs = require('./gql/types/index');
@@ -76,7 +74,7 @@ const initApplication = async () => {
 		typeDefs,
 		resolvers,
 		introspection: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
-		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
+		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger], // Log all querys and their responses. Show playground (do not use in production)
 		formatError (error) {
 			if ( !(error.originalError instanceof UserInputError) ) {
 				logger.error(error.message);

@@ -1,8 +1,29 @@
 'use strict';
 
-const { AuthenticationError, ForbiddenError, ValidationError } = require('apollo-server-express');
+const { GraphQLError } = require('graphql');
 const { globalVariablesConfig } = require('../../config/appConfig');
 const { Users } = require('../../data/models/index');
+
+class AuthenticationError extends GraphQLError {
+	constructor (message) {
+		super(message, { extensions: { code: 'UNAUTHENTICATED' } });
+		this.name = 'AuthenticationError';
+	}
+}
+
+class ForbiddenError extends GraphQLError {
+	constructor (message) {
+		super(message, { extensions: { code: 'FORBIDDEN' } });
+		this.name = 'ForbiddenError';
+	}
+}
+
+class ValidationError extends GraphQLError {
+	constructor (message) {
+		super(message, { extensions: { code: 'VALIDATION_ERROR' } });
+		this.name = 'ValidationError';
+	}
+}
 
 /**
  * Auth validations repository
