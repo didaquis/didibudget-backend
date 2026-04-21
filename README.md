@@ -1,7 +1,7 @@
 # 💰 didibudget-backend
 
 This is an app to manage your money.
-The project is splitted on two repositories: one for the backend and one for the frontend application. 
+The project is split into two repositories: one for the backend and one for the frontend application. 
 
 This repository is for the backend and is intended to work with [the frontend](https://github.com/didaquis/didibudget-frontend)
 
@@ -29,7 +29,7 @@ Don't worry, I have written down some information for you. Here you have a guide
 | MONGO_FORMAT_CONNECTION | The format of connection with MongoDB service. Choose between: standard or DNSseedlist |
 | MONGO_HOST | Set this value only if you are using the standard connection format. Host of MongoDB service |
 | MONGO_PORT | Set this value only if you are using the standard connection format. Port of MongoDB service |
-| MONGO_DB | Set this value only if you are using the standard connection format. The name of database |
+| MONGO_DB | Set this value only if you are using the standard connection format. The name of the database |
 | MONGO_USER | Set this value only if you are using the standard connection format. User name |
 | MONGO_PASS | Set this value only if you are using the standard connection format. User password |
 | MONGO_DNS_SEEDLIST_CONNECTION | Set this value only if you are using the DNSseedlist connection format. It should be something like this: mongodb+srv://user:password@uri-and-options |
@@ -38,15 +38,15 @@ Don't worry, I have written down some information for you. Here you have a guide
 
 **How can I configure a user to be an administrator?** 
 
-To make a user an administrator you must access to the database and search its registry. You will see a Boolean who allows the user to have the role of the administrator. Set it to 'true' and in their next authentication that user will have administrator permissions.
+To make a user an administrator you must access to the database and search its registry. You will see a Boolean that allows the user to have the role of the administrator. Set it to 'true' and in their next authentication that user will have administrator permissions.
 
 ### 💻 Tricks for development
 * Run app in dev mode: `npm run dev`
 * Run the linter: `npm run lint`
 * Delete all log files: `npm run clean`
-* Run the test, mode watch: `npm run test:watch`
+* Run the tests in watch mode: `npm run test:watch`
 
-### How to add default expenses categories?
+### How to add default expense categories?
 To add new expense categories or subcategories, you must create a totally random and unique `inmutableKey`. 
 
 Use this snippet to obtain a new value:
