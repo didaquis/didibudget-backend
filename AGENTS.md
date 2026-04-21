@@ -238,3 +238,15 @@ Throw proper Apollo errors:
 The category lists and default data included in this repository (for example, files as `src/config/defaultData.js` and related resources) are used to populate the application's database. Under no circumstances should these categories be modified, renamed, removed, or otherwise altered without the explicit, documented consent of the end-user. Unauthorized changes may cause data loss, inconsistencies, or broken migrations.
 
 If a change to the default categories is required, you should obtain explicit consent from the end-user before.
+
+---
+
+## Code quality guidelines
+
+- No hacks or quick fixes. We do not accept sloppy, fragile, or shortcut-based solutions. Code must be robust, intentional, and maintainable.
+- Readability over cleverness. Prefer clear, explicit, and easy-to-understand code over compact, overly clever, or cryptic implementations.
+- Maintainability first. Write code that is easy to reason about, modify, and debug by other developers in the future.
+- Tests are expected. Most non-trivial code must be accompanied by appropriate unit tests. Tests should be meaningful, readable, and cover the main execution paths and edge cases.
+- Consistency matters. Follow existing project conventions, naming standards, and architectural patterns.
+- Fail explicitly. Handle errors clearly and predictably; avoid silent failures or ambiguous behavior.
+- TypeScript over JavaScript. Prefer TypeScript instead of JavaScript. Use strict typing, explicit interfaces, and meaningful types to improve correctness and maintainability.
