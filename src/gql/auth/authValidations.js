@@ -1,7 +1,6 @@
 'use strict';
 
 import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
-import { globalVariablesConfig } from '../../config/appConfig.js';
 import { Users } from '../../data/models/index.js';
 
 /**
@@ -12,9 +11,9 @@ const authValidations = {
 	/**
 	 * Check if the maximum limit of users has been reached. If limit is reached, it throws an error.
 	 * @param {number} numberOfCurrentlyUsersRegistered 	- The number of users currently registered in the service
+	* @param {number} usersLimit 	- The maximum number of users allowed to be registered in the service. Set the value to 0 to not use the limit.
 	 */
-	ensureLimitOfUsersIsNotReached: (numberOfCurrentlyUsersRegistered) => {
-		const usersLimit = globalVariablesConfig.limitOfUsersRegistered;
+	ensureLimitOfUsersIsNotReached: (numberOfCurrentlyUsersRegistered, usersLimit) => {
 		if (usersLimit === 0) {
 			return;
 		}
@@ -58,7 +57,7 @@ const authValidations = {
 		if (!context.user) {
 			return null;
 		}
-	
+
 		const userUUID = context.user.uuid || null;
 		const user = await Users.findOne({ uuid: userUUID }).lean();
 		if (!user) {

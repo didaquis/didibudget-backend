@@ -3,6 +3,7 @@
 import { UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
 import { isValidEmail, isStrongPassword } from '../../helpers/validations.js';
+import { globalVariablesConfig } from '../../config/appConfig.js';
 
 
 /**
@@ -31,7 +32,7 @@ export const Mutation = {
 
 		const registeredUsersCount = await context.di.model.Users.find().estimatedDocumentCount();
 
-		context.di.authValidation.ensureLimitOfUsersIsNotReached(registeredUsersCount);
+		context.di.authValidation.ensureLimitOfUsersIsNotReached(registeredUsersCount, globalVariablesConfig.limitOfUsersRegistered);
 
 		const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({ email }).lean();
 
@@ -76,7 +77,7 @@ export const Mutation = {
 	/**
 	 * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
 	 */
-	deleteMyUserAccount:  async (parent, args, context) => {
+	deleteMyUserAccount: async (parent, args, context) => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);

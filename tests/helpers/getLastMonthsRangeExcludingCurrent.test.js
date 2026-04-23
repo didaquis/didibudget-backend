@@ -1,15 +1,15 @@
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 import { getLastMonthsRangeExcludingCurrent } from '../../src/helpers/getLastMonthsRangeExcludingCurrent.js';
 
 describe('getLastMonthsRangeExcludingCurrent', () => {
 	const mockDate = new Date(2023, 5, 15); // June 15, 2023
 
 	beforeAll(() => {
-		jest.useFakeTimers().setSystemTime(mockDate);
+		vi.useFakeTimers().setSystemTime(mockDate);
 	});
 
 	afterAll(() => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	});
 
 	test('Should return correct range for last 1 month excluding current', () => {
@@ -26,7 +26,7 @@ describe('getLastMonthsRangeExcludingCurrent', () => {
 
 	test('Should return correct range when crossing year boundary', () => {
 		const januaryDate = new Date(2023, 0, 15); // January 15, 2023
-		jest.setSystemTime(januaryDate);
+		vi.setSystemTime(januaryDate);
 
 		const result = getLastMonthsRangeExcludingCurrent(2);
 		expect(result.startDate).toEqual(new Date(2022, 10, 1)); // November 1, 2022
@@ -34,7 +34,7 @@ describe('getLastMonthsRangeExcludingCurrent', () => {
 	});
 
 	test('Should handle 0 months', () => {
-		jest.setSystemTime(mockDate);
+		vi.setSystemTime(mockDate);
 
 		const result = getLastMonthsRangeExcludingCurrent(0);
 		expect(result.startDate).toEqual(new Date(2023, 5, 1)); // June 1, 2023
