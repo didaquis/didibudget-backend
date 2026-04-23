@@ -1,8 +1,8 @@
 'use strict';
 
-const { gql } = require('apollo-server-express');
+import { gql } from 'apollo-server-express';
 
-module.exports = /* GraphQL */ gql`
+export default /* GraphQL */ gql`
 	""" Delete Result """
 	type DeleteResult {
 		deletedCount: Int!

@@ -12,7 +12,7 @@
  * @module logger
  */
 
-const log4js = require('log4js');
+import log4js from 'log4js';
 
 /**
  * log4js configuration data
@@ -49,4 +49,4 @@ const logger = log4js.getLogger();
 
 const endLogger = log4js.shutdown;
 
-module.exports = { logger, endLogger };
+export { logger, endLogger };

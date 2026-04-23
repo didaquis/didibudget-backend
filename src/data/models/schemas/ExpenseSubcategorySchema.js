@@ -1,9 +1,9 @@
 'use strict';
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Expense subcategory schema
@@ -33,4 +33,4 @@ const ExpenseSubcategorySchema = new Schema({
 	},
 });
 
-module.exports = ExpenseSubcategorySchema;
+export default ExpenseSubcategorySchema;

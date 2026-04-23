@@ -1,6 +1,6 @@
 'use strict';
 
-const { Router } = require('express');
+import { Router } from 'express';
 const routesManager = Router();
 
 /**
@@ -11,5 +11,4 @@ routesManager.get('/', (req, res) => {
 	res.status(status).end();
 });
 
-
-module.exports = routesManager;
+export default routesManager;

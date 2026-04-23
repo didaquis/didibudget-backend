@@ -1,6 +1,6 @@
 'use strict';
 
-const { CategoryType } = require('../data/CategoryType');
+import { CategoryType } from '../data/CategoryType.js';
 
 /* Home doc */
 /**
@@ -37,7 +37,7 @@ const { CategoryType } = require('../data/CategoryType');
  *
  * @type {Array<ExpenseCategory>}
  */
-const expenseCategories = [
+export const expenseCategories = [
 	{
 		name: 'Computers, smartphones and electronic devices',
 		inmutableKey: '1dc0abadd6f2356c6914',
@@ -390,6 +390,3 @@ const expenseCategories = [
 		categoryType: CategoryType.INVESTMENT,
 	},
 ];
-
-/** Default data for database */
-module.exports = { expenseCategories };

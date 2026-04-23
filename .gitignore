@@ -1,5 +1,6 @@
 # AI generated code
 /docs
+.worktrees/
 
 # Webstorm
 .idea

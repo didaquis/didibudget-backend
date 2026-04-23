@@ -14,4 +14,4 @@ const monthlyBalanceDTO = (monthlyBalance) => {
 	};
 };
 
-module.exports = { monthlyBalanceDTO };
+export { monthlyBalanceDTO };

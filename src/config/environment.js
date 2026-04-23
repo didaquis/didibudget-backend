@@ -20,9 +20,7 @@
  * @property {string} DEVELOPMENT - Development environment
  * @property {string} PRODUCTION - Production environment
  */
-const ENVIRONMENT = Object.freeze({
+export const ENVIRONMENT = Object.freeze({
 	DEVELOPMENT: 'development',
 	PRODUCTION: 'production'
 });
-
-module.exports = { ENVIRONMENT };

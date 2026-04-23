@@ -1,15 +1,15 @@
 'use strict';
 
-const { validateAuthToken, createAuthToken } = require('./jwt');
-const { environmentVariablesConfig } = require('../../config/appConfig');
-const { authValidations } = require('../auth/authValidations');
-const { pagingValidations } = require('../../helpers/pagingValidations');
-const { datetimeValidations } = require('../../helpers/datetimeValidations');
-const { parameterValidations } = require('../../helpers/parameterValidations');
-const { ENVIRONMENT } = require('../../config/environment');
-const { logger } = require('../../helpers/logger');
+import { validateAuthToken, createAuthToken } from './jwt.js';
+import { environmentVariablesConfig } from '../../config/appConfig.js';
+import { authValidations } from '../auth/authValidations.js';
+import { pagingValidations } from '../../helpers/pagingValidations.js';
+import { datetimeValidations } from '../../helpers/datetimeValidations.js';
+import { parameterValidations } from '../../helpers/parameterValidations.js';
+import { ENVIRONMENT } from '../../config/environment.js';
+import { logger } from '../../helpers/logger.js';
 
-const models = require('../../data/models/index');
+import * as models from '../../data/models/index.js';
 
 /**
  * Context function from Apollo Server
@@ -58,4 +58,4 @@ const setContext = async ({ req }) => {
 	return context;
 };
 
-module.exports = { setContext };
+export { setContext };

@@ -1,26 +1,26 @@
 'use strict';
 
-const mongoose = require('mongoose');
-const express = require('express');
-const helmet = require('helmet');
-const favicon = require('serve-favicon');
-const path = require('path');
-const cors = require('cors');
-const { ApolloServer } = require('apollo-server-express');
-const { UserInputError } = require('apollo-server-errors');
-const { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
+import mongoose from 'mongoose';
+import express from 'express';
+import helmet from 'helmet';
+import favicon from 'serve-favicon';
+import path from 'path';
+import cors from 'cors';
+import { ApolloServer } from 'apollo-server-express';
+import { UserInputError } from 'apollo-server-errors';
+import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
 
-const { setContext } = require('./gql/auth/setContext');
-const typeDefs = require('./gql/types/index');
-const resolvers = require('./gql/resolvers/index');
-const { getListOfIPV4Address } = require('./helpers/getListOfIPV4Address');
-const routesManager = require('./routes/routesManager');
-const { ENVIRONMENT } = require('./config/environment');
-const { environmentVariablesConfig } = require('./config/appConfig');
-const { expenseCategories } = require('./config/defaultData');
-const { logger, endLogger } = require('./helpers/logger');
-const { requestDevLogger } = require('./helpers/requestDevLogger');
-const { upsertDBWithExpenseCategories } = require('./helpers/upsertDatabase');
+import { setContext } from './gql/auth/setContext.js';
+import typeDefs from './gql/types/index.js';
+import resolvers from './gql/resolvers/index.js';
+import { getListOfIPV4Address } from './helpers/getListOfIPV4Address.js';
+import routesManager from './routes/routesManager.js';
+import { ENVIRONMENT } from './config/environment.js';
+import { environmentVariablesConfig } from './config/appConfig.js';
+import { expenseCategories } from './config/defaultData.js';
+import { logger, endLogger } from './helpers/logger.js';
+import { requestDevLogger } from './helpers/requestDevLogger.js';
+import { upsertDBWithExpenseCategories } from './helpers/upsertDatabase.js';
 
 mongoose.set('strictQuery', true);
 
@@ -67,7 +67,7 @@ const initApplication = async () => {
 		app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 	}
 	app.use(cors({ credentials: true }));
-	app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+	app.use(favicon(path.join(import.meta.dirname, 'public', 'favicon.ico')));
 	app.use('', routesManager);
 
 	const server = new ApolloServer({ 

@@ -17,4 +17,4 @@ const roundToTwoDecimals = (value) => {
 	return Number(num.toFixed(decimals));
 };
 
-module.exports = { roundToTwoDecimals };
+export { roundToTwoDecimals };

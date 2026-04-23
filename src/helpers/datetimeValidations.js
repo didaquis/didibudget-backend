@@ -1,6 +1,6 @@
 'use strict';
 
-const { UserInputError } = require('apollo-server-express');
+import { UserInputError } from 'apollo-server-express';
 
 /**
  * Datetime validations repository
@@ -35,4 +35,4 @@ const datetimeValidations = {
 };
 
 /* Datetime validations repository */
-module.exports = { datetimeValidations };
+export { datetimeValidations };

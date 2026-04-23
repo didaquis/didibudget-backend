@@ -1,13 +1,13 @@
 'use strict';
 
-const UsersSchema = require('./UsersSchema');
-const MonthlyBalanceSchema = require('./MonthlyBalanceSchema');
-const ExpenseCategorySchema = require('./ExpenseCategorySchema');
-const ExpenseSubcategorySchema = require('./ExpenseSubcategorySchema');
-const ExpensesSchema = require('./ExpensesSchema');
-const RecurringExpenseSuggestionSchema = require('./RecurringExpenseSuggestionSchema');
+import UsersSchema from './UsersSchema.js';
+import MonthlyBalanceSchema from './MonthlyBalanceSchema.js';
+import ExpenseCategorySchema from './ExpenseCategorySchema.js';
+import ExpenseSubcategorySchema from './ExpenseSubcategorySchema.js';
+import ExpensesSchema from './ExpensesSchema.js';
+import RecurringExpenseSuggestionSchema from './RecurringExpenseSuggestionSchema.js';
 
-module.exports = {
+export {
 	UsersSchema,
 	MonthlyBalanceSchema,
 	ExpenseCategorySchema,

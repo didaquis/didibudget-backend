@@ -14,4 +14,4 @@ const CategoryType = Object.freeze({
 	PENSION_PLAN: 'pension_plan'
 });
 
-module.exports = { CategoryType };
+export { CategoryType };

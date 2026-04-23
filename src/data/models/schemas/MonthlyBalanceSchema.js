@@ -1,11 +1,11 @@
 'use strict';
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
-const { CurrencyISO } = require('../../CurrencyISO');
+import { CurrencyISO } from '../../CurrencyISO.js';
 
 /**
  * Monthly Balance schema
@@ -38,4 +38,4 @@ const MonthlyBalanceSchema = new Schema({
 	}
 });
 
-module.exports = MonthlyBalanceSchema;
+export default MonthlyBalanceSchema;

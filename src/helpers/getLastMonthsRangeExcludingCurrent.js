@@ -22,4 +22,4 @@ const getLastMonthsRangeExcludingCurrent = (lastNMonths) => {
 	return { startDate, endDate };
 };
 
-module.exports = { getLastMonthsRangeExcludingCurrent };
+export { getLastMonthsRangeExcludingCurrent };

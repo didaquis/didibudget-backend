@@ -1,8 +1,8 @@
 'use strict';
 
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-const { securityVariablesConfig } = require('../../config/appConfig');
+import { securityVariablesConfig } from '../../config/appConfig.js';
 
 /**
  * Create a new JSON Web Token
@@ -27,4 +27,4 @@ const validateAuthToken = async (token) => {
 	return user;
 };
 
-module.exports = { createAuthToken, validateAuthToken };
+export { createAuthToken, validateAuthToken };

@@ -16,4 +16,4 @@ const expenseDTO = (expense) => {
 	};
 };
 
-module.exports = { expenseDTO };
+export { expenseDTO };

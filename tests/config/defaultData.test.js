@@ -1,5 +1,5 @@
-const { expenseCategories } = require('../../src/config/defaultData');
-const { CategoryType } = require('../../src/data/CategoryType');
+import { expenseCategories } from '../../src/config/defaultData.js';
+import { CategoryType } from '../../src/data/CategoryType.js';
 
 describe('defaultData', () => {
 	it('should be a valid array with expense categories and subcategories', () => {
