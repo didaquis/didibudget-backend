@@ -13,7 +13,7 @@
  */
 
 
-const { ExpenseCategory, ExpenseSubcategory } = require('../data/models/index');
+import { ExpenseCategory, ExpenseSubcategory } from '../data/models/index.js';
 
 
 /**
@@ -56,4 +56,4 @@ const upsertDBWithExpenseCategories = async (expenseCategories = []) => {
 };
 
 
-module.exports = { upsertDBWithExpenseCategories };
+export { upsertDBWithExpenseCategories };

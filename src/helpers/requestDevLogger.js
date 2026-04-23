@@ -1,4 +1,4 @@
-const { logger } = require('./logger');
+import { logger } from './logger.js';
 
 const formatResponse = (requestContext) => {
 	const space = 2;
@@ -40,4 +40,4 @@ const requestDevLogger = {
 	}
 };
 
-module.exports = { requestDevLogger };
+export { requestDevLogger };

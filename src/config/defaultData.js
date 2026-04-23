@@ -1,6 +1,6 @@
 'use strict';
 
-const { CategoryType } = require('../data/CategoryType');
+import { CategoryType } from '../data/CategoryType.js';
 
 /* Home doc */
 /**
@@ -391,5 +391,4 @@ const expenseCategories = [
 	},
 ];
 
-/** Default data for database */
-module.exports = { expenseCategories };
+export { expenseCategories };

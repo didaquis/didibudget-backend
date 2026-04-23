@@ -16,4 +16,4 @@ const expenseSumByTypeDTO = (categoryType, currencyISO, sum) => {
 	};
 };
 
-module.exports = { expenseSumByTypeDTO };
+export { expenseSumByTypeDTO };

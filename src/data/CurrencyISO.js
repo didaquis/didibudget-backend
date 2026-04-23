@@ -10,4 +10,4 @@ const CurrencyISO = Object.freeze({
 	EUR: 'EUR',
 });
 
-module.exports = { CurrencyISO };
+export { CurrencyISO };

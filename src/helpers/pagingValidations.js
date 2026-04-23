@@ -1,6 +1,6 @@
 'use strict';
 
-const { UserInputError } = require('apollo-server-express');
+import { UserInputError } from 'apollo-server-express';
 
 /**
  * Paging validations repository
@@ -33,4 +33,4 @@ const pagingValidations = {
 };
 
 /* Paging validations repository */
-module.exports = { pagingValidations };
+export { pagingValidations };

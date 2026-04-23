@@ -1,6 +1,6 @@
 'use strict';
 
-const { roundToTwoDecimals } = require('../helpers/roundToTwoDecimals');
+import { roundToTwoDecimals } from '../helpers/roundToTwoDecimals.js';
 
 /**
  * Builds a DTO of ExpensesMonthlyAverage
@@ -15,4 +15,4 @@ const expenseMonthlyAverageDTO = (average, currencyISO) => {
 	};
 };
 
-module.exports = { expenseMonthlyAverageDTO };
+export { expenseMonthlyAverageDTO };

@@ -27,4 +27,4 @@ const isStrongPassword = (password) => {
 	return passwordValidPattern.test(password);
 };
 
-module.exports = { isValidEmail, isStrongPassword };
+export { isValidEmail, isStrongPassword };

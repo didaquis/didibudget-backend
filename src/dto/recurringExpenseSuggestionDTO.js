@@ -27,4 +27,4 @@ const buildSuggestedExpenseDTO = (suggestedExpense) => {
 	};
 };
 
-module.exports = { recurringExpenseSuggestionDTO };
+export { recurringExpenseSuggestionDTO };

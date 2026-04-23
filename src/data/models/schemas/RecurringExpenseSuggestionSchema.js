@@ -1,10 +1,10 @@
 'use strict';
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const { v4: uuidv4 } = require('uuid');
-const SuggestedExpenseSchema = require('./SuggestedExpenseSchema.js');
+import { v4 as uuidv4 } from 'uuid';
+import SuggestedExpenseSchema from './SuggestedExpenseSchema.js';
 
 /**
  * Recurring Expense Suggestion schema
@@ -54,4 +54,4 @@ const RecurringExpenseSuggestionSchema = new Schema({
 	suggestedExpense: { type: SuggestedExpenseSchema, required: true },
 });
 
-module.exports = RecurringExpenseSuggestionSchema;
+export default RecurringExpenseSuggestionSchema;

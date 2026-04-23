@@ -1,7 +1,9 @@
 'use strict';
 
-require('dotenv').config();
-const { ENVIRONMENT } = require('./environment');
+import dotenv from 'dotenv';
+dotenv.config();
+
+import { ENVIRONMENT } from './environment.js';
 
 /* Home doc */
 /**
@@ -32,7 +34,7 @@ const limitOfUsersRegistered = 0; /* Set the value to 0 to not use the limit. Re
  * @property {string} environment - Application execution environment
  * @property {number} port - The port for running this application
  */
-const environmentVariablesConfig = Object.freeze({
+export const environmentVariablesConfig = Object.freeze({
 	formatConnection: process.env.MONGO_FORMAT_CONNECTION || 'standard',
 	mongoDNSseedlist: process.env.MONGO_DNS_SEEDLIST_CONNECTION || '',
 	dbHost: process.env.MONGO_HOST || '127.0.0.1',
@@ -51,7 +53,7 @@ const environmentVariablesConfig = Object.freeze({
  * @property {string} secret - Secret key for authentication
  * @property {string} timeExpiration - Expiration time for authentication tokens
  */
-const securityVariablesConfig = Object.freeze({
+export const securityVariablesConfig = Object.freeze({
 	secret: process.env.SECRET || 'yoursecret',
 	timeExpiration: process.env.DURATION || '2h'
 });
@@ -62,10 +64,8 @@ const securityVariablesConfig = Object.freeze({
  * @type {Object}
  * @property {number} limitOfUsersRegistered - The maximum number of users that can register
  */
-const globalVariablesConfig = Object.freeze({
+export const globalVariablesConfig = Object.freeze({
 	limitOfUsersRegistered: Number(process.env.LIMIT_USERS_REGISTERED) || limitOfUsersRegistered
 });
 
 
-/** Variables configuration */
-module.exports = { environmentVariablesConfig, securityVariablesConfig, globalVariablesConfig };

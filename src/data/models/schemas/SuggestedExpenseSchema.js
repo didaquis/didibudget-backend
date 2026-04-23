@@ -1,6 +1,6 @@
 'use strict';
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 /**
@@ -23,4 +23,4 @@ const SuggestedExpenseSchema = new Schema({
 	},
 });
 
-module.exports = SuggestedExpenseSchema;
+export default SuggestedExpenseSchema;

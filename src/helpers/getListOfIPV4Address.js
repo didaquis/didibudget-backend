@@ -6,8 +6,9 @@
  * @param {boolean} [obj.skipLocalhost=false] - Determines if the localhost address is returned in the result list
  * @returns {Array}                          Array of IPs
  */
+import os from 'os';
+
 const getListOfIPV4Address = ({ skipLocalhost = false } = {}) => {
-	const os = require('os');
 	const ifaces = os.networkInterfaces();
 
 	let result = [];
@@ -33,4 +34,4 @@ const getListOfIPV4Address = ({ skipLocalhost = false } = {}) => {
 	return result;
 };
 
-module.exports = { getListOfIPV4Address };
+export { getListOfIPV4Address };
