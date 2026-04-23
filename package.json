@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "description": "didibudget-backend",
   "main": "src/server.js",
+  "type": "module",
   "engines": {
     "node": "24.14.x"
   },
   "scripts": {
-    "start": "node .",
-    "dev": "nodemon .",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watchAll",
     "lint": "eslint --ext .js .",
     "clean": "rimraf logs",
     "prepare": "husky install"
@@ -28,7 +29,7 @@
   "devDependencies": {
     "eslint": "8.57.1",
     "husky": "9.1.7",
-    "jest": "29.7.0",
+    "jest": "30.0.0",
     "jsonfile": "6.2.0",
     "nodemon": "3.1.10",
     "rimraf": "6.1.3"
