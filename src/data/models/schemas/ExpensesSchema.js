@@ -8,8 +8,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { CurrencyISO } from '../../CurrencyISO.js';
 
 /**
- * Monthly Balance schema
- * @constructor Monthly Balance model constructor
+ * Expenses schema
+ * @constructor Expenses model constructor
  */
 const ExpensesSchema = new Schema({
 	user_id: {
