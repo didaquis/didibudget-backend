@@ -1,15 +1,16 @@
 'use strict';
 
-const merge = require('lodash.merge');
+import merge from 'lodash.merge';
 
-const users = require('./users');
-const monthlyBalance = require('./monthlyBalance');
-const auth = require('./auth');
-const expenseCategory = require('./expenseCategory');
-const expenses = require('./expenses');
-const recurringExpenseSuggestion = require('./recurringExpenseSuggestion');
+import * as users from './users.js';
+import * as monthlyBalance from './monthlyBalance.js';
+import * as auth from './auth.js';
+import * as expenseCategory from './expenseCategory.js';
+import * as expenses from './expenses.js';
+import * as recurringExpenseSuggestion from './recurringExpenseSuggestion.js';
 
-module.exports = merge(
+export default merge(
+	{},
 	users,
 	monthlyBalance,
 	auth,

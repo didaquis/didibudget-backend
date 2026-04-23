@@ -1,8 +1,8 @@
 'use strict';
 
-const { AuthenticationError, ForbiddenError, ValidationError } = require('apollo-server-express');
-const { globalVariablesConfig } = require('../../config/appConfig');
-const { Users } = require('../../data/models/index');
+import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
+import { globalVariablesConfig } from '../../config/appConfig.js';
+import { Users } from '../../data/models/index.js';
 
 /**
  * Auth validations repository
@@ -70,4 +70,4 @@ const authValidations = {
 };
 
 /* Auth validations repository */
-module.exports = { authValidations };
+export { authValidations };

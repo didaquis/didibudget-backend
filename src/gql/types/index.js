@@ -1,8 +1,8 @@
 'use strict';
 
-const { loadFilesSync } = require('@graphql-tools/load-files');
-const { mergeTypeDefs } = require('@graphql-tools/merge');
+import { loadFilesSync } from '@graphql-tools/load-files';
+import { mergeTypeDefs } from '@graphql-tools/merge';
 
-const typesArray = loadFilesSync(__dirname, { extensions: ['js'], ignoreIndex: true });
+const typesArray = loadFilesSync(import.meta.dirname, { extensions: ['js'], ignoreIndex: true });
 
-module.exports = mergeTypeDefs(typesArray);
+export default mergeTypeDefs(typesArray);

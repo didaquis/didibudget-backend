@@ -1,8 +1,8 @@
 'use strict';
 
-const { gql } = require('apollo-server-express');
+import { gql } from 'apollo-server-express';
 
-module.exports = /* GraphQL */ gql`
+export default /* GraphQL */ gql`
 	type MonthlyBalance {
 		user_id: ID!
 		balance: Float!
