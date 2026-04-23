@@ -11,7 +11,7 @@ This document serves as the primary context and instruction set for AI assistant
 - **Database:** MongoDB 8.0+ (Mongoose ODM)
 - **GraphQL:** GraphQL 16.12.x with schema stitching
 - **Authentication:** JWT (jsonwebtoken 9.0.x)
-- **Testing:** Jest 29.7.x
+- **Testing:** Vitest 3.2.x
 - **Code Quality:** ESLint 8.57.x, Husky (pre-commit hooks)
 
 ### Project Structure
@@ -24,7 +24,7 @@ src/
 ├── services/            # Business logic
 ├── middleware/          # Express middleware
 └── server.js            # Application entry point
-tests/                   # Jest tests mirroring source structure
+tests/                   # Tests mirroring source structure
 ```
 
 
