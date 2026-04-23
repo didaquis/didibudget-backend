@@ -37,7 +37,7 @@ import { CategoryType } from '../data/CategoryType.js';
  *
  * @type {Array<ExpenseCategory>}
  */
-const expenseCategories = [
+export const expenseCategories = [
 	{
 		name: 'Computers, smartphones and electronic devices',
 		inmutableKey: '1dc0abadd6f2356c6914',
@@ -390,5 +390,3 @@ const expenseCategories = [
 		categoryType: CategoryType.INVESTMENT,
 	},
 ];
-
-export { expenseCategories };
