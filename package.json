@@ -10,8 +10,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watchAll",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint --ext .js .",
     "clean": "rimraf logs",
     "prepare": "husky install"
@@ -29,10 +29,10 @@
   "devDependencies": {
     "eslint": "8.57.1",
     "husky": "9.1.7",
-    "jest": "30.3.0",
     "jsonfile": "6.2.0",
     "nodemon": "3.1.14",
-    "rimraf": "6.1.3"
+    "rimraf": "6.1.3",
+    "vitest": "3.2.0"
   },
   "dependencies": {
     "@graphql-tools/load-files": "6.6.1",
