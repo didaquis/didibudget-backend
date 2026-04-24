@@ -53,17 +53,17 @@ export const Query = {
 				$or: [
 					{
 						$and: [
-							{ $lte: [ '$startDay', day ] },
-							{ $gte: [ '$endDay', day ] }
+							{ $lte: ['$startDay', day] },
+							{ $gte: ['$endDay', day] }
 						]
 					},
 					{
 						$and: [
-							{ $gt: [ '$startDay', '$endDay' ] },
+							{ $gt: ['$startDay', '$endDay'] },
 							{
 								$or: [
-									{ $gte: [ day, '$startDay' ] },
-									{ $lte: [ day, '$endDay' ] }
+									{ $gte: [day, '$startDay'] },
+									{ $lte: [day, '$endDay'] }
 								]
 							}
 						]
