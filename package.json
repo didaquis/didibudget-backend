@@ -2,18 +2,20 @@
   "name": "didibudget-backend",
   "version": "1.0.3",
   "description": "didibudget-backend",
-  "main": "src/server.js",
+  "main": "dist/server.js",
   "type": "module",
   "engines": {
     "node": "24.x"
   },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc && tsc-alias",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "clean": "rimraf logs",
+    "clean": "rimraf logs dist",
     "prepare": "husky install"
   },
   "keywords": [
