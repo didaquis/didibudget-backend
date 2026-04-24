@@ -1,13 +1,15 @@
-'use strict';
-
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 /**
  * Suggested Expense schema
- * @constructor Suggested Expense model constructor
  */
-const SuggestedExpenseSchema = new Schema({
+export interface ISuggestedExpense extends Document {
+	category: Types.ObjectId;
+	subcategory?: Types.ObjectId;
+	quantity: Types.Decimal128;
+}
+
+const SuggestedExpenseSchema: Schema<ISuggestedExpense> = new Schema({
 	category: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'expensescategory',

@@ -1,16 +1,22 @@
-'use strict';
-
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
+
 import SuggestedExpenseSchema from './SuggestedExpenseSchema.js';
 
 /**
  * Recurring Expense Suggestion schema
- * @constructor Recurring Expense Suggestion model constructor
  */
-const RecurringExpenseSuggestionSchema = new Schema({
+export interface IRecurringExpenseSuggestion extends Document {
+	user_id: Types.ObjectId;
+	isActive: boolean;
+	startDay: number;
+	endDay: number;
+	uuid: string;
+	suggestedExpense: Document;
+}
+
+const RecurringExpenseSuggestionSchema: Schema<IRecurringExpenseSuggestion> = new Schema({
 	user_id: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'users',

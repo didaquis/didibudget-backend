@@ -1,17 +1,24 @@
-'use strict';
-
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Users schema
- * @constructor Users model constructor
- * @classdesc User have interesting properties. Some of them are isAdmin (false by default), isActive (true by default. Useful for removing login permission to the registered users), uuid (random and unique token. Created to provided a random identifier token for every user different than _id native MongoDB value)
+ *
+ * User have interesting properties. Some of them are isAdmin (false by default), isActive (true by default. Useful for removing login permission to the registered users), uuid (random and unique token. Created to provided a random identifier token for every user different than _id native MongoDB value)
  */
-const UsersSchema = new Schema({
+export interface IUser extends Document {
+	email: string;
+	password: string;
+	isAdmin: boolean;
+	isActive: boolean;
+	uuid: string;
+	registrationDate: Date;
+	lastLogin: Date;
+}
+
+const UsersSchema: Schema<IUser> = new Schema({
 	email: {
 		type: String,
 		required: true,

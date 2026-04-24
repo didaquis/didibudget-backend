@@ -1,7 +1,4 @@
-'use strict';
-
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,9 +6,17 @@ import { CategoryType } from '../../CategoryType.js';
 
 /**
  * Expense category schema
- * @constructor Expense category model constructor
  */
-const ExpenseCategorySchema = new Schema({
+export interface IExpenseCategory extends Document {
+	name: string;
+	subcategories: Types.ObjectId[];
+	inmutableKey: string;
+	emojis: string[];
+	uuid: string;
+	categoryType: string;
+}
+
+const ExpenseCategorySchema: Schema<IExpenseCategory> = new Schema({
 	name: {
 		type: String,
 		required: true,

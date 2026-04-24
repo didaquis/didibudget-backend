@@ -1,7 +1,4 @@
-'use strict';
-
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,9 +6,18 @@ import { CurrencyISO } from '../../CurrencyISO.js';
 
 /**
  * Expenses schema
- * @constructor Expenses model constructor
  */
-const ExpensesSchema = new Schema({
+export interface IExpense extends Document {
+	user_id: Types.ObjectId;
+	category: Types.ObjectId;
+	subcategory?: Types.ObjectId;
+	quantity: Types.Decimal128;
+	date: Date;
+	currencyISO: string;
+	uuid: string;
+}
+
+const ExpensesSchema: Schema<IExpense> = new Schema({
 	user_id: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'users',

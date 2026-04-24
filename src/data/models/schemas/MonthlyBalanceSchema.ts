@@ -1,7 +1,4 @@
-'use strict';
-
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,9 +6,16 @@ import { CurrencyISO } from '../../CurrencyISO.js';
 
 /**
  * Monthly Balance schema
- * @constructor Monthly Balance model constructor
  */
-const MonthlyBalanceSchema = new Schema({
+export interface IMonthlyBalance extends Document {
+	user_id: Types.ObjectId;
+	balance: Types.Decimal128;
+	date: Date;
+	currencyISO: string;
+	uuid: string;
+}
+
+const MonthlyBalanceSchema: Schema<IMonthlyBalance> = new Schema({
 	user_id: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'users',

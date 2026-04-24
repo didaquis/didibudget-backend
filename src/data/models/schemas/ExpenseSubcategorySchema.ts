@@ -1,15 +1,18 @@
-'use strict';
-
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Expense subcategory schema
- * @constructor Expense subcategory model constructor
  */
-const ExpenseSubcategorySchema = new Schema({
+export interface IExpenseSubcategory extends Document {
+	name: string;
+	inmutableKey: string;
+	emojis: string[];
+	uuid: string;
+}
+
+const ExpenseSubcategorySchema: Schema<IExpenseSubcategory> = new Schema({
 	name: {
 		type: String,
 		required: true,
