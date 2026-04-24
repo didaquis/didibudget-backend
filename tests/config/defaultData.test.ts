@@ -65,7 +65,7 @@ describe('defaultData', () => {
 	});
 
 	it('should have an unique value in the property inmutableKey of the expense categories and subcategories', () => {
-		const inmutableKeyList = [];
+		const inmutableKeyList: string[] = [];
 
 		expenseCategories.forEach(category => {
 			expect(inmutableKeyList).not.toContain(category.inmutableKey);

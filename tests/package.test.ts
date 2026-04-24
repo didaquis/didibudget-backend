@@ -1,6 +1,6 @@
 import jsonfile from 'jsonfile';
 
-let packageJSONData; 
+let packageJSONData: any;
 
 describe('package.json file', () => {
 
