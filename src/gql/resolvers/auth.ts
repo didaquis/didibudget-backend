@@ -1,14 +1,21 @@
-'use strict';
-
 import { UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
 import { isValidEmail, isStrongPassword } from '../../helpers/validations.js';
 import { globalVariablesConfig } from '../../config/appConfig.js';
+import { Context } from '../auth/setContext.js';
 
+interface RegisterUserArgs {
+	email: string;
+	password: string;
+}
+
+interface AuthUserArgs {
+	email: string;
+	password: string;
+}
 
 /**
  * All resolvers related to auth
- * @typedef {Object}
  */
 export const Query = {
 };
@@ -17,7 +24,7 @@ export const Mutation = {
 	/**
 	 * It allows to users to register as long as the limit of allowed users has not been reached
 	 */
-	registerUser: async (parent, { email, password }, context) => {
+	registerUser: async (_parent: unknown, { email, password }: RegisterUserArgs, context: Context): Promise<{ token: string }> => {
 		if (!email || !password) {
 			throw new UserInputError('Data provided is not valid');
 		}
@@ -51,7 +58,7 @@ export const Mutation = {
 	/**
 	 * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When an user authenticates the value of lastLogin will be updated
 	 */
-	authUser: async (parent, { email, password }, context) => {
+	authUser: async (_parent: unknown, { email, password }: AuthUserArgs, context: Context): Promise<{ token: string }> => {
 		if (!email || !password) {
 			throw new UserInputError('Invalid credentials');
 		}
@@ -77,7 +84,7 @@ export const Mutation = {
 	/**
 	 * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
 	 */
-	deleteMyUserAccount: async (parent, args, context) => {
+	deleteMyUserAccount: async (_parent: unknown, _args: unknown, context: Context): Promise<any> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);

@@ -1,16 +1,29 @@
-'use strict';
+import { recurringExpenseSuggestionDTO, RecurringExpenseSuggestionDTO } from '../../dto/recurringExpenseSuggestionDTO.js';
+import { Context } from '../auth/setContext.js';
 
-import { recurringExpenseSuggestionDTO } from '../../dto/recurringExpenseSuggestionDTO.js';
+interface GetRecurringExpenseSuggestionsByDayArgs {
+	day: number;
+}
+
+interface RegisterRecurringExpenseSuggestionArgs {
+	isActive: boolean;
+	startDay: number;
+	endDay: number | null;
+	suggestedExpense: {
+		category: string;
+		subcategory?: string | null;
+		quantity: number | string;
+	};
+}
 
 /**
-* All resolvers related to Recurring Expense Suggestion
-* @typedef {Object}
-*/
+ * All resolvers related to Recurring Expense Suggestion
+ */
 export const Query = {
 	/**
-	* Get all recurring expense suggestions for an user
-	*/
-	getRecurringExpenseSuggestions: async (parent, args, context) => {
+	 * Get all recurring expense suggestions for an user
+	 */
+	getRecurringExpenseSuggestions: async (_parent: unknown, _args: unknown, context: Context): Promise<RecurringExpenseSuggestionDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);
@@ -20,12 +33,12 @@ export const Query = {
 			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
-		return allSuggestions.map(suggestion => recurringExpenseSuggestionDTO(suggestion));
+		return allSuggestions.map((suggestion: any) => recurringExpenseSuggestionDTO(suggestion));
 	},
 	/**
-	* Get the active recurring expense suggestions for an user for a specific day of the month
-	*/
-	getRecurringExpenseSuggestionsByDay: async (parent, { day }, context) => {
+	 * Get the active recurring expense suggestions for an user for a specific day of the month
+	 */
+	getRecurringExpenseSuggestionsByDay: async (_parent: unknown, { day }: GetRecurringExpenseSuggestionsByDayArgs, context: Context): Promise<RecurringExpenseSuggestionDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		const minDay = 1;
 		const maxDay = 31;
@@ -62,15 +75,15 @@ export const Query = {
 			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
-		return allSuggestions.map(suggestion => recurringExpenseSuggestionDTO(suggestion));
+		return allSuggestions.map((suggestion: any) => recurringExpenseSuggestionDTO(suggestion));
 	},
 };
 
 export const Mutation = {
 	/**
-	* Register a recurring expense suggestion
-	*/
-	registerRecurringExpenseSuggestion: async (parent, { isActive, startDay, endDay, suggestedExpense }, context) => {
+	 * Register a recurring expense suggestion
+	 */
+	registerRecurringExpenseSuggestion: async (_parent: unknown, { isActive, startDay, endDay, suggestedExpense }: RegisterRecurringExpenseSuggestionArgs, context: Context): Promise<RecurringExpenseSuggestionDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);

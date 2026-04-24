@@ -1,14 +1,17 @@
-'use strict';
+import { Context } from '../auth/setContext.js';
+
+interface GetExpenseCategoryByIdArgs {
+	category: string;
+}
 
 /**
  * All resolvers related to Expense Category
- * @typedef {Object}
  */
 export const Query = {
 	/**
 	 * Get all expense categories and subcategories
 	 */
-	getExpenseCategory: async (parent, args, context) => {
+	getExpenseCategory: async (_parent: unknown, _args: unknown, context: Context): Promise<any[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const sortCriteria = { name: 'asc' };
@@ -19,7 +22,7 @@ export const Query = {
 	/**
 	 * Get an expense category and their subcategories by category id
 	 */
-	getExpenseCategoryById: async (parent, { category }, context) => {
+	getExpenseCategoryById: async (_parent: unknown, { category }: GetExpenseCategoryByIdArgs, context: Context): Promise<any | null> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const sortCriteria = { name: 'asc' };

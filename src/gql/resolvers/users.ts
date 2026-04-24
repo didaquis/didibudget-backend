@@ -1,14 +1,13 @@
-'use strict';
+import { Context } from '../auth/setContext.js';
 
 /**
  * All resolvers related to users
- * @typedef {Object}
  */
 export const Query = {
 	/**
 	 * It allows to administrators to list all users registered
 	 */
-	listAllUsers:  async (parent, args, context) => {
+	listAllUsers:  async (_parent: unknown, _args: unknown, context: Context): Promise<any[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		context.di.authValidation.ensureThatUserIsAdministrator(context);

@@ -1,21 +1,49 @@
-'use strict';
-
-import { expenseDTO } from '../../dto/expenseDTO.js';
-import { expenseSumByTypeDTO } from '../../dto/expenseSumByTypeDTO.js';
-import { expenseMonthlyAverageDTO } from '../../dto/expenseMonthlyAverageDTO.js';
+import { expenseDTO, ExpenseDTO } from '../../dto/expenseDTO.js';
+import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '../../dto/expenseSumByTypeDTO.js';
+import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '../../dto/expenseMonthlyAverageDTO.js';
 import { getOffset, getTotalPagesNumber } from '../../helpers/pagingUtilities.js';
 import { getLastMonthsRangeExcludingCurrent } from '../../helpers/getLastMonthsRangeExcludingCurrent.js';
 import { CurrencyISO } from '../../data/CurrencyISO.js';
+import { Context } from '../auth/setContext.js';
+
+interface GetExpensesWithPaginationArgs {
+	page: number;
+	pageSize: number;
+}
+
+interface GetExpensesBetweenDatesArgs {
+	startDate: string;
+	endDate: string;
+}
+
+interface GetExpensesSumByTypeArgs {
+	categoryType: string;
+}
+
+interface GetExpensesMonthlyAverageArgs {
+	lastNMonths: number;
+	excludedCategoryTypes?: string[];
+}
+
+interface RegisterExpenseArgs {
+	category: string;
+	subcategory?: string;
+	quantity: number | string;
+	date: string;
+}
+
+interface DeleteExpenseArgs {
+	uuid: string;
+}
 
 /**
  * All resolvers related to expenses
- * @typedef {Object}
  */
 export const Query = {
 	/**
 	 * Get all data of expenses by user
 	 */
-	getExpenses: async (parent, args, context) => {
+	getExpenses: async (_parent: unknown, _args: unknown, context: Context): Promise<ExpenseDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);
@@ -23,12 +51,12 @@ export const Query = {
 		const sortCriteria = { date: 'asc' };
 		const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).lean();
 
-		return allExpenses.map((expense) => expenseDTO(expense));
+		return allExpenses.map((expense: any) => expenseDTO(expense));
 	},
 	/**
 	 * Get expenses by user using pagination
 	 */
-	getExpensesWithPagination: async (parent, { page, pageSize }, context) => {
+	getExpensesWithPagination: async (_parent: unknown, { page, pageSize }: GetExpensesWithPaginationArgs, context: Context): Promise<{ expenses: ExpenseDTO[]; pagination: { currentPage: number; totalPages: number; totalCount: number } }> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.pagingValidation.ensurePageValueIsValid(page);
 		context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
@@ -46,7 +74,7 @@ export const Query = {
 		const totalPages = getTotalPagesNumber(totalCount, pageSize);
 
 		return {
-			expenses: expenses.map((expense) => expenseDTO(expense)),
+			expenses: expenses.map((expense: any) => expenseDTO(expense)),
 			pagination: {
 				currentPage: page,
 				totalPages: totalPages,
@@ -57,7 +85,7 @@ export const Query = {
 	/**
 	 * Get list of expenses for a specific user between two dates
 	 */
-	getExpensesBetweenDates: async (parent, { startDate, endDate }, context) => {
+	getExpensesBetweenDates: async (_parent: unknown, { startDate, endDate }: GetExpensesBetweenDatesArgs, context: Context): Promise<ExpenseDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.datetimeValidation.ensureDateIsValid(startDate);
 		context.di.datetimeValidation.ensureDateIsValid(endDate);
@@ -69,12 +97,12 @@ export const Query = {
 
 		const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: { $gte: startDate, $lt: endDate } }).sort(sortCriteria).lean();
 
-		return expenses.map((expense) => expenseDTO(expense));
+		return expenses.map((expense: any) => expenseDTO(expense));
 	},
 	/**
 	 * Get the total expenses of a specific type for a user
 	 */
-	getExpensesSumByType: async (parent, { categoryType }, context) => {
+	getExpensesSumByType: async (_parent: unknown, { categoryType }: GetExpensesSumByTypeArgs, context: Context): Promise<ExpenseSumByTypeDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);
@@ -115,7 +143,7 @@ export const Query = {
 	/**
 	 * Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types.
 	 */
-	getExpensesMonthlyAverage: async (parent, { lastNMonths, excludedCategoryTypes = [] }, context) => {
+	getExpensesMonthlyAverage: async (_parent: unknown, { lastNMonths, excludedCategoryTypes = [] }: GetExpensesMonthlyAverageArgs, context: Context): Promise<ExpenseMonthlyAverageDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const minMonths = 1;
@@ -160,30 +188,30 @@ export const Mutation = {
 	/**
 	 * Register an expense
 	 */
-	registerExpense: async (parent, { category, subcategory, quantity, date }, context) => {
+	registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: RegisterExpenseArgs, context: Context): Promise<ExpenseDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.datetimeValidation.ensureDateIsValid(date);
 
 		const user = await context.di.authValidation.getUser(context);
 
 		return context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
-			.then(expense => expenseDTO(expense));
+			.then((expense: any) => expenseDTO(expense));
 	},
 	/**
 	 * Delete one registry of expense
 	 */
-	deleteExpense: async (parent, { uuid }, context) => {
+	deleteExpense: async (_parent: unknown, { uuid }: DeleteExpenseArgs, context: Context): Promise<ExpenseDTO | null> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);
 
 		return context.di.model.Expenses.findOneAndDelete({ uuid, user_id: user._id })
-			.then(expense => expenseDTO(expense));
+			.then((expense: any) => expense ? expenseDTO(expense) : null);
 	},
 	/**
 	 * Delete all registries of expense
 	 */
-	deleteAllExpenses: async (parent, args, context) => {
+	deleteAllExpenses: async (_parent: unknown, _args: unknown, context: Context): Promise<any> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);
