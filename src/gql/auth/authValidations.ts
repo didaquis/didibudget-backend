@@ -1,19 +1,15 @@
-'use strict';
-
 import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
 import { Users } from '../../data/models/index.js';
+import type { Context } from './setContext.js';
 
 /**
  * Auth validations repository
- * @typedef {Object}
  */
 const authValidations = {
 	/**
 	 * Check if the maximum limit of users has been reached. If limit is reached, it throws an error.
-	 * @param {number} numberOfCurrentlyUsersRegistered 	- The number of users currently registered in the service
-	* @param {number} usersLimit 	- The maximum number of users allowed to be registered in the service. Set the value to 0 to not use the limit.
 	 */
-	ensureLimitOfUsersIsNotReached: (numberOfCurrentlyUsersRegistered, usersLimit) => {
+	ensureLimitOfUsersIsNotReached: (numberOfCurrentlyUsersRegistered: number, usersLimit: number): void => {
 		if (usersLimit === 0) {
 			return;
 		}
@@ -25,10 +21,8 @@ const authValidations = {
 
 	/**
 	 * Check if in Apollo Server context contains a logged user. If user is not in context, it throws an error
-	 * @param {Object} context 			- The context object of Apollo Server
-	 * @param {Object} [context.user]  	- The context object data: user data
 	 */
-	ensureThatUserIsLogged: (context) => {
+	ensureThatUserIsLogged: (context: Context): void => {
 		if (!context.user) {
 			throw new AuthenticationError('You must be logged in to perform this action');
 		}
@@ -36,11 +30,8 @@ const authValidations = {
 
 	/**
 	 * Check if in Apollo Server context contains an user and is an administrator. If user is not in context or user is not an administrator it throws an error
-	 * @param {Object} context 					- The context object of Apollo Server
-	 * @param {Object} [context.user]  			- The context object data: user data
-	 * @param {boolean} [context.user.isAdmin] 	- The context object data: user data role information
 	 */
-	ensureThatUserIsAdministrator: (context) => {
+	ensureThatUserIsAdministrator: (context: Context): void => {
 		if (!context.user || !context.user.isAdmin) {
 			throw new ForbiddenError('You must be an administrator to perform this action');
 		}
@@ -48,12 +39,8 @@ const authValidations = {
 
 	/**
 	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. If user does not exist, it throws an error.
-	 * @async
-	 * @param {Object} context 			- The context object of Apollo Server
-	 * @param {Object} [context.user]  	- The context object data: user data
-	 * @returns {User}
 	 */
-	getUser: async (context) => {
+	getUser: async (context: Context): Promise<any | null> => {
 		if (!context.user) {
 			return null;
 		}
@@ -68,5 +55,4 @@ const authValidations = {
 	},
 };
 
-/* Auth validations repository */
 export { authValidations };
