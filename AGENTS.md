@@ -7,12 +7,14 @@ This document serves as the primary context and instruction set for AI assistant
 ## 1. Project Overview & Tech Stack
 **didibudget-backend** is a budget management API built with Node.js, Express, GraphQL, and MongoDB.
 - **Runtime:** Node.js 24.14.x
+- **Language:** TypeScript 5.9.x
 - **Framework:** Express 4.21.x + Apollo Server 3.13.x
 - **Database:** MongoDB 8.0+ (Mongoose ODM)
 - **GraphQL:** GraphQL 16.12.x with schema stitching
 - **Authentication:** JWT (jsonwebtoken 9.0.x)
-- **Testing:** Vitest 3.2.x
-- **Code Quality:** ESLint 8.57.x, Husky (pre-commit hooks)
+- **Dev Server:** tsx (TypeScript execution with hot reload)
+- **Testing:** Vitest 3.2.x (native TypeScript support)
+- **Code Quality:** typescript-eslint (ESLint 9 flat config), Husky (pre-commit hooks)
 
 ### Project Structure
 ```text
@@ -23,13 +25,13 @@ src/
 ├── models/              # Mongoose schemas
 ├── services/            # Business logic
 ├── middleware/          # Express middleware
-└── server.js            # Application entry point
+└── server.ts            # Application entry point
 tests/                   # Tests mirroring source structure
 ```
 
 
 ### Common Commands
-- **Start dev server:** `npm run dev` (with hot reload via nodemon)
+- **Start dev server:** `npm run dev` (with hot reload via tsx)
 - **Run tests:** `npm test` or `npm run test:watch`
 - **Lint code:** `npm run lint` (ESLint)
 - **Fix linting issues:** `npm run lint -- --fix`
@@ -42,7 +44,7 @@ tests/                   # Tests mirroring source structure
 ### ✅ Always Do
 - **Verify Safety:** Run `npm test` and `npm run lint` before suggesting changes.
 - **Follow Patterns:** Adhere to existing code patterns and naming conventions.
-- **Documentation:** Use JSDoc for complex functions and logic.
+- **Documentation:** Use TypeScript types/interfaces + descriptive comments for complex functions and logic.
 - **Environment:** Reference `.env` for secrets; never hardcode credentials.
 - **Separation of Concerns:** Keep logic in `services/` and formatting in `dto/`.
 
@@ -104,8 +106,22 @@ Resolvers (in `src/gql/resolvers/` or `mutations/`) must follow these rules:
 - Return data formatted via **DTOs**.
 
 **Example Implementation:**
-```javascript
-module.exports = {
+```typescript
+import { expenseDTO } from '../dto/expense.js';
+import { getOffset } from '../utils/paging.js';
+
+interface ExpenseResolver {
+  Query: {
+    getExpenses: (parent: unknown, args: unknown, context: any) => Promise<any[]>;
+    getExpensesWithPagination: (parent: unknown, args: { page: number; pageSize: number }, context: any) => Promise<any[]>;
+  };
+  Mutation: {
+    registerExpense: (parent: unknown, args: { category: string; quantity: number; date: string }, context: any) => Promise<any>;
+    deleteExpense: (parent: unknown, args: { uuid: string }, context: any) => Promise<any>;
+  };
+}
+
+export const expenseResolvers: ExpenseResolver = {
   Query: {
     /**
      * Get all expenses for authenticated user
@@ -115,7 +131,7 @@ module.exports = {
 
       const user = await context.di.authValidation.getUser(context);
 
-      const sortCriteria = { date: 'asc' };
+      const sortCriteria = { date: 'asc' as const };
       const allExpenses = await context.di.model.Expenses
         .find({ user_id: user._id })
         .sort(sortCriteria)
@@ -187,7 +203,7 @@ module.exports = {
 
 Example with Authentication Checks:  
 
-```javascript
+```typescript
 registerExpense: async (parent, { category, quantity, date }, context) => {
   // Always check authentication first
   context.di.authValidation.ensureThatUserIsLogged(context);
@@ -235,7 +251,7 @@ Throw proper Apollo errors:
 
 ## 6. Default Data on database — Do Not Modify Without Consent
 
-The category lists and default data included in this repository (for example, files as `src/config/defaultData.js` and related resources) are used to populate the application's database. Under no circumstances should these categories be modified, renamed, removed, or otherwise altered without the explicit, documented consent of the end-user. Unauthorized changes may cause data loss, inconsistencies, or broken migrations.
+The category lists and default data included in this repository (for example, files as `src/config/defaultData.ts` and related resources) are used to populate the application's database. Under no circumstances should these categories be modified, renamed, removed, or otherwise altered without the explicit, documented consent of the end-user. Unauthorized changes may cause data loss, inconsistencies, or broken migrations.
 
 If a change to the default categories is required, you should obtain explicit consent from the end-user before.
 
