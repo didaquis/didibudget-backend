@@ -18,7 +18,7 @@ This repository is for the backend and is intended to work with [the frontend](h
 * Then use: `npm run start`. 
 * That's it! That was fast enough, right? 🚀
 
-> Heroku automatically runs the `build` script during deployment, then starts the application with `npm start`.
+> For production deployment, run `npm run build` first to compile the TypeScript code, then start the application with `npm start`.
 
 **Do you need help with `.env` file?** 
 
