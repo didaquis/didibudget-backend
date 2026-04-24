@@ -1,6 +1,7 @@
 'use strict';
 
 import { Router } from 'express';
+/** @type {import('express').Router} */
 const routesManager = Router();
 
 /**

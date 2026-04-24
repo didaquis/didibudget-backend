@@ -1,11 +1,7 @@
-'use strict';
-
 /**
  * Calculates the date range of the last N full months excluding the current month.
- * @param {number} lastNMonths number of months to look back
- * @returns {Object} an object containing startDate and endDate
  */
-const getLastMonthsRangeExcludingCurrent = (lastNMonths) => {
+export const getLastMonthsRangeExcludingCurrent = (lastNMonths: number): { startDate: Date; endDate: Date } => {
 	const today = new Date();
 	const currentMonth = today.getMonth();
 	const currentYear = today.getFullYear();
@@ -21,5 +17,3 @@ const getLastMonthsRangeExcludingCurrent = (lastNMonths) => {
 
 	return { startDate, endDate };
 };
-
-export { getLastMonthsRangeExcludingCurrent };

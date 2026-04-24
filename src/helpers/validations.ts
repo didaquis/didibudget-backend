@@ -1,12 +1,7 @@
-'use strict';
-
-
 /**
  * Check if email is valid.
- * @param {string} email
- * @returns {boolean}
  */
-const isValidEmail = (email) => {
+export const isValidEmail = (email?: string | null): boolean => {
 	if (!email) {
 		return false;
 	}
@@ -16,15 +11,11 @@ const isValidEmail = (email) => {
 
 /**
  * Check if password is secure. Rules: At least 8 characters. It must contain numbers, lowercase letters and uppercase letters. The spaces are not allowed. Only english characters are allowed. This characters are not allowed: { } ( ) | ~ € ¿ ¬
- * @param {string} password
- * @returns {boolean}
  */
-const isStrongPassword = (password) => {
+export const isStrongPassword = (password?: string | null): boolean => {
 	if (!password) {
 		return false;
 	}
 	const passwordValidPattern = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!*^?+-_@#$%&]{8,}$/);
 	return passwordValidPattern.test(password);
 };
-
-export { isValidEmail, isStrongPassword };

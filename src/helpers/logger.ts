@@ -1,15 +1,11 @@
-'use strict';
-
 /* Home doc */
 /**
- * @file Configuration settings for logger module
- * @see module:logger
+ * Configuration settings for logger module
  */
 
 /* Module doc */
 /**
  * Configuration settings for logger module
- * @module logger
  */
 
 import log4js from 'log4js';
@@ -36,17 +32,7 @@ log4js.configure({
 
 /**
  * Logger object that provides the methods to logger data (all logs are printed in console and in logs file).
- * @async
- * @example <caption>Usage of logger:</caption>
- *          logger.trace('trace'); 	// Log file: application_trace.log
- *          logger.debug('debug'); 	// Log file: application_debug.log
- *          logger.info('info'); 	// Log file: application.log
- *          logger.warn('warn'); 	// Log file: application.log
- *          logger.error('error'); 	// Log file: application_error.log and application.log
- *          logger.fatal('fatal'); 	// Log file: application_error.log and application.log
  */
-const logger = log4js.getLogger();
+export const logger = log4js.getLogger();
 
-const endLogger = log4js.shutdown;
-
-export { logger, endLogger };
+export const endLogger = log4js.shutdown;
