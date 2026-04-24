@@ -1,7 +1,5 @@
-'use strict';
-
 import mongoose from 'mongoose';
-import express from 'express';
+import express, { Express, Request, Response } from 'express';
 import helmet from 'helmet';
 import favicon from 'serve-favicon';
 import path from 'path';
@@ -9,6 +7,7 @@ import cors from 'cors';
 import { ApolloServer } from 'apollo-server-express';
 import { UserInputError } from 'apollo-server-errors';
 import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
+import { GraphQLError } from 'graphql';
 
 import { setContext } from './gql/auth/setContext.js';
 import typeDefs from './gql/types/index.js';
@@ -35,7 +34,7 @@ if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environment
 }
 
 const db = mongoose.connection;
-db.on('error', (err) => {
+db.on('error', (err: Error) => {
 	logger.error(`Connection error with database. ${err}`);
 });
 
@@ -58,8 +57,8 @@ db.once('open', async () => {
 	initApplication();
 });
 
-const initApplication = async () => {
-	const app = express();
+const initApplication = async (): Promise<void> => {
+	const app: Express = express();
 	if (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) {
 		app.use(helmet());
 	} else {
@@ -70,13 +69,13 @@ const initApplication = async () => {
 	app.use(favicon(path.join(import.meta.dirname, 'public', 'favicon.ico')));
 	app.use('', routesManager);
 
-	const server = new ApolloServer({ 
+	const server = new ApolloServer({
 		typeDefs,
 		resolvers,
 		context: setContext,
 		introspection: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
-		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
-		formatError (error) {
+		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger as any, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
+		formatError (error: GraphQLError) {
 			if ( !(error.originalError instanceof UserInputError) ) {
 				logger.error(error.message);
 			}
@@ -87,9 +86,9 @@ const initApplication = async () => {
 
 	await server.start();
 
-	server.applyMiddleware({ app });
+	server.applyMiddleware({ app: app as any });
 
-	app.use((req, res) => {
+	app.use((req: Request, res: Response) => {
 		res.status(404).send('404'); // eslint-disable-line no-magic-numbers
 	});
 
