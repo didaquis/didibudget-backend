@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { roundToTwoDecimals } from '#/helpers/roundToTwoDecimals.js';
 
 describe('roundToTwoDecimals', () => {

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { expenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
 
 describe('expenseMonthlyAverageDTO', () => {

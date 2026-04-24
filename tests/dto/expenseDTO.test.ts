@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { expenseDTO } from '#/dto/expenseDTO.js';
 
 describe('expenseDTO', () => {

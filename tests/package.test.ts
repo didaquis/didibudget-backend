@@ -1,3 +1,4 @@
+import { describe, expect, test, beforeAll } from 'vitest';
 import jsonfile from 'jsonfile';
 
 let packageJSONData: any;

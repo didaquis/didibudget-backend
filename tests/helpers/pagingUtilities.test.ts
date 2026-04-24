@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 
 describe('pagingUtilities', () => {

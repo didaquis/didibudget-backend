@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { expenseCategories } from '#/config/defaultData.js';
 import { CategoryType } from '#/data/CategoryType.js';
 

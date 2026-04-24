@@ -57,19 +57,6 @@ export default tseslint.config(
 	},
 	{
 		files: ['tests/**/*.test.ts'],
-		languageOptions: {
-			globals: {
-				describe: 'readonly',
-				test: 'readonly',
-				it: 'readonly',
-				expect: 'readonly',
-				beforeAll: 'readonly',
-				afterAll: 'readonly',
-				beforeEach: 'readonly',
-				afterEach: 'readonly',
-				vi: 'readonly',
-			},
-		},
 		rules: {
 			'no-magic-numbers': 'off',
 		},

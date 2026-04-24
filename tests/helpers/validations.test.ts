@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { isValidEmail, isStrongPassword } from '#/helpers/validations.js';
 
 describe('validations', () => {
