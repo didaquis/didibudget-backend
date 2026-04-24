@@ -1,4 +1,4 @@
-import { Schema, Document } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,7 +8,8 @@ import { v4 as uuidv4 } from 'uuid';
  *
  * User have interesting properties. Some of them are isAdmin (false by default), isActive (true by default. Useful for removing login permission to the registered users), uuid (random and unique token. Created to provided a random identifier token for every user different than _id native MongoDB value)
  */
-export interface IUser extends Document {
+export interface IUser {
+	_id: Types.ObjectId;
 	email: string;
 	password: string;
 	isAdmin: boolean;
@@ -18,7 +19,7 @@ export interface IUser extends Document {
 	lastLogin: Date;
 }
 
-const UsersSchema: Schema<IUser> = new Schema({
+const UsersSchema = new Schema<IUser>({
 	email: {
 		type: String,
 		required: true,

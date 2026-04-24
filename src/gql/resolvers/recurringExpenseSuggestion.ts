@@ -1,5 +1,8 @@
+import { Types } from 'mongoose';
+
 import { recurringExpenseSuggestionDTO, RecurringExpenseSuggestionDTO } from '#/dto/recurringExpenseSuggestionDTO.js';
 import { Context } from '../auth/setContext.js';
+import type { IRecurringExpenseSuggestion, IExpenseCategory, IExpenseSubcategory } from '#/data/models/index.js';
 
 interface GetRecurringExpenseSuggestionsByDayArgs {
 	day: number;
@@ -13,6 +16,14 @@ interface RegisterRecurringExpenseSuggestionArgs {
 		category: string;
 		subcategory?: string | null;
 		quantity: number | string;
+	};
+}
+
+interface PopulatedSuggestion extends Omit<IRecurringExpenseSuggestion, 'suggestedExpense'> {
+	suggestedExpense: {
+		category: IExpenseCategory;
+		subcategory: IExpenseSubcategory | null;
+		quantity: Types.Decimal128;
 	};
 }
 
@@ -33,7 +44,7 @@ export const Query = {
 			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
-		return allSuggestions.map((suggestion: any) => recurringExpenseSuggestionDTO(suggestion));
+		return (allSuggestions as unknown as PopulatedSuggestion[]).map((suggestion) => recurringExpenseSuggestionDTO(suggestion));
 	},
 	/**
 	 * Get the active recurring expense suggestions for an user for a specific day of the month
@@ -75,7 +86,7 @@ export const Query = {
 			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
-		return allSuggestions.map((suggestion: any) => recurringExpenseSuggestionDTO(suggestion));
+		return (allSuggestions as unknown as PopulatedSuggestion[]).map((suggestion) => recurringExpenseSuggestionDTO(suggestion));
 	},
 };
 
@@ -104,6 +115,11 @@ export const Mutation = {
 			.populate({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
 			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
-		return recurringExpenseSuggestionDTO(populated);
+
+		if (!populated) {
+			throw new Error('Failed to populate recurring expense suggestion');
+		}
+
+		return recurringExpenseSuggestionDTO(populated as unknown as PopulatedSuggestion);
 	},
 };

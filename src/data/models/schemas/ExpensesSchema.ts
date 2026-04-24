@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,7 +7,8 @@ import { CurrencyISO } from '#/data/CurrencyISO.js';
 /**
  * Expenses schema
  */
-export interface IExpense extends Document {
+export interface IExpense {
+	_id: Types.ObjectId;
 	user_id: Types.ObjectId;
 	category: Types.ObjectId;
 	subcategory?: Types.ObjectId;
@@ -17,7 +18,7 @@ export interface IExpense extends Document {
 	uuid: string;
 }
 
-const ExpensesSchema: Schema<IExpense> = new Schema({
+const ExpensesSchema = new Schema<IExpense>({
 	user_id: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'users',

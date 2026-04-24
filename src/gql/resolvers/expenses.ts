@@ -1,3 +1,5 @@
+import { DeleteResult } from 'mongoose';
+
 import { expenseDTO, ExpenseDTO } from '#/dto/expenseDTO.js';
 import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByTypeDTO.js';
 import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
@@ -48,10 +50,10 @@ export const Query = {
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const sortCriteria = { date: 'asc' };
+		const sortCriteria = { date: 'asc' as const };
 		const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).lean();
 
-		return allExpenses.map((expense: any) => expenseDTO(expense));
+		return allExpenses.map((expense) => expenseDTO(expense));
 	},
 	/**
 	 * Get expenses by user using pagination
@@ -64,7 +66,7 @@ export const Query = {
 		const user = await context.di.authValidation.getUser(context);
 
 		const offset = getOffset(page, pageSize);
-		const sortCriteria = { date: 'desc', _id: 'desc' };
+		const sortCriteria = { date: 'desc' as const, _id: 'desc' as const };
 
 		const getTotalCount = context.di.model.Expenses.countDocuments({ user_id: user._id });
 		const getExpenses = context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();
@@ -74,7 +76,7 @@ export const Query = {
 		const totalPages = getTotalPagesNumber(totalCount, pageSize);
 
 		return {
-			expenses: expenses.map((expense: any) => expenseDTO(expense)),
+			expenses: expenses.map((expense) => expenseDTO(expense)),
 			pagination: {
 				currentPage: page,
 				totalPages: totalPages,
@@ -93,11 +95,11 @@ export const Query = {
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const sortCriteria = { date: 'desc', _id: 'desc' };
+		const sortCriteria = { date: 'desc' as const, _id: 'desc' as const };
 
 		const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: { $gte: startDate, $lt: endDate } }).sort(sortCriteria).lean();
 
-		return expenses.map((expense: any) => expenseDTO(expense));
+		return expenses.map((expense) => expenseDTO(expense));
 	},
 	/**
 	 * Get the total expenses of a specific type for a user
@@ -194,8 +196,8 @@ export const Mutation = {
 
 		const user = await context.di.authValidation.getUser(context);
 
-		return context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
-			.then((expense: any) => expenseDTO(expense));
+		return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
+			.then((expense) => expenseDTO(expense));
 	},
 	/**
 	 * Delete one registry of expense
@@ -206,12 +208,12 @@ export const Mutation = {
 		const user = await context.di.authValidation.getUser(context);
 
 		return context.di.model.Expenses.findOneAndDelete({ uuid, user_id: user._id })
-			.then((expense: any) => expense ? expenseDTO(expense) : null);
+			.then((expense) => expense ? expenseDTO(expense) : null);
 	},
 	/**
 	 * Delete all registries of expense
 	 */
-	deleteAllExpenses: async (_parent: unknown, _args: unknown, context: Context): Promise<any> => {
+	deleteAllExpenses: async (_parent: unknown, _args: unknown, context: Context): Promise<DeleteResult> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);

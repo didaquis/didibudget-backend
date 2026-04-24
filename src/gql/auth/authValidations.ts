@@ -1,5 +1,6 @@
 import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
 import { Users } from '#/data/models/index.js';
+import type { IUser } from '#/data/models/schemas/UsersSchema.js';
 import type { Context } from './setContext.js';
 
 /**
@@ -40,7 +41,7 @@ const authValidations = {
 	/**
 	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. If user does not exist, it throws an error.
 	 */
-	getUser: async (context: Context): Promise<any | null> => {
+	getUser: async (context: Context): Promise<IUser | null> => {
 		if (!context.user) {
 			return null;
 		}

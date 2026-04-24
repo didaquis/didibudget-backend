@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,7 +7,8 @@ import { CurrencyISO } from '#/data/CurrencyISO.js';
 /**
  * Monthly Balance schema
  */
-export interface IMonthlyBalance extends Document {
+export interface IMonthlyBalance {
+	_id: Types.ObjectId;
 	user_id: Types.ObjectId;
 	balance: Types.Decimal128;
 	date: Date;
@@ -15,7 +16,7 @@ export interface IMonthlyBalance extends Document {
 	uuid: string;
 }
 
-const MonthlyBalanceSchema: Schema<IMonthlyBalance> = new Schema({
+const MonthlyBalanceSchema = new Schema<IMonthlyBalance>({
 	user_id: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'users',

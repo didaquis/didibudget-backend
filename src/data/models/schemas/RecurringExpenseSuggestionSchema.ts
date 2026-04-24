@@ -1,22 +1,24 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
 import SuggestedExpenseSchema from './SuggestedExpenseSchema.js';
+import type { ISuggestedExpense } from './SuggestedExpenseSchema.js';
 
 /**
  * Recurring Expense Suggestion schema
  */
-export interface IRecurringExpenseSuggestion extends Document {
+export interface IRecurringExpenseSuggestion {
+	_id: Types.ObjectId;
 	user_id: Types.ObjectId;
 	isActive: boolean;
 	startDay: number;
 	endDay: number;
 	uuid: string;
-	suggestedExpense: Document;
+	suggestedExpense: ISuggestedExpense;
 }
 
-const RecurringExpenseSuggestionSchema: Schema<IRecurringExpenseSuggestion> = new Schema({
+const RecurringExpenseSuggestionSchema = new Schema<IRecurringExpenseSuggestion>({
 	user_id: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'users',

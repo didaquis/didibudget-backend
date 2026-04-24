@@ -1,3 +1,4 @@
+import { DeleteResult } from 'mongoose';
 import { UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
 import { isValidEmail, isStrongPassword } from '#/helpers/validations.js';
@@ -47,12 +48,16 @@ export const Mutation = {
 			throw new UserInputError('Data provided is not valid');
 		}
 
-		await context.di.model.Users({ email, password }).save();
+		await new context.di.model.Users({ email, password }).save();
 
 		const user = await context.di.model.Users.findOne({ email }).lean();
 
+		if (!user) {
+			throw new UserInputError('Data provided is not valid');
+		}
+
 		return {
-			token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate)
+			token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate as unknown as string)
 		};
 	},
 	/**
@@ -75,16 +80,16 @@ export const Mutation = {
 			throw new UserInputError('Invalid credentials');
 		}
 
-		await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date().toISOString() }, { new: true }).lean();
+		await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date() }, { new: true }).lean();
 
 		return {
-			token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate)
+			token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate as unknown as string)
 		};
 	},
 	/**
 	 * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
 	 */
-	deleteMyUserAccount: async (_parent: unknown, _args: unknown, context: Context): Promise<any> => {
+	deleteMyUserAccount: async (_parent: unknown, _args: unknown, context: Context): Promise<DeleteResult> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const user = await context.di.authValidation.getUser(context);

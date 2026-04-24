@@ -1,18 +1,19 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Expense subcategory schema
  */
-export interface IExpenseSubcategory extends Document {
+export interface IExpenseSubcategory {
+	_id: Types.ObjectId;
 	name: string;
 	inmutableKey: string;
 	emojis: string[];
 	uuid: string;
 }
 
-const ExpenseSubcategorySchema: Schema<IExpenseSubcategory> = new Schema({
+const ExpenseSubcategorySchema = new Schema<IExpenseSubcategory>({
 	name: {
 		type: String,
 		required: true,
