@@ -1,8 +1,4 @@
-'use strict';
-
-import { gql } from 'apollo-server-express';
-
-export default /* GraphQL */ gql`
+const monthlyBalance: string = `
 	type MonthlyBalance {
 		user_id: ID!
 		balance: Float!
@@ -35,3 +31,5 @@ export default /* GraphQL */ gql`
 		deleteAllMonthlyBalances: DeleteResult
 	}
 `;
+
+export default monthlyBalance;

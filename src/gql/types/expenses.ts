@@ -1,8 +1,4 @@
-'use strict';
-
-import { gql } from 'apollo-server-express';
-
-export default /* GraphQL */ gql`
+const expenses: string = `
 	type Expense {
 		user_id: ID!
 		category: ID!
@@ -57,3 +53,5 @@ export default /* GraphQL */ gql`
 		deleteAllExpenses: DeleteResult
 	}
 `;
+
+export default expenses;

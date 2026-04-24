@@ -1,8 +1,4 @@
-'use strict';
-
-import { gql } from 'apollo-server-express';
-
-export default /* GraphQL */ gql`
+const shared: string = `
 	""" Delete Result """
 	type DeleteResult {
 		deletedCount: Int!
@@ -15,3 +11,5 @@ export default /* GraphQL */ gql`
 		totalCount: Int!
 	}
 `;
+
+export default shared;

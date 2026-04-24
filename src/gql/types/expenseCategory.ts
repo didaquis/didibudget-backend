@@ -1,8 +1,4 @@
-'use strict';
-
-import { gql } from 'apollo-server-express';
-
-export default /* GraphQL */ gql`
+const expenseCategory: string = `
 	enum CategoryType {
 		expense
 		investment
@@ -33,3 +29,5 @@ export default /* GraphQL */ gql`
 		getExpenseCategoryById(category: ID!): ExpenseCategory
 	}
 `;
+
+export default expenseCategory;

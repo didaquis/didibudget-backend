@@ -1,8 +1,4 @@
-'use strict';
-
-import { gql } from 'apollo-server-express';
-
-export default /* GraphQL */ gql`
+const auth: string = `
 	type Token {
 		token: String
 	}
@@ -18,3 +14,5 @@ export default /* GraphQL */ gql`
 		deleteMyUserAccount: DeleteResult
 	}
 `;
+
+export default auth;

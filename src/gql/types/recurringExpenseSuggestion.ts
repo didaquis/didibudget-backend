@@ -1,8 +1,4 @@
-'use strict';
-
-import { gql } from 'apollo-server-express';
-
-export default /* GraphQL */ gql`
+const recurringExpenseSuggestion: string = `
 	type RecurringExpenseSuggestion {
 		isActive: Boolean!
 		startDay: Int!
@@ -40,3 +36,5 @@ export default /* GraphQL */ gql`
 		registerRecurringExpenseSuggestion(isActive: Boolean!, startDay: Int!, endDay: Int!, suggestedExpense: SuggestedExpenseInput!): RecurringExpenseSuggestion
 	}
 `;
+
+export default recurringExpenseSuggestion;

@@ -1,8 +1,4 @@
-'use strict';
-
-import { gql } from 'apollo-server-express';
-
-export default /* GraphQL */ gql`
+const users: string = `
 	type User {
 		email: String
 		isAdmin: Boolean
@@ -17,3 +13,5 @@ export default /* GraphQL */ gql`
 		listAllUsers: [User]
 	}
 `;
+
+export default users;
