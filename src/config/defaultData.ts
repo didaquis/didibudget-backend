@@ -1,43 +1,28 @@
-'use strict';
-
 import { CategoryType } from '../data/CategoryType.js';
 
-/* Home doc */
-/**
- * @file Contains all the default data to insert on database on first start of application
- * @see module:defaultData
- */
-
-/* Module doc */
 /**
  * Contains all the default data to insert on database on first start of application
- * @module defaultData
  */
 
+export interface Subcategory {
+	name: string;
+	inmutableKey: string;
+	emojis: string[];
+}
 
-/**
- * @typedef {Object} Subcategory
- * @property {string} name - Name of the subcategory
- * @property {string} inmutableKey - Immutable key of the subcategory
- * @property {Array<string>} emojis - Emojis identifying the subcategory
- */
-
-/**
- * @typedef {Object} ExpenseCategory
- * @property {string} name - Name of the expense category
- * @property {string} inmutableKey - Static and private identifier for the category, consistent across environments/persistence layers
- * @property {Array<string>} emojis - Emojis identifying the category
- * @property {string} categoryType - Type of the expense category (see CategoryType)
- * @property {Array<Subcategory>} subcategories - Array of subcategory objects (may be empty)
- */
+export interface ExpenseCategory {
+	name: string;
+	inmutableKey: string;
+	subcategories: Subcategory[];
+	emojis: string[];
+	categoryType: string;
+}
 
 /**
  * Default categories and subcategories for expenses.
  * Each category has a list of emojis, a type (see CategoryType), and optional subcategories.
- *
- * @type {Array<ExpenseCategory>}
  */
-export const expenseCategories = [
+export const expenseCategories: ExpenseCategory[] = [
 	{
 		name: 'Computers, smartphones and electronic devices',
 		inmutableKey: '1dc0abadd6f2356c6914',
