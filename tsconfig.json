@@ -8,11 +8,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./src",
+    "rootDir": ".",
     "paths": {
       "#/*": [
-        "./*"
+        "./src/*"
       ]
     },
     "allowJs": true,
@@ -20,7 +19,8 @@
     "sourceMap": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules",

@@ -1,13 +1,19 @@
 import { describe, expect, test, beforeAll } from 'vitest';
 import jsonfile from 'jsonfile';
 
+type JsonfileModule = {
+	readFileSync: (file: string) => any;
+};
+
+const jsonfileReader = jsonfile as unknown as JsonfileModule;
+
 let packageJSONData: any;
 
 describe('package.json file', () => {
 
 	beforeAll(() => {
 		const file = './package.json';
-		packageJSONData = jsonfile.readFileSync(file);
+		packageJSONData = jsonfileReader.readFileSync(file);
 	});
 
 	test('Should have all dependencies with semver version fixed', () => {

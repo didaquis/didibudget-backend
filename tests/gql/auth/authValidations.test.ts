@@ -40,51 +40,51 @@ describe('authValidations', () => {
 
 	describe('ensureThatUserIsLogged', () => {
 		test('Should not throw if context contains user', () => {
-			expect(() => authValidations.ensureThatUserIsLogged({ user: {} })).not.toThrow();
+			expect(() => authValidations.ensureThatUserIsLogged({ user: {} } as any)).not.toThrow();
 		});
 
 		test('Should throw AuthenticationError if context does not contain user', () => {
-			expect(() => authValidations.ensureThatUserIsLogged({})).toThrow(AuthenticationError);
+			expect(() => authValidations.ensureThatUserIsLogged({} as any)).toThrow(AuthenticationError);
 		});
 
 		test('Should throw AuthenticationError if user is null', () => {
-			expect(() => authValidations.ensureThatUserIsLogged({ user: null })).toThrow(AuthenticationError);
+			expect(() => authValidations.ensureThatUserIsLogged({ user: null } as any)).toThrow(AuthenticationError);
 		});
 	});
 
 	describe('ensureThatUserIsAdministrator', () => {
 		test('Should not throw if user is admin', () => {
-			expect(() => authValidations.ensureThatUserIsAdministrator({ user: { isAdmin: true } })).not.toThrow();
+			expect(() => authValidations.ensureThatUserIsAdministrator({ user: { isAdmin: true } } as any)).not.toThrow();
 		});
 
 		test('Should throw ForbiddenError if user is not admin', () => {
-			expect(() => authValidations.ensureThatUserIsAdministrator({ user: { isAdmin: false } })).toThrow(ForbiddenError);
+			expect(() => authValidations.ensureThatUserIsAdministrator({ user: { isAdmin: false } } as any)).toThrow(ForbiddenError);
 		});
 
 		test('Should throw ForbiddenError if context has no user', () => {
-			expect(() => authValidations.ensureThatUserIsAdministrator({})).toThrow(ForbiddenError);
+			expect(() => authValidations.ensureThatUserIsAdministrator({} as any)).toThrow(ForbiddenError);
 		});
 	});
 
 	describe('getUser', () => {
 		test('Should return null if context has no user', async () => {
-			const result = await authValidations.getUser({});
+			const result = await authValidations.getUser({} as any);
 			expect(result).toBeNull();
 		});
 
 		test('Should return user data if found in database', async () => {
 			const mockUser = { uuid: 'user-1', email: 'test@test.com' };
-			Users.findOne.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
+			(Users.findOne as any).mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
 
-			const result = await authValidations.getUser({ user: { uuid: 'user-1' } });
+			const result = await authValidations.getUser({ user: { uuid: 'user-1' } } as any);
 			expect(result).toEqual(mockUser);
 			expect(Users.findOne).toHaveBeenCalledWith({ uuid: 'user-1' });
 		});
 
 		test('Should throw AuthenticationError if user is not found in database', async () => {
-			Users.findOne.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(null) });
+			(Users.findOne as any).mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(null) });
 
-			await expect(authValidations.getUser({ user: { uuid: 'missing' } })).rejects.toThrow(AuthenticationError);
+			await expect(authValidations.getUser({ user: { uuid: 'missing' } } as any)).rejects.toThrow(AuthenticationError);
 		});
 	});
 });
