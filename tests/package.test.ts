@@ -15,7 +15,7 @@ describe('package.json file', () => {
 			const regex = RegExp(validPattern);
 	
 			let allDependenciesAreFixed = true;
-			for (let key in packageJSONData.dependencies){
+			for (const key in packageJSONData.dependencies){
 				if (Object.prototype.hasOwnProperty.call(packageJSONData.dependencies, key)) {
 					if (!regex.test(packageJSONData.dependencies[key])) {
 						allDependenciesAreFixed = false;
@@ -34,7 +34,7 @@ describe('package.json file', () => {
 
 			let allDevDependenciesAreFixed = true;
 
-			for (let key in packageJSONData.devDependencies){
+			for (const key in packageJSONData.devDependencies){
 				if (Object.prototype.hasOwnProperty.call(packageJSONData.devDependencies, key)) {
 					if (!regex.test(packageJSONData.devDependencies[key])) {
 						allDevDependenciesAreFixed = false;

@@ -1,17 +1,22 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default [
+export default tseslint.config(
 	js.configs.recommended,
+	...tseslint.configs.recommended,
 	{
 		languageOptions: {
-			ecmaVersion: 2023,
-			sourceType: 'module',
+			parser: tseslint.parser,
+			parserOptions: {
+				project: './tsconfig.eslint.json',
+			},
 			globals: {
 				...globals.node,
 				...globals.es6,
 			},
 		},
+		files: ['src/**/*.ts', 'tests/**/*.ts'],
 		rules: {
 			indent: [
 				'error',
@@ -32,8 +37,9 @@ export default [
 			],
 			'no-console': 'warn',
 			'no-alert': 'warn',
-			'no-unused-vars': 'error',
-			'keyword-spacing': ['error', { before: true, after: true }],
+		'@typescript-eslint/no-unused-vars': 'error',
+		'@typescript-eslint/no-explicit-any': 'warn',
+		'keyword-spacing': ['error', { before: true, after: true }],
 			'space-infix-ops': ['error', { int32Hint: false }],
 			'comma-spacing': ['error'],
 			'arrow-spacing': ['error'],
@@ -47,7 +53,7 @@ export default [
 		},
 	},
 	{
-		files: ['tests/**/*.test.js'],
+		files: ['tests/**/*.test.ts'],
 		languageOptions: {
 			globals: {
 				describe: 'readonly',
@@ -65,4 +71,4 @@ export default [
 			'no-magic-numbers': 'off',
 		},
 	},
-];
+);
