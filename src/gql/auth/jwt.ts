@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import { securityVariablesConfig } from '../../config/appConfig.js';
+import { securityVariablesConfig } from '#/config/appConfig.js';
 
 /**
  * Create a new JSON Web Token

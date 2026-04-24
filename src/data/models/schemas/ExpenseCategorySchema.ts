@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { CategoryType } from '../../CategoryType.js';
+import { CategoryType } from '#/data/CategoryType.js';
 
 /**
  * Expense category schema

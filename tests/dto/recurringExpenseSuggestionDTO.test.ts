@@ -1,4 +1,4 @@
-import { recurringExpenseSuggestionDTO } from '../../src/dto/recurringExpenseSuggestionDTO.js';
+import { recurringExpenseSuggestionDTO } from '#/dto/recurringExpenseSuggestionDTO.js';
 
 describe('recurringExpenseSuggestionDTO', () => {
 	test('Should map all recurring expense suggestion fields to the DTO', () => {

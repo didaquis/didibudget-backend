@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { getLastMonthsRangeExcludingCurrent } from '../../src/helpers/getLastMonthsRangeExcludingCurrent.js';
+import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
 
 describe('getLastMonthsRangeExcludingCurrent', () => {
 	const mockDate = new Date(2023, 5, 15); // June 15, 2023

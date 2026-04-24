@@ -1,4 +1,4 @@
-import { roundToTwoDecimals } from '../../src/helpers/roundToTwoDecimals.js';
+import { roundToTwoDecimals } from '#/helpers/roundToTwoDecimals.js';
 
 describe('roundToTwoDecimals', () => {
 	test('Should return 0 if no receive params', () => {

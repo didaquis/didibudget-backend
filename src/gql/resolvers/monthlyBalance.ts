@@ -1,5 +1,5 @@
-import { monthlyBalanceDTO, MonthlyBalanceDTO } from '../../dto/monthlyBalanceDTO.js';
-import { getOffset, getTotalPagesNumber } from '../../helpers/pagingUtilities.js';
+import { monthlyBalanceDTO, MonthlyBalanceDTO } from '#/dto/monthlyBalanceDTO.js';
+import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 import { Context } from '../auth/setContext.js';
 
 interface GetMonthlyBalancesWithPaginationArgs {

@@ -1,4 +1,4 @@
-import { expenseSumByTypeDTO } from '../../src/dto/expenseSumByTypeDTO.js';
+import { expenseSumByTypeDTO } from '#/dto/expenseSumByTypeDTO.js';
 
 describe('expenseSumByTypeDTO', () => {
 	test('Should return categoryType, currencyISO and sum', () => {

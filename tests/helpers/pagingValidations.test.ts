@@ -1,4 +1,4 @@
-import { pagingValidations } from '../../src/helpers/pagingValidations.js';
+import { pagingValidations } from '#/helpers/pagingValidations.js';
 import { UserInputError } from 'apollo-server-express';
 
 describe('pagingValidations', () => {

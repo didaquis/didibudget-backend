@@ -1,4 +1,4 @@
-import { expenseMonthlyAverageDTO } from '../../src/dto/expenseMonthlyAverageDTO.js';
+import { expenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
 
 describe('expenseMonthlyAverageDTO', () => {
 	test('Should return rounded average and currencyISO', () => {

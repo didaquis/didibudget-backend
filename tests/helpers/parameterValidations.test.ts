@@ -1,4 +1,4 @@
-import { parameterValidations } from '../../src/helpers/parameterValidations.js';
+import { parameterValidations } from '#/helpers/parameterValidations.js';
 import { UserInputError } from 'apollo-server-express';
 
 describe('parameterValidations', () => {

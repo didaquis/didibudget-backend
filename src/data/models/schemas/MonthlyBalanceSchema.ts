@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { CurrencyISO } from '../../CurrencyISO.js';
+import { CurrencyISO } from '#/data/CurrencyISO.js';
 
 /**
  * Monthly Balance schema

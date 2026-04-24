@@ -1,7 +1,7 @@
 import { UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
-import { isValidEmail, isStrongPassword } from '../../helpers/validations.js';
-import { globalVariablesConfig } from '../../config/appConfig.js';
+import { isValidEmail, isStrongPassword } from '#/helpers/validations.js';
+import { globalVariablesConfig } from '#/config/appConfig.js';
 import { Context } from '../auth/setContext.js';
 
 interface RegisterUserArgs {

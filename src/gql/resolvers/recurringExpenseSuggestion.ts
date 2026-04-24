@@ -1,4 +1,4 @@
-import { recurringExpenseSuggestionDTO, RecurringExpenseSuggestionDTO } from '../../dto/recurringExpenseSuggestionDTO.js';
+import { recurringExpenseSuggestionDTO, RecurringExpenseSuggestionDTO } from '#/dto/recurringExpenseSuggestionDTO.js';
 import { Context } from '../auth/setContext.js';
 
 interface GetRecurringExpenseSuggestionsByDayArgs {

@@ -1,5 +1,5 @@
 import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
-import { Users } from '../../data/models/index.js';
+import { Users } from '#/data/models/index.js';
 import type { Context } from './setContext.js';
 
 /**

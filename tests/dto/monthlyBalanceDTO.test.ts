@@ -1,4 +1,4 @@
-import { monthlyBalanceDTO } from '../../src/dto/monthlyBalanceDTO.js';
+import { monthlyBalanceDTO } from '#/dto/monthlyBalanceDTO.js';
 
 describe('monthlyBalanceDTO', () => {
 	test('Should map all monthlyBalance fields to the DTO', () => {

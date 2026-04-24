@@ -1,5 +1,5 @@
-import { expenseCategories } from '../../src/config/defaultData.js';
-import { CategoryType } from '../../src/data/CategoryType.js';
+import { expenseCategories } from '#/config/defaultData.js';
+import { CategoryType } from '#/data/CategoryType.js';
 
 describe('defaultData', () => {
 	it('should be a valid array with expense categories and subcategories', () => {

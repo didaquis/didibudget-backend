@@ -1,4 +1,4 @@
-import { expenseDTO } from '../../src/dto/expenseDTO.js';
+import { expenseDTO } from '#/dto/expenseDTO.js';
 
 describe('expenseDTO', () => {
 	test('Should map all expense fields to the DTO', () => {

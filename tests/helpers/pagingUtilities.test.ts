@@ -1,4 +1,4 @@
-import { getOffset, getTotalPagesNumber } from '../../src/helpers/pagingUtilities.js';
+import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 
 describe('pagingUtilities', () => {
 	describe('getOffset', () => {

@@ -1,4 +1,4 @@
-import { isValidEmail, isStrongPassword } from '../../src/helpers/validations.js';
+import { isValidEmail, isStrongPassword } from '#/helpers/validations.js';
 
 describe('validations', () => {
 	describe('isValidEmail', () => {

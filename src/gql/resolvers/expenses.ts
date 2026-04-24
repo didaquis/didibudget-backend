@@ -1,9 +1,9 @@
-import { expenseDTO, ExpenseDTO } from '../../dto/expenseDTO.js';
-import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '../../dto/expenseSumByTypeDTO.js';
-import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '../../dto/expenseMonthlyAverageDTO.js';
-import { getOffset, getTotalPagesNumber } from '../../helpers/pagingUtilities.js';
-import { getLastMonthsRangeExcludingCurrent } from '../../helpers/getLastMonthsRangeExcludingCurrent.js';
-import { CurrencyISO } from '../../data/CurrencyISO.js';
+import { expenseDTO, ExpenseDTO } from '#/dto/expenseDTO.js';
+import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByTypeDTO.js';
+import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
+import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
+import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
+import { CurrencyISO } from '#/data/CurrencyISO.js';
 import { Context } from '../auth/setContext.js';
 
 interface GetExpensesWithPaginationArgs {
