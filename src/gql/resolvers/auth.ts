@@ -57,7 +57,7 @@ export const Mutation = {
 		}
 
 		return {
-			token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate as unknown as string)
+			token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid, user.registrationDate)
 		};
 	},
 	/**

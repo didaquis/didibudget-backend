@@ -21,7 +21,7 @@ export interface Context {
 	di: {
 		model: ModelsMap;
 		jwt: {
-			createAuthToken: (email: string, isAdmin: boolean, isActive: boolean, uuid: string, registrationDate: string) => string;
+			createAuthToken: (email: string, isAdmin: boolean, isActive: boolean, uuid: string, registrationDate: Date) => string;
 		};
 		authValidation: {
 			ensureLimitOfUsersIsNotReached: (numberOfCurrentlyUsersRegistered: number, usersLimit: number) => void;
