@@ -257,4 +257,4 @@ If a change to the default categories is required, you should obtain explicit co
 - Consistency matters. Follow existing project conventions, naming standards, and architectural patterns.
 - Fail explicitly. Handle errors clearly and predictably; avoid silent failures or ambiguous behavior.
 - TypeScript over JavaScript. Prefer TypeScript instead of JavaScript. Use strict typing, explicit interfaces, and meaningful types to improve correctness and maintainability.
-- Avoid type casts. Do not use `as any`, `as unknown as X`, or unnecessary casts. If a cast seems necessary, investigate whether the underlying types are modelled correctly first. When a cast is truly unavoidable (e.g. Mongoose cannot infer populated types for nested dot-notation paths), isolate it in a single named helper function with a JSDoc comment explaining why the cast is necessary and what runtime guarantee makes it safe. Never scatter unexplained casts across the codebase.
+- Avoid type casts. Do not use `as any`, `as unknown as X`, or unnecessary casts. If a cast seems necessary, investigate whether the underlying types are modelled correctly first.
