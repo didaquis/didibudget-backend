@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import express, { Express, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import favicon from 'serve-favicon';
 import path from 'path';
@@ -58,7 +58,7 @@ db.once('open', async () => {
 });
 
 const initApplication = async (): Promise<void> => {
-	const app: Express = express();
+	const app = express();
 	if (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) {
 		app.use(helmet());
 	} else {

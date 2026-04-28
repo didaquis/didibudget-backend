@@ -47,7 +47,7 @@ export default tseslint.config(
 			'comma-spacing': ['error'],
 			'arrow-spacing': ['error'],
 			'semi-spacing': ['error'],
-			'space-before-function-paren': ['error'],
+			'space-before-function-paren': ['warn'],
 			'no-multi-spaces': 'error',
 			'no-magic-numbers': ['warn', { ignore: [0], ignoreArrayIndexes: true }],
 			'valid-typeof': 'error',
