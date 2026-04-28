@@ -8,6 +8,7 @@ import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
 import { CurrencyISO } from '#/data/CurrencyISO.js';
 import { Context } from '../auth/setContext.js';
+import { CategoryTypeValue } from '#/data/CategoryType.js';
 
 interface GetExpensesWithPaginationArgs {
 	page: number;
@@ -20,18 +21,18 @@ interface GetExpensesBetweenDatesArgs {
 }
 
 interface GetExpensesSumByTypeArgs {
-	categoryType: string;
+	categoryType: CategoryTypeValue;
 }
 
 interface GetExpensesMonthlyAverageArgs {
 	lastNMonths: number;
-	excludedCategoryTypes?: string[];
+	excludedCategoryTypes?: CategoryTypeValue[];
 }
 
 interface RegisterExpenseArgs {
 	category: string;
 	subcategory?: string;
-	quantity: number | string;
+	quantity: number;
 	date: string;
 }
 
