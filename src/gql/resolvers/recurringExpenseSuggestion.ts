@@ -19,12 +19,26 @@ interface RegisterRecurringExpenseSuggestionArgs {
 	};
 }
 
+/**
+ * Shape of a RecurringExpenseSuggestion document after populating
+ * suggestedExpense.category and suggestedExpense.subcategory.
+ */
 interface PopulatedSuggestion extends Omit<IRecurringExpenseSuggestion, 'suggestedExpense'> {
 	suggestedExpense: {
 		category: IExpenseCategory;
 		subcategory: IExpenseSubcategory | null;
 		quantity: Types.Decimal128;
 	};
+}
+
+/**
+ * Casts a lean Mongoose document with populated fields to PopulatedSuggestion.
+ * The cast is necessary because Mongoose cannot infer the populated type for
+ * nested dot-notation paths (e.g. 'suggestedExpense.category') at compile time.
+ * The runtime shape is guaranteed by the .populate() calls that precede this cast.
+ */
+function asPopulated (doc: IRecurringExpenseSuggestion): PopulatedSuggestion {
+	return doc as unknown as PopulatedSuggestion;
 }
 
 /**
@@ -44,7 +58,7 @@ export const Query = {
 			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
-		return (allSuggestions as unknown as PopulatedSuggestion[]).map((suggestion) => recurringExpenseSuggestionDTO(suggestion));
+		return allSuggestions.map((suggestion) => recurringExpenseSuggestionDTO(asPopulated(suggestion)));
 	},
 	/**
 	 * Get the active recurring expense suggestions for an user for a specific day of the month
@@ -86,7 +100,7 @@ export const Query = {
 			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
-		return (allSuggestions as unknown as PopulatedSuggestion[]).map((suggestion) => recurringExpenseSuggestionDTO(suggestion));
+		return allSuggestions.map((suggestion) => recurringExpenseSuggestionDTO(asPopulated(suggestion)));
 	},
 };
 
@@ -120,6 +134,6 @@ export const Mutation = {
 			throw new Error('Failed to populate recurring expense suggestion');
 		}
 
-		return recurringExpenseSuggestionDTO(populated as unknown as PopulatedSuggestion);
+		return recurringExpenseSuggestionDTO(asPopulated(populated));
 	},
 };
