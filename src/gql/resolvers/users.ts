@@ -1,3 +1,4 @@
+import { SortValues } from 'mongoose';
 import { Context } from '../auth/setContext.js';
 import type { IUser } from '#/data/models/index.js';
 
@@ -8,12 +9,12 @@ export const Query = {
 	/**
 	 * It allows to administrators to list all users registered
 	 */
-	listAllUsers:  async (_parent: unknown, _args: unknown, context: Context): Promise<IUser[]> => {
+	listAllUsers: async (_parent: unknown, _args: unknown, context: Context): Promise<IUser[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		context.di.authValidation.ensureThatUserIsAdministrator(context);
 
-		const sortCriteria = { isAdmin: 'desc' as const, registrationDate: 'asc' as const };
+		const sortCriteria: Record<string, SortValues> = { isAdmin: 'desc', registrationDate: 'asc' };
 		return context.di.model.Users.find().sort(sortCriteria).lean() as Promise<IUser[]>;
 	}
 };

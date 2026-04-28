@@ -1,4 +1,4 @@
-import { DeleteResult } from 'mongoose';
+import { DeleteResult, SortValues } from 'mongoose';
 
 import { monthlyBalanceDTO, MonthlyBalanceDTO } from '#/dto/monthlyBalanceDTO.js';
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
@@ -31,7 +31,7 @@ export const Query = {
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const sortCriteria = { date: 'asc' as const };
+		const sortCriteria: Record<string, SortValues> = { date: 'asc' };
 		const allMonthlyBalances = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
 
 		return allMonthlyBalances.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
@@ -47,7 +47,7 @@ export const Query = {
 		const user = await context.di.authValidation.getUser(context);
 
 		const offset = getOffset(page, pageSize);
-		const sortCriteria = { date: 'desc' as const };
+		const sortCriteria: Record<string, SortValues> = { date: 'desc' };
 
 		const getTotalCount = context.di.model.MonthlyBalance.countDocuments({ user_id: user._id });
 		const getMonthlyBalances = context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();

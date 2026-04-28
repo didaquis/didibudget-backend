@@ -131,7 +131,7 @@ export const expenseResolvers: ExpenseResolver = {
 
       const user = await context.di.authValidation.getUser(context);
 
-      const sortCriteria = { date: 'asc' as const };
+      const sortCriteria: Record<string, SortValues> = { date: 'asc' };
       const allExpenses = await context.di.model.Expenses
         .find({ user_id: user._id })
         .sort(sortCriteria)
