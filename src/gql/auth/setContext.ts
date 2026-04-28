@@ -50,7 +50,7 @@ export interface Context {
 const setContext = async ({ req }: ExpressContext): Promise<Context> => {
 	const context: Context = {
 		di: {
-			model: models as ModelsMap,
+			model: models,
 			jwt: {
 				createAuthToken: createAuthToken
 			},
