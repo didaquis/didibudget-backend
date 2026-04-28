@@ -11,7 +11,7 @@ interface GetMonthlyBalancesWithPaginationArgs {
 }
 
 interface RegisterMonthlyBalanceArgs {
-	balance: number | string;
+	balance: number;
 	date: string;
 }
 
