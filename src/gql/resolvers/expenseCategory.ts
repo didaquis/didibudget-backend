@@ -6,9 +6,7 @@ interface GetExpenseCategoryByIdArgs {
 	category: string;
 }
 
-interface PopulatedExpenseCategory extends Omit<IExpenseCategory, 'subcategories'> {
-	subcategories: IExpenseSubcategory[];
-}
+type PopulatedExpenseCategory = Omit<IExpenseCategory, 'subcategories'> & { subcategories: IExpenseSubcategory[] };
 
 /**
  * All resolvers related to Expense Category
@@ -21,9 +19,13 @@ export const Query = {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const sortCriteria: Record<string, SortValues> = { name: 'asc' };
-		const allExpenseCategories = await context.di.model.ExpenseCategory.find().sort(sortCriteria).populate<{ subcategories: IExpenseSubcategory[] }>('subcategories').lean();
+		const allExpenseCategories = await context.di.model.ExpenseCategory
+			.find()
+			.sort(sortCriteria)
+			.populate<{ subcategories: IExpenseSubcategory[] }>('subcategories')
+			.lean();
 
-		return (allExpenseCategories || []) as unknown as PopulatedExpenseCategory[];
+		return allExpenseCategories ?? [];
 	},
 	/**
 	 * Get an expense category and their subcategories by category id
@@ -32,8 +34,12 @@ export const Query = {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const sortCriteria: Record<string, SortValues> = { name: 'asc' };
-		const result = await context.di.model.ExpenseCategory.findOne({ _id: category }).sort(sortCriteria).populate<{ subcategories: IExpenseSubcategory[] }>('subcategories').lean();
+		const result = await context.di.model.ExpenseCategory
+			.findOne({ _id: category })
+			.sort(sortCriteria)
+			.populate<{ subcategories: IExpenseSubcategory[] }>('subcategories')
+			.lean();
 
-		return result as unknown as PopulatedExpenseCategory | null;
+		return result;
 	}
 };
