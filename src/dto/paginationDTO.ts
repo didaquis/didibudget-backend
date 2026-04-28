@@ -5,7 +5,7 @@ export interface PaginationDTO {
 }
 
 /**
- * Builds a DTO for ExpenseSumByType
+ * Builds a DTO for pagination metadata
  */
 export const paginationDTO = (
 	page: number,

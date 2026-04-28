@@ -2,7 +2,7 @@ import type { Types } from 'mongoose';
 
 export interface MonthlyBalanceDTO {
 	balance: string;
-	date: string;
+	date: string | Date;
 	currencyISO: string;
 	uuid: string;
 }
@@ -20,7 +20,7 @@ interface MonthlyBalanceDTOInput {
 export const monthlyBalanceDTO = (monthlyBalance: MonthlyBalanceDTOInput): MonthlyBalanceDTO => {
 	return {
 		balance: monthlyBalance.balance.toString(),
-		date: monthlyBalance.date as string,
+		date: monthlyBalance.date,
 		currencyISO: monthlyBalance.currencyISO,
 		uuid: monthlyBalance.uuid
 	};
