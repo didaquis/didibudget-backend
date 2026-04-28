@@ -15,6 +15,6 @@ export const expenseSumByTypeDTO = (
 	return {
 		categoryType,
 		currencyISO,
-		sum: sum
+		sum
 	};
 };
