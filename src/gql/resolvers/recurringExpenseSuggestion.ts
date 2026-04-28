@@ -7,11 +7,11 @@ interface GetRecurringExpenseSuggestionsByDayArgs {
 interface RegisterRecurringExpenseSuggestionArgs {
 	isActive: boolean;
 	startDay: number;
-	endDay: number | null;
+	endDay: number;
 	suggestedExpense: {
 		category: string;
 		subcategory?: string | null;
-		quantity: number | string;
+		quantity: number;
 	};
 }
 
