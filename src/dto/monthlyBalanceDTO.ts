@@ -8,7 +8,7 @@ export interface MonthlyBalanceDTO {
 }
 
 interface MonthlyBalanceDTOInput {
-	balance: number | string | Types.Decimal128;
+	balance: Types.Decimal128;
 	date: string | Date;
 	currencyISO: string;
 	uuid: string;
