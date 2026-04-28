@@ -7,16 +7,15 @@ import { datetimeValidations } from '#/helpers/datetimeValidations.js';
 import { parameterValidations } from '#/helpers/parameterValidations.js';
 import { ENVIRONMENT } from '#/config/environment.js';
 import { logger } from '#/helpers/logger.js';
+import type { ExpressContext } from 'apollo-server-express';
 
 import * as models from '#/data/models/index.js';
 import type { ModelsMap, IUser } from '#/data/models/index.js';
 
+/**
+ * Application context produced by setContext and available in all resolvers via the context argument.
+ */
 export interface Context {
-	req?: {
-		headers: {
-			authorization?: string;
-		};
-	};
 	user?: JwtTokenPayload;
 	di: {
 		model: ModelsMap;
@@ -45,14 +44,13 @@ export interface Context {
 }
 
 /**
- * Context function from Apollo Server
+ * Context function for Apollo Server. Receives the Express request/response pair and returns
+ * the application context available to all resolvers.
  */
-const setContext = async ({ req }: { req: { headers: { authorization?: string } } }): Promise<Context> => {
+const setContext = async ({ req }: ExpressContext): Promise<Context> => {
 	const context: Context = {
 		di: {
-			model: {
-				...models
-			} as unknown as ModelsMap,
+			model: models as ModelsMap,
 			jwt: {
 				createAuthToken: createAuthToken
 			},
