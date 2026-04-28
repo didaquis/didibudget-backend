@@ -1,61 +1,53 @@
 import { describe, expect, test } from 'vitest';
-import { recurringExpenseSuggestionDTO } from '#/dto/recurringExpenseSuggestionDTO.js';
+import { Types } from 'mongoose';
+import { RecurringExpenseSuggestionDTO, recurringExpenseSuggestionDTO } from '#/dto/recurringExpenseSuggestionDTO.js';
 
 describe('recurringExpenseSuggestionDTO', () => {
 	test('Should map all recurring expense suggestion fields to the DTO', () => {
 		const recurringExpenseSuggestion = {
+			_id: new Types.ObjectId('507f1f77bcf86cd799439010'),
+			user_id: new Types.ObjectId('507f1f77bcf86cd799439001'),
 			isActive: true,
 			startDay: 1,
 			endDay: 31,
 			uuid: 'uuid-123',
 			suggestedExpense: {
-				category: {
-					_id: 'cat-1',
-					name: 'Food',
-					emojis: ['🍔', '🍕']
-				},
-				subcategory: {
-					_id: 'sub-1',
-					name: 'Groceries',
-					emojis: ['🛒']
-				},
-				quantity: 42.5
+				_id: new Types.ObjectId('507f1f77bcf86cd799439099'),
+				category: new Types.ObjectId('507f1f77bcf86cd799439011'),
+				subcategory: new Types.ObjectId('507f1f77bcf86cd799439012'),
+				quantity: Types.Decimal128.fromString('42.5')
 			}
 		};
 
 		const result = recurringExpenseSuggestionDTO(recurringExpenseSuggestion);
 
-		expect(result).toStrictEqual({
+		const expectedResult: RecurringExpenseSuggestionDTO = {
 			isActive: true,
 			startDay: 1,
 			endDay: 31,
 			uuid: 'uuid-123',
 			suggestedExpense: {
-				category: 'cat-1',
-				categoryName: 'Food',
-				categoryEmojis: ['🍔', '🍕'],
-				subcategory: 'sub-1',
-				subcategoryName: 'Groceries',
-				subcategoryEmojis: ['🛒'],
+				category: '507f1f77bcf86cd799439011',
+				subcategory: '507f1f77bcf86cd799439012',
 				quantity: '42.5'
 			}
-		});
+		};
+
+		expect(result).toStrictEqual(expectedResult);
 	});
 
 	test('Should handle null subcategory gracefully', () => {
 		const recurringExpenseSuggestion = {
+			_id: new Types.ObjectId('507f1f77bcf86cd799439020'),
+			user_id: new Types.ObjectId('507f1f77bcf86cd799439002'),
 			isActive: false,
 			startDay: 15,
-			endDay: null,
+			endDay: 23,
 			uuid: 'uuid-456',
 			suggestedExpense: {
-				category: {
-					_id: 'cat-2',
-					name: 'Transport',
-					emojis: []
-				},
-				subcategory: null,
-				quantity: 10
+				_id: new Types.ObjectId('507f1f77bcf86cd799439098'),
+				category: new Types.ObjectId('507f1f77bcf86cd799439013'),
+				quantity: Types.Decimal128.fromString('10')
 			}
 		};
 
@@ -64,42 +56,15 @@ describe('recurringExpenseSuggestionDTO', () => {
 		expect(result).toStrictEqual({
 			isActive: false,
 			startDay: 15,
-			endDay: null,
+			endDay: 23,
 			uuid: 'uuid-456',
 			suggestedExpense: {
-				category: 'cat-2',
-				categoryName: 'Transport',
-				categoryEmojis: [],
+				category: '507f1f77bcf86cd799439013',
 				subcategory: null,
-				subcategoryName: null,
-				subcategoryEmojis: [],
 				quantity: '10'
 			}
 		});
 	});
 
-	test('Should handle missing category name gracefully', () => {
-		const recurringExpenseSuggestion = {
-			isActive: true,
-			startDay: 1,
-			endDay: 15,
-			uuid: 'uuid-789',
-			suggestedExpense: {
-				category: {
-					_id: 'cat-3'
-				},
-				subcategory: {
-					_id: 'sub-3'
-				},
-				quantity: 99.99
-			}
-		};
-
-		const result = recurringExpenseSuggestionDTO(recurringExpenseSuggestion);
-
-		expect(result.suggestedExpense.categoryName).toBeNull();
-		expect(result.suggestedExpense.categoryEmojis).toStrictEqual([]);
-		expect(result.suggestedExpense.subcategoryName).toBeNull();
-		expect(result.suggestedExpense.subcategoryEmojis).toStrictEqual([]);
-	});
 });
+
