@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import type { StringValue } from 'ms';
 import { ENVIRONMENT } from './environment.js';
 
 const serverPortByDefault = 4000;
@@ -32,12 +33,12 @@ export const environmentVariablesConfig = Object.freeze<EnvironmentVariablesConf
 
 export interface SecurityVariablesConfig {
 	secret: string;
-	timeExpiration: string;
+	timeExpiration: StringValue;
 }
 
 export const securityVariablesConfig = Object.freeze<SecurityVariablesConfig>({
 	secret: process.env.SECRET || 'yoursecret',
-	timeExpiration: process.env.DURATION || '2h'
+	timeExpiration: (process.env.DURATION || '2h') as StringValue
 });
 
 export interface GlobalVariablesConfig {

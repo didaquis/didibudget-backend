@@ -41,12 +41,12 @@ const authValidations = {
 	/**
 	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. If user does not exist, it throws an error.
 	 */
-	getUser: async (context: Context): Promise<IUser | null> => {
+	getUser: async (context: Context): Promise<IUser> => {
 		if (!context.user) {
-			return null;
+			throw new AuthenticationError('You must be logged in to perform this action');
 		}
 
-		const userUUID = context.user.uuid || null;
+		const userUUID = context.user.uuid;
 		const user = await Users.findOne({ uuid: userUUID }).lean();
 		if (!user) {
 			throw new AuthenticationError('You must be logged in to perform this action');

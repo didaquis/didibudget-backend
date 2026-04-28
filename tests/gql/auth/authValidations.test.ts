@@ -2,6 +2,8 @@ import { describe, expect, test, beforeEach, vi } from 'vitest';
 import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
 import { Users } from '#/data/models/index.js';
 import { authValidations } from '#/gql/auth/authValidations.js';
+import type { Context } from '#/gql/auth/setContext.js';
+import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
 
 vi.mock('../../../src/data/models/index.js', () => ({
 	Users: {
@@ -10,6 +12,17 @@ vi.mock('../../../src/data/models/index.js', () => ({
 		}))
 	}
 }));
+
+/** Minimal context with an authenticated user */
+const ctxWithUser = (userFields: Partial<JwtTokenPayload>): Context => ({
+	user: userFields as JwtTokenPayload,
+	di: {} as Context['di'],
+});
+
+/** Minimal context without a user */
+const ctxWithoutUser = (): Context => ({
+	di: {} as Context['di'],
+});
 
 describe('authValidations', () => {
 	beforeEach(() => {
@@ -40,51 +53,50 @@ describe('authValidations', () => {
 
 	describe('ensureThatUserIsLogged', () => {
 		test('Should not throw if context contains user', () => {
-			expect(() => authValidations.ensureThatUserIsLogged({ user: {} } as any)).not.toThrow();
+			expect(() => authValidations.ensureThatUserIsLogged(ctxWithUser({}))).not.toThrow();
 		});
 
 		test('Should throw AuthenticationError if context does not contain user', () => {
-			expect(() => authValidations.ensureThatUserIsLogged({} as any)).toThrow(AuthenticationError);
-		});
-
-		test('Should throw AuthenticationError if user is null', () => {
-			expect(() => authValidations.ensureThatUserIsLogged({ user: null } as any)).toThrow(AuthenticationError);
+			expect(() => authValidations.ensureThatUserIsLogged(ctxWithoutUser())).toThrow(AuthenticationError);
 		});
 	});
 
 	describe('ensureThatUserIsAdministrator', () => {
 		test('Should not throw if user is admin', () => {
-			expect(() => authValidations.ensureThatUserIsAdministrator({ user: { isAdmin: true } } as any)).not.toThrow();
+			expect(() => authValidations.ensureThatUserIsAdministrator(ctxWithUser({ isAdmin: true }))).not.toThrow();
 		});
 
 		test('Should throw ForbiddenError if user is not admin', () => {
-			expect(() => authValidations.ensureThatUserIsAdministrator({ user: { isAdmin: false } } as any)).toThrow(ForbiddenError);
+			expect(() => authValidations.ensureThatUserIsAdministrator(ctxWithUser({ isAdmin: false }))).toThrow(ForbiddenError);
 		});
 
 		test('Should throw ForbiddenError if context has no user', () => {
-			expect(() => authValidations.ensureThatUserIsAdministrator({} as any)).toThrow(ForbiddenError);
+			expect(() => authValidations.ensureThatUserIsAdministrator(ctxWithoutUser())).toThrow(ForbiddenError);
 		});
 	});
 
 	describe('getUser', () => {
-		test('Should return null if context has no user', async () => {
-			const result = await authValidations.getUser({} as any);
-			expect(result).toBeNull();
+		test('Should throw AuthenticationError if context has no user', async () => {
+			await expect(authValidations.getUser(ctxWithoutUser())).rejects.toThrow(AuthenticationError);
 		});
 
 		test('Should return user data if found in database', async () => {
 			const mockUser = { uuid: 'user-1', email: 'test@test.com' };
-			(Users.findOne as any).mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
+			(Users.findOne as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+				lean: vi.fn().mockResolvedValueOnce(mockUser)
+			});
 
-			const result = await authValidations.getUser({ user: { uuid: 'user-1' } } as any);
+			const result = await authValidations.getUser(ctxWithUser({ uuid: 'user-1' }));
 			expect(result).toEqual(mockUser);
 			expect(Users.findOne).toHaveBeenCalledWith({ uuid: 'user-1' });
 		});
 
 		test('Should throw AuthenticationError if user is not found in database', async () => {
-			(Users.findOne as any).mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(null) });
+			(Users.findOne as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+				lean: vi.fn().mockResolvedValueOnce(null)
+			});
 
-			await expect(authValidations.getUser({ user: { uuid: 'missing' } } as any)).rejects.toThrow(AuthenticationError);
+			await expect(authValidations.getUser(ctxWithUser({ uuid: 'missing' }))).rejects.toThrow(AuthenticationError);
 		});
 	});
 });
