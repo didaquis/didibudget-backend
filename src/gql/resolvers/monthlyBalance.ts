@@ -1,6 +1,7 @@
 import { DeleteResult } from 'mongoose';
 
 import { monthlyBalanceDTO, MonthlyBalanceDTO } from '#/dto/monthlyBalanceDTO.js';
+import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 import { Context } from '../auth/setContext.js';
 
@@ -38,7 +39,7 @@ export const Query = {
 	/**
 	 * Get monthly balances by user using pagination
 	 */
-	getMonthlyBalancesWithPagination: async (_parent: unknown, { page, pageSize }: GetMonthlyBalancesWithPaginationArgs, context: Context): Promise<{ monthlyBalances: MonthlyBalanceDTO[]; pagination: { currentPage: number; totalPages: number; totalCount: number } }> => {
+	getMonthlyBalancesWithPagination: async (_parent: unknown, { page, pageSize }: GetMonthlyBalancesWithPaginationArgs, context: Context): Promise<{ monthlyBalances: MonthlyBalanceDTO[]; pagination: PaginationDTO }> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.pagingValidation.ensurePageValueIsValid(page);
 		context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
@@ -57,11 +58,7 @@ export const Query = {
 
 		return {
 			monthlyBalances: monthlyBalances.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance)),
-			pagination: {
-				currentPage: page,
-				totalPages: totalPages,
-				totalCount: totalCount,
-			}
+			pagination: paginationDTO(page, totalPages, totalCount)
 		};
 	}
 };

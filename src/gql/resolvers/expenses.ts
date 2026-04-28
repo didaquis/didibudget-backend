@@ -3,6 +3,7 @@ import { DeleteResult } from 'mongoose';
 import { expenseDTO, ExpenseDTO } from '#/dto/expenseDTO.js';
 import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByTypeDTO.js';
 import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
+import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
 import { CurrencyISO } from '#/data/CurrencyISO.js';
@@ -58,7 +59,7 @@ export const Query = {
 	/**
 	 * Get expenses by user using pagination
 	 */
-	getExpensesWithPagination: async (_parent: unknown, { page, pageSize }: GetExpensesWithPaginationArgs, context: Context): Promise<{ expenses: ExpenseDTO[]; pagination: { currentPage: number; totalPages: number; totalCount: number } }> => {
+	getExpensesWithPagination: async (_parent: unknown, { page, pageSize }: GetExpensesWithPaginationArgs, context: Context): Promise<{ expenses: ExpenseDTO[]; pagination: PaginationDTO }> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.pagingValidation.ensurePageValueIsValid(page);
 		context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
@@ -77,11 +78,7 @@ export const Query = {
 
 		return {
 			expenses: expenses.map((expense) => expenseDTO(expense)),
-			pagination: {
-				currentPage: page,
-				totalPages: totalPages,
-				totalCount: totalCount,
-			}
+			pagination: paginationDTO(page, totalPages, totalCount)
 		};
 	},
 	/**
