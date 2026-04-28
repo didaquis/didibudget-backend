@@ -40,7 +40,7 @@ export const upsertDBWithExpenseCategories = async (expenseCategories: ExpenseCa
 
 		const listOfSubcategories = await Promise.all(upsertSubcategories);
 
-		const listOfSubcategoriesId = listOfSubcategories.map((subcategory) => subcategory!._id);
+		const listOfSubcategoriesId = listOfSubcategories.map((subcategory) => subcategory._id);
 
 		await ExpenseCategory.findOneAndUpdate({ inmutableKey: category.inmutableKey }, { name: category.name, inmutableKey: category.inmutableKey, subcategories: listOfSubcategoriesId, emojis: category.emojis, categoryType: category.categoryType }, { upsert: true, new: true, setDefaultsOnInsert: true });
 	});
