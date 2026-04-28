@@ -1,4 +1,4 @@
-import { roundToTwoDecimals } from '../helpers/roundToTwoDecimals.js';
+import { roundToTwoDecimals } from '#/helpers/roundToTwoDecimals.js';
 
 export interface ExpenseMonthlyAverageDTO {
 	average: number;
