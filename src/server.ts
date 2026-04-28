@@ -75,8 +75,8 @@ const initApplication = async (): Promise<void> => {
 		context: setContext,
 		introspection: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
 		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger as any, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
-		formatError (error: GraphQLError) {
-			if ( !(error.originalError instanceof UserInputError) ) {
+		formatError(error: GraphQLError) {
+			if (!(error.originalError instanceof UserInputError)) {
 				logger.error(error.message);
 			}
 
@@ -86,7 +86,7 @@ const initApplication = async (): Promise<void> => {
 
 	await server.start();
 
-	server.applyMiddleware({ app: app as any });
+	server.applyMiddleware({ app: app });
 
 	app.use((req: Request, res: Response) => {
 		res.status(404).send('404'); // eslint-disable-line no-magic-numbers
