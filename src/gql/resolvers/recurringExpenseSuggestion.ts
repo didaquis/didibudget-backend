@@ -1,4 +1,4 @@
-import { recurringExpenseSuggestionDTO, RecurringExpenseSuggestionDTO } from '#/dto/recurringExpenseSuggestionDTO.js';
+import { recurringExpenseSuggestionDTO, RecurringExpenseSuggestionDTO, type SuggestedExpensePopulated } from '#/dto/recurringExpenseSuggestionDTO.js';
 import { Context } from '../auth/setContext.js';
 interface GetRecurringExpenseSuggestionsByDayArgs {
 	day: number;
@@ -28,8 +28,8 @@ export const Query = {
 		const user = await context.di.authValidation.getUser(context);
 
 		const allSuggestions = await context.di.model.RecurringExpenseSuggestion.find({ user_id: user._id })
-			.populate({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
-			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
+			.populate<{ suggestedExpense: SuggestedExpensePopulated }>({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
+			.populate<{ suggestedExpense: SuggestedExpensePopulated }>({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
 		return allSuggestions.map((suggestion) => recurringExpenseSuggestionDTO(suggestion));
@@ -70,8 +70,8 @@ export const Query = {
 				]
 			}
 		})
-			.populate({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
-			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
+			.populate<{ suggestedExpense: SuggestedExpensePopulated }>({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
+			.populate<{ suggestedExpense: SuggestedExpensePopulated }>({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
 		return allSuggestions.map((suggestion) => recurringExpenseSuggestionDTO(suggestion));
@@ -100,8 +100,8 @@ export const Mutation = {
 		});
 
 		const populated = await context.di.model.RecurringExpenseSuggestion.findById(saved._id)
-			.populate({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
-			.populate({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
+			.populate<{ suggestedExpense: SuggestedExpensePopulated }>({ path: 'suggestedExpense.category', select: 'name emojis', model: context.di.model.ExpenseCategory })
+			.populate<{ suggestedExpense: SuggestedExpensePopulated }>({ path: 'suggestedExpense.subcategory', select: 'name emojis', model: context.di.model.ExpenseSubcategory })
 			.lean();
 
 		if (!populated) {
