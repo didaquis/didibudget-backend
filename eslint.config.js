@@ -1,17 +1,25 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default [
+export default tseslint.config(
 	js.configs.recommended,
+	...tseslint.configs.recommended,
+	{
+		ignores: ['dist/**'],
+	},
 	{
 		languageOptions: {
-			ecmaVersion: 2023,
-			sourceType: 'module',
+			parser: tseslint.parser,
+			parserOptions: {
+				project: './tsconfig.eslint.json',
+			},
 			globals: {
 				...globals.node,
 				...globals.es6,
 			},
 		},
+		files: ['src/**/*.ts', 'tests/**/*.ts'],
 		rules: {
 			indent: [
 				'error',
@@ -32,13 +40,13 @@ export default [
 			],
 			'no-console': 'warn',
 			'no-alert': 'warn',
-			'no-unused-vars': 'error',
+			'@typescript-eslint/no-unused-vars': 'error',
+			'@typescript-eslint/no-explicit-any': 'warn',
 			'keyword-spacing': ['error', { before: true, after: true }],
 			'space-infix-ops': ['error', { int32Hint: false }],
 			'comma-spacing': ['error'],
 			'arrow-spacing': ['error'],
 			'semi-spacing': ['error'],
-			'space-before-function-paren': ['error'],
 			'no-multi-spaces': 'error',
 			'no-magic-numbers': ['warn', { ignore: [0], ignoreArrayIndexes: true }],
 			'valid-typeof': 'error',
@@ -47,22 +55,9 @@ export default [
 		},
 	},
 	{
-		files: ['tests/**/*.test.js'],
-		languageOptions: {
-			globals: {
-				describe: 'readonly',
-				test: 'readonly',
-				it: 'readonly',
-				expect: 'readonly',
-				beforeAll: 'readonly',
-				afterAll: 'readonly',
-				beforeEach: 'readonly',
-				afterEach: 'readonly',
-				vi: 'readonly',
-			},
-		},
+		files: ['tests/**/*.test.ts'],
 		rules: {
 			'no-magic-numbers': 'off',
 		},
 	},
-];
+);

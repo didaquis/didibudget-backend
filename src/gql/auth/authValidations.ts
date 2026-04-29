@@ -1,0 +1,59 @@
+import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
+import { Users } from '#/data/models/index.js';
+import type { IUser } from '#/data/models/schemas/UsersSchema.js';
+import type { Context } from './setContext.js';
+
+/**
+ * Auth validations repository
+ */
+const authValidations = {
+	/**
+	 * Check if the maximum limit of users has been reached. If limit is reached, it throws an error.
+	 */
+	ensureLimitOfUsersIsNotReached: (numberOfCurrentlyUsersRegistered: number, usersLimit: number): void => {
+		if (usersLimit === 0) {
+			return;
+		}
+
+		if (numberOfCurrentlyUsersRegistered >= usersLimit) {
+			throw new ValidationError('The maximum number of users allowed has been reached. You must contact the administrator of the service in order to register');
+		}
+	},
+
+	/**
+	 * Check if in Apollo Server context contains a logged user. If user is not in context, it throws an error
+	 */
+	ensureThatUserIsLogged: (context: Context): void => {
+		if (!context.user) {
+			throw new AuthenticationError('You must be logged in to perform this action');
+		}
+	},
+
+	/**
+	 * Check if in Apollo Server context contains an user and is an administrator. If user is not in context or user is not an administrator it throws an error
+	 */
+	ensureThatUserIsAdministrator: (context: Context): void => {
+		if (!context.user || !context.user.isAdmin) {
+			throw new ForbiddenError('You must be an administrator to perform this action');
+		}
+	},
+
+	/**
+	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. If user does not exist, it throws an error.
+	 */
+	getUser: async (context: Context): Promise<IUser> => {
+		if (!context.user) {
+			throw new AuthenticationError('You must be logged in to perform this action');
+		}
+
+		const userUUID = context.user.uuid;
+		const user = await Users.findOne({ uuid: userUUID }).lean();
+		if (!user) {
+			throw new AuthenticationError('You must be logged in to perform this action');
+		}
+
+		return user;
+	},
+};
+
+export { authValidations };

@@ -8,6 +8,7 @@ This repository is for the backend and is intended to work with [the frontend](h
 ### 📝 Backend Requirements
 * MongoDB 8.0 or higher
 * Node.js 24.14 or higher
+* TypeScript 5.9 or higher
 
 ### 📚 How to run the application?
 * Use the command: `npm install`. If you are deploying the app in production, it's better to use this command: `npm install --production`
@@ -16,6 +17,8 @@ This repository is for the backend and is intended to work with [the frontend](h
   * Edit the file `.env`
 * Then use: `npm run start`. 
 * That's it! That was fast enough, right? 🚀
+
+> For production deployment, run `npm run build` first to compile the TypeScript code, then start the application with `npm start`.
 
 **Do you need help with `.env` file?** 
 
@@ -41,7 +44,9 @@ Don't worry, I have written down some information for you. Here you have a guide
 To make a user an administrator you must access to the database and search its registry. You will see a Boolean that allows the user to have the role of the administrator. Set it to 'true' and in their next authentication that user will have administrator permissions.
 
 ### 💻 Tricks for development
-* Run app in dev mode: `npm run dev`
+* Run app in dev mode: `npm run dev` — development with hot reload (tsx watch)
+* Compile TypeScript for production: `npm run build`
+* Check types without emitting: `npm run typecheck`
 * Run the linter: `npm run lint`
 * Delete all log files: `npm run clean`
 * Run the tests in watch mode: `npm run test:watch`

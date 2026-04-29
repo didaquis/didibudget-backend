@@ -1,0 +1,221 @@
+import { DeleteResult, SortValues } from 'mongoose';
+
+import { expenseDTO, ExpenseDTO } from '#/dto/expenseDTO.js';
+import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByTypeDTO.js';
+import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
+import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
+import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
+import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
+import { CurrencyISO } from '#/data/CurrencyISO.js';
+import { Context } from '../auth/setContext.js';
+import { CategoryTypeValue } from '#/data/CategoryType.js';
+
+interface GetExpensesWithPaginationArgs {
+	page: number;
+	pageSize: number;
+}
+
+interface GetExpensesBetweenDatesArgs {
+	startDate: string;
+	endDate: string;
+}
+
+interface GetExpensesSumByTypeArgs {
+	categoryType: CategoryTypeValue;
+}
+
+interface GetExpensesMonthlyAverageArgs {
+	lastNMonths: number;
+	excludedCategoryTypes?: CategoryTypeValue[];
+}
+
+interface RegisterExpenseArgs {
+	category: string;
+	subcategory?: string;
+	quantity: number;
+	date: string;
+}
+
+interface DeleteExpenseArgs {
+	uuid: string;
+}
+
+/**
+ * All resolvers related to expenses
+ */
+export const Query = {
+	/**
+	 * Get all data of expenses by user
+	 */
+	getExpenses: async (_parent: unknown, _args: unknown, context: Context): Promise<ExpenseDTO[]> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		const sortCriteria: Record<string, SortValues> = { date: 'asc' };
+		const allExpenses = await context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).lean();
+
+		return allExpenses.map((expense) => expenseDTO(expense));
+	},
+	/**
+	 * Get expenses by user using pagination
+	 */
+	getExpensesWithPagination: async (_parent: unknown, { page, pageSize }: GetExpensesWithPaginationArgs, context: Context): Promise<{ expenses: ExpenseDTO[]; pagination: PaginationDTO }> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.pagingValidation.ensurePageValueIsValid(page);
+		context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		const offset = getOffset(page, pageSize);
+		const sortCriteria: Record<string, SortValues> = { date: 'desc', _id: 'desc' };
+
+		const getTotalCount = context.di.model.Expenses.countDocuments({ user_id: user._id });
+		const getExpenses = context.di.model.Expenses.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();
+
+		const [totalCount, expenses] = await Promise.all([getTotalCount, getExpenses]);
+
+		const totalPages = getTotalPagesNumber(totalCount, pageSize);
+
+		return {
+			expenses: expenses.map((expense) => expenseDTO(expense)),
+			pagination: paginationDTO(page, totalPages, totalCount)
+		};
+	},
+	/**
+	 * Get list of expenses for a specific user between two dates
+	 */
+	getExpensesBetweenDates: async (_parent: unknown, { startDate, endDate }: GetExpensesBetweenDatesArgs, context: Context): Promise<ExpenseDTO[]> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.datetimeValidation.ensureDateIsValid(startDate);
+		context.di.datetimeValidation.ensureDateIsValid(endDate);
+		context.di.datetimeValidation.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		const sortCriteria: Record<string, SortValues> = { date: 'desc', _id: 'desc' };
+
+		const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: { $gte: startDate, $lt: endDate } }).sort(sortCriteria).lean();
+
+		return expenses.map((expense) => expenseDTO(expense));
+	},
+	/**
+	 * Get the total expenses of a specific type for a user
+	 */
+	getExpensesSumByType: async (_parent: unknown, { categoryType }: GetExpensesSumByTypeArgs, context: Context): Promise<ExpenseSumByTypeDTO> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		const fromCollection = context.di.model.ExpenseCategory.collection.name;
+
+		const aggregationResult = await context.di.model.Expenses.aggregate([
+			{ $match: { user_id: user._id } },
+			{
+				$lookup: {
+					from: fromCollection,
+					localField: 'category',
+					foreignField: '_id',
+					as: 'categoryDetails'
+				}
+			},
+			{ $unwind: '$categoryDetails' },
+			{ $match: { 'categoryDetails.categoryType': categoryType } },
+			{ $addFields: { quantityNum: { $toDouble: '$quantity' } } },
+			{
+				$group: {
+					_id: '$currencyISO',
+					totalSum: { $sum: '$quantityNum' }
+				}
+			},
+			{ $project: { _id: 0, currencyISO: '$_id', sum: '$totalSum' } }
+		]);
+
+		if (!aggregationResult.length) {
+			return expenseSumByTypeDTO(categoryType, CurrencyISO.EUR, 0);
+		}
+
+
+		const firstCurrencyGroup = aggregationResult[0];
+
+		return expenseSumByTypeDTO(categoryType, firstCurrencyGroup.currencyISO, firstCurrencyGroup.sum);
+	},
+	/**
+	 * Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types.
+	 */
+	getExpensesMonthlyAverage: async (_parent: unknown, { lastNMonths, excludedCategoryTypes = [] }: GetExpensesMonthlyAverageArgs, context: Context): Promise<ExpenseMonthlyAverageDTO> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+
+		const minMonths = 1;
+		const maxMonths = 240;
+		context.di.parameterValidations.isIntegerBetween(lastNMonths, minMonths, maxMonths);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		const { startDate, endDate } = getLastMonthsRangeExcludingCurrent(lastNMonths);
+
+		const fromCollection = context.di.model.ExpenseCategory.collection.name;
+
+		const aggregationResult = await context.di.model.Expenses.aggregate([
+			{ $match: { user_id: user._id, date: { $gte: startDate, $lt: endDate } } },
+			{
+				$lookup: {
+					from: fromCollection,
+					localField: 'category',
+					foreignField: '_id',
+					as: 'categoryDetails'
+				}
+			},
+			{ $unwind: '$categoryDetails' },
+			{ $match: { 'categoryDetails.categoryType': { $nin: excludedCategoryTypes } } },
+			{
+				$group: {
+					_id: null,
+					totalSum: { $sum: { $toDouble: '$quantity' } }
+				}
+			},
+			{ $project: { _id: 0, totalSum: 1 } }
+		]);
+
+		const totalSum = aggregationResult.length ? aggregationResult[0].totalSum : 0;
+		const average = totalSum / lastNMonths;
+
+		return expenseMonthlyAverageDTO(average, CurrencyISO.EUR);
+	}
+};
+
+export const Mutation = {
+	/**
+	 * Register an expense
+	 */
+	registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: RegisterExpenseArgs, context: Context): Promise<ExpenseDTO> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.datetimeValidation.ensureDateIsValid(date);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
+			.then((expense) => expenseDTO(expense));
+	},
+	/**
+	 * Delete one registry of expense
+	 */
+	deleteExpense: async (_parent: unknown, { uuid }: DeleteExpenseArgs, context: Context): Promise<ExpenseDTO | null> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		return context.di.model.Expenses.findOneAndDelete({ uuid, user_id: user._id })
+			.then((expense) => expense ? expenseDTO(expense) : null);
+	},
+	/**
+	 * Delete all registries of expense
+	 */
+	deleteAllExpenses: async (_parent: unknown, _args: unknown, context: Context): Promise<DeleteResult> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+
+		const user = await context.di.authValidation.getUser(context);
+
+		return context.di.model.Expenses.deleteMany({ user_id: user._id });
+	}
+};
