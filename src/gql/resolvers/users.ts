@@ -15,7 +15,7 @@ export const Query = {
 		context.di.authValidation.ensureThatUserIsAdministrator(context);
 
 		const sortCriteria: Record<string, SortValues> = { isAdmin: 'desc', registrationDate: 'asc' };
-		return context.di.model.Users.find().sort(sortCriteria).lean() as Promise<IUser[]>;
+		return context.di.model.Users.find().sort(sortCriteria).lean();
 	}
 };
 
