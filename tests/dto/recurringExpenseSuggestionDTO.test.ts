@@ -27,8 +27,16 @@ describe('recurringExpenseSuggestionDTO', () => {
 			endDay: 31,
 			uuid: 'uuid-123',
 			suggestedExpense: {
-				category: '507f1f77bcf86cd799439011',
-				subcategory: '507f1f77bcf86cd799439012',
+				category: new Types.ObjectId('507f1f77bcf86cd799439011'),
+				categoryName: 'Foo',
+				categoryEmojis: [
+					'🏠'
+				],
+				subcategory: new Types.ObjectId('507f1f77bcf86cd799439012'),
+				subcategoryName: 'Bar',
+				subcategoryEmojis: [
+					'💡'
+				],
 				quantity: '42.5'
 			}
 		};

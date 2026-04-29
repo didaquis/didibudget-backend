@@ -1,9 +1,12 @@
+import { Types } from 'mongoose';
 import { IRecurringExpenseSuggestion } from '#/data/models/schemas/RecurringExpenseSuggestionSchema.js';
-import { ISuggestedExpense } from '#/data/models/schemas/SuggestedExpenseSchema.js';
-
 interface SuggestedExpenseDTO {
-	category: string;
-	subcategory: string | null;
+	category: Types.ObjectId;
+	categoryName: string;
+	categoryEmojis: string[];
+	subcategory: Types.ObjectId | null;
+	subcategoryName: string | null;
+	subcategoryEmojis: string[];
 	quantity: string;
 }
 
@@ -28,10 +31,14 @@ export const recurringExpenseSuggestionDTO = (recurringExpenseSuggestion: IRecur
 	};
 };
 
-const buildSuggestedExpenseDTO = (suggestedExpense: ISuggestedExpense): SuggestedExpenseDTO => {
+const buildSuggestedExpenseDTO = (suggestedExpense): SuggestedExpenseDTO => {
 	return {
-		category: suggestedExpense.category._id.toString(),
-		subcategory: suggestedExpense.subcategory?._id.toString() || null,
+		category: suggestedExpense.category._id,
+		categoryName: suggestedExpense.category.name || null,
+		categoryEmojis: suggestedExpense.category.emojis || [],
+		subcategory: suggestedExpense.subcategory?._id || null,
+		subcategoryName: suggestedExpense.subcategory?.name || null,
+		subcategoryEmojis: suggestedExpense.subcategory?.emojis || [],
 		quantity: suggestedExpense.quantity.toString(),
 	};
 };
