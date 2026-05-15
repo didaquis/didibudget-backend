@@ -6,6 +6,11 @@
       "sourceType": "github",
       "skillPath": "skills/caveman/SKILL.md",
       "computedHash": "dfbf85749fd474feeb0bbe60c779795ecd5dbec0083299b56e68916bc3ddd8c9"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "be7329a28a492b802061206c2d75603ab294f25f541bc5421d5de8d41abe68b1"
     }
   }
 }
