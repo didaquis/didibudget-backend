@@ -32,7 +32,7 @@ export const createDatabaseIndexes = async (): Promise<void> => {
  * This function never deletes documents, but creates new documents if the default data changes.
  */
 export const upsertDBWithExpenseCategories = async (expenseCategories: ExpenseCategoryInput[] = []): Promise<void> => {
-	expenseCategories.forEach(async (category) => {
+	for (const category of expenseCategories) {
 		const upsertSubcategories = category.subcategories.map((subcategory) => {
 			return ExpenseSubcategory.findOneAndUpdate({ inmutableKey: subcategory.inmutableKey }, { name: subcategory.name, inmutableKey: subcategory.inmutableKey, emojis: subcategory.emojis }, { upsert: true, new: true, setDefaultsOnInsert: true });
 		});
@@ -42,5 +42,5 @@ export const upsertDBWithExpenseCategories = async (expenseCategories: ExpenseCa
 		const listOfSubcategoriesId = listOfSubcategories.map((subcategory) => subcategory._id);
 
 		await ExpenseCategory.findOneAndUpdate({ inmutableKey: category.inmutableKey }, { name: category.name, inmutableKey: category.inmutableKey, subcategories: listOfSubcategoriesId, emojis: category.emojis, categoryType: category.categoryType }, { upsert: true, new: true, setDefaultsOnInsert: true });
-	});
+	}
 };
