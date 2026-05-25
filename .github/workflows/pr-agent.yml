@@ -33,5 +33,5 @@ jobs:
                   config.custom_model_max_tokens: 8000
                   github_action_config.auto_describe: 'true'
                   github_action_config.auto_review: 'true'
-                  github_action_config.auto_improve: 'true'
+                  github_action_config.auto_improve: 'false'
                   github_action_config.pr_actions: '["opened", "reopened", "synchronize"]'
