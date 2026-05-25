@@ -39,26 +39,32 @@ db.on('error', (err: Error) => {
 });
 
 db.once('open', async () => {
-	if (environmentVariablesConfig.environment !== ENVIRONMENT.DEVELOPMENT) {
-		logger.info(`Connected with MongoDB service (${ENVIRONMENT.PRODUCTION} mode)`);
-	} else {
-		if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environmentVariablesConfig.mongoDNSseedlist !== '') {
-			logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.mongoDNSseedlist}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+	try {
+		if (environmentVariablesConfig.environment !== ENVIRONMENT.DEVELOPMENT) {
+			logger.info(`Connected with MongoDB service (${ENVIRONMENT.PRODUCTION} mode)`);
 		} else {
-			logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.dbHost}" in port "${environmentVariablesConfig.dbPort}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+			if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environmentVariablesConfig.mongoDNSseedlist !== '') {
+				logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.mongoDNSseedlist}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+			} else {
+				logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.dbHost}" in port "${environmentVariablesConfig.dbPort}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+			}
 		}
+
+
+		logger.info('Ensuring database indexes...');
+		await createDatabaseIndexes();
+		logger.info('Database indexes are up to date.');
+
+		logger.info('Trying to upsert the database with default values...');
+		await upsertDBWithExpenseCategories(expenseCategories);
+		logger.info('The upsert of database has been finished.');
+
+		initApplication();
+	} catch (err) {
+		logger.error(`Startup failed: ${err}`);
+		const EXIT_CODE_FAILURE = 1;
+		process.exit(EXIT_CODE_FAILURE);
 	}
-
-
-	logger.info('Ensuring database indexes...');
-	await createDatabaseIndexes();
-	logger.info('Database indexes are up to date.');
-
-	logger.info('Trying to upsert the database with default values...');
-	await upsertDBWithExpenseCategories(expenseCategories);
-	logger.info('The upsert of database has been finished.');
-
-	initApplication();
 });
 
 const initApplication = async (): Promise<void> => {
