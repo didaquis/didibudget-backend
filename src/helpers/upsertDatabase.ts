@@ -7,7 +7,7 @@ interface Subcategory {
 	emojis: string[];
 }
 
-interface ExpenseCategoryInput {
+export interface ExpenseCategoryInput {
 	name: string;
 	inmutableKey: string;
 	emojis: string[];
