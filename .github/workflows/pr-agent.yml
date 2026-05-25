@@ -30,8 +30,8 @@ jobs:
                   # View the models available here: https://console.groq.com/docs/rate-limits
                   config.model: 'groq/openai/gpt-oss-120b'
                   config.fallback_models: '["groq/qwen/qwen3-32b", "groq/llama-3.3-70b-versatile"]'
-                  config.custom_model_max_tokens: 32000
+                  config.custom_model_max_tokens: 8000
                   github_action_config.auto_describe: 'true'
                   github_action_config.auto_review: 'true'
-                  github_action_config.auto_improve: 'true'
+                  github_action_config.auto_improve: 'false'
                   github_action_config.pr_actions: '["opened", "reopened", "synchronize"]'

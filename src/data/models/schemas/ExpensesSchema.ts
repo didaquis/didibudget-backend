@@ -55,4 +55,7 @@ const ExpensesSchema = new Schema<IExpense>({
 	}
 });
 
+ExpensesSchema.index({ user_id: 1, date: -1, _id: -1 });
+ExpensesSchema.index({ category: 1 });
+
 export default ExpensesSchema;

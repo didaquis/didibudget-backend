@@ -62,4 +62,6 @@ const RecurringExpenseSuggestionSchema = new Schema<IRecurringExpenseSuggestion>
 	suggestedExpense: { type: SuggestedExpenseSchema, required: true },
 });
 
+RecurringExpenseSuggestionSchema.index({ user_id: 1, isActive: 1 });
+
 export default RecurringExpenseSuggestionSchema;
