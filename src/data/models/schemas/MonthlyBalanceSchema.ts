@@ -43,4 +43,6 @@ const MonthlyBalanceSchema = new Schema<IMonthlyBalance>({
 	}
 });
 
+MonthlyBalanceSchema.index({ user_id: 1, date: -1 });
+
 export default MonthlyBalanceSchema;

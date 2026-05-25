@@ -19,7 +19,7 @@ import { environmentVariablesConfig } from './config/appConfig.js';
 import { expenseCategories } from './config/defaultData.js';
 import { logger, endLogger } from './helpers/logger.js';
 import { requestDevLogger } from './helpers/requestDevLogger.js';
-import { upsertDBWithExpenseCategories } from './helpers/upsertDatabase.js';
+import { createDatabaseIndexes, upsertDBWithExpenseCategories } from './helpers/upsertDatabase.js';
 
 mongoose.set('strictQuery', true);
 
@@ -49,6 +49,10 @@ db.once('open', async () => {
 		}
 	}
 
+
+	logger.info('Ensuring database indexes...');
+	await createDatabaseIndexes();
+	logger.info('Database indexes are up to date.');
 
 	logger.info('Trying to upsert the database with default values...');
 	await upsertDBWithExpenseCategories(expenseCategories);
