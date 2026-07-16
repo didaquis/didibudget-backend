@@ -34,6 +34,8 @@ export const Mutation = {
 	 * It allows to users to register as long as the limit of allowed users has not been reached
 	 */
 	registerUser: async (_parent: unknown, { email, password }: RegisterUserArgs, context: Context): Promise<{ token: string }> => {
+		await context.di.rateLimitValidation.ensureRegisterRateLimitNotExceeded(context.clientIp ?? 'unknown');
+
 		if (!email || !password) {
 			throw new UserInputError('Data provided is not valid');
 		}

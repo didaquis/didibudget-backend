@@ -33,6 +33,7 @@ export interface Context {
 		};
 		rateLimitValidation: {
 			ensureLoginRateLimitNotExceeded: (key: string) => Promise<void>;
+			ensureRegisterRateLimitNotExceeded: (key: string) => Promise<void>;
 		};
 		pagingValidation: {
 			ensurePageValueIsValid: (page: unknown) => void;
