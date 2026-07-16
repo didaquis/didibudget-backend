@@ -21,9 +21,9 @@ interface MockUsersModel {
 
 const mockSave = vi.fn();
 
-const MockUsersConstructor = vi.fn(() => ({
-	save: mockSave
-})) as unknown as ReturnType<typeof vi.fn> & MockUsersModel;
+const MockUsersConstructor = vi.fn(function () {
+	return { save: mockSave };
+}) as unknown as ReturnType<typeof vi.fn> & MockUsersModel;
 
 MockUsersConstructor.find = vi.fn();
 MockUsersConstructor.findOne = vi.fn();
