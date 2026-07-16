@@ -69,7 +69,8 @@ const createMockContext = (): Context => ({
 			ensureThatUserIsAdministrator: vi.fn()
 		},
 		rateLimitValidation: {
-			ensureLoginRateLimitNotExceeded: vi.fn()
+			ensureLoginRateLimitNotExceeded: vi.fn(),
+			ensureRegisterRateLimitNotExceeded: vi.fn()
 		},
 		pagingValidation: {
 			ensurePageValueIsValid: vi.fn(),
@@ -154,6 +155,43 @@ describe('auth resolvers', () => {
 
 			expect(result).toHaveProperty('token');
 			expect(typeof result.token).toBe('string');
+		});
+
+		test('Should enforce the registration rate limit using the client IP', async () => {
+			const context = createMockContext();
+			const mockFind = vi.fn(() => ({
+				estimatedDocumentCount: vi.fn().mockResolvedValueOnce(0)
+			}));
+			const mockFindOne = vi.fn()
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(null) })
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
+			MockUsersConstructor.find = mockFind;
+			MockUsersConstructor.findOne = mockFindOne;
+			mockSave.mockResolvedValueOnce(mockUser);
+
+			await Mutation.registerUser({}, { email: 'new@example.com', password: 'Valid1Pass' }, context);
+
+			expect(context.di.rateLimitValidation.ensureRegisterRateLimitNotExceeded).toHaveBeenCalledWith('203.0.113.5');
+		});
+
+		test('Should reject without touching the database when the registration rate limit is exceeded', async () => {
+			const context = createMockContext();
+			const rateLimitError = new Error('Too many registration attempts, please try again later');
+			(context.di.rateLimitValidation.ensureRegisterRateLimitNotExceeded as ReturnType<typeof vi.fn>).mockRejectedValueOnce(rateLimitError);
+			const mockFind = vi.fn(() => ({
+				estimatedDocumentCount: vi.fn().mockResolvedValueOnce(0)
+			}));
+			const mockFindOne = vi.fn(() => ({
+				lean: vi.fn().mockResolvedValueOnce(null)
+			}));
+			MockUsersConstructor.find = mockFind;
+			MockUsersConstructor.findOne = mockFindOne;
+
+			await expect(Mutation.registerUser({}, { email: 'new@example.com', password: 'Valid1Pass' }, context))
+				.rejects.toThrow(rateLimitError);
+			expect(mockFind).not.toHaveBeenCalled();
+			expect(mockFindOne).not.toHaveBeenCalled();
+			expect(mockSave).not.toHaveBeenCalled();
 		});
 	});
 
