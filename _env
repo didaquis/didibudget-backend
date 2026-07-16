@@ -20,6 +20,6 @@ MONGO_PASS=
 # MongoDB: DNS Seedlist Connection Format
 MONGO_DNS_SEEDLIST_CONNECTION=mongodb+srv://<user>:<password>@<uri-and-options>
 
-# JSONWEBTOKEN:
+# JSONWEBTOKEN (in production, SECRET is mandatory and must be a strong private value; the app refuses to start with the default value):
 SECRET=yoursecret
 DURATION=2h
