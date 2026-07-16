@@ -66,6 +66,7 @@
     "lodash.merge": "4.6.2",
     "log4js": "6.9.1",
     "mongoose": "8.24.0",
+    "rate-limiter-flexible": "11.2.0",
     "serve-favicon": "2.5.1",
     "uuid": "14.0.0"
   }

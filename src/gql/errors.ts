@@ -48,3 +48,13 @@ export class ValidationError extends GraphQLError {
 		this.name = 'ValidationError';
 	}
 }
+
+/**
+ * Too many requests in a short period (rate limiting). Serialized with code `TOO_MANY_REQUESTS`.
+ */
+export class TooManyRequestsError extends GraphQLError {
+	constructor(message: string) {
+		super(message, { extensions: { code: 'TOO_MANY_REQUESTS' } });
+		this.name = 'TooManyRequestsError';
+	}
+}

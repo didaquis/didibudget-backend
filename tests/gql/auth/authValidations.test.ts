@@ -88,7 +88,17 @@ describe('authValidations', () => {
 
 			const result = await authValidations.getUser(ctxWithUser({ uuid: 'user-1' }));
 			expect(result).toEqual(mockUser);
-			expect(Users.findOne).toHaveBeenCalledWith({ uuid: 'user-1' });
+			expect(Users.findOne).toHaveBeenCalledWith({ uuid: 'user-1', isActive: true });
+		});
+
+		test('Should scope the query to active users only', async () => {
+			(Users.findOne as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+				lean: vi.fn().mockResolvedValueOnce({ uuid: 'user-1' })
+			});
+
+			await authValidations.getUser(ctxWithUser({ uuid: 'user-1' }));
+
+			expect(Users.findOne).toHaveBeenCalledWith(expect.objectContaining({ isActive: true }));
 		});
 
 		test('Should throw AuthenticationError if user is not found in database', async () => {

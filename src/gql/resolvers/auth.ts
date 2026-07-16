@@ -5,6 +5,14 @@ import { isValidEmail, isStrongPassword } from '#/helpers/validations.js';
 import { globalVariablesConfig } from '#/config/appConfig.js';
 import { Context } from '../auth/setContext.js';
 
+/**
+ * A valid bcrypt hash that no real password matches. When authentication fails because the
+ * account does not exist, the password is still compared against this hash so that the request
+ * takes the same time as a comparison against a real user's hash. This prevents attackers from
+ * telling registered from unregistered emails by measuring response times (user enumeration).
+ */
+const DUMMY_PASSWORD_HASH = '$2b$10$DdgJQVj02TFFtsStN1eJguwFzHyWGrHILqfFBjhkHMXZNoSeSqncm';
+
 interface RegisterUserArgs {
 	email: string;
 	password: string;
@@ -64,19 +72,20 @@ export const Mutation = {
 	 * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When an user authenticates the value of lastLogin will be updated
 	 */
 	authUser: async (_parent: unknown, { email, password }: AuthUserArgs, context: Context): Promise<{ token: string }> => {
+		await context.di.rateLimitValidation.ensureLoginRateLimitNotExceeded(context.clientIp ?? 'unknown');
+
 		if (!email || !password) {
 			throw new UserInputError('Invalid credentials');
 		}
 
 		const user = await context.di.model.Users.findOne({ email, isActive: true }).lean();
 
-		if (!user) {
-			throw new UserInputError('User not found or login not allowed');
-		}
+		// Always run a bcrypt comparison — against the real hash when the user exists, against a
+		// dummy hash otherwise — so response timing does not reveal whether the email is registered.
+		const passwordHashToCompare = user ? user.password : DUMMY_PASSWORD_HASH;
+		const isCorrectPassword = await bcrypt.compare(password, passwordHashToCompare);
 
-		const isCorrectPassword = await bcrypt.compare(password, user.password);
-
-		if (!isCorrectPassword) {
+		if (!user || !isCorrectPassword) {
 			throw new UserInputError('Invalid credentials');
 		}
 

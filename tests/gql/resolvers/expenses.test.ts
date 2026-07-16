@@ -71,6 +71,9 @@ const createMockContext = (): Context => ({
 			getUser: vi.fn().mockResolvedValue(mockUser),
 			ensureThatUserIsAdministrator: vi.fn()
 		},
+		rateLimitValidation: {
+			ensureLoginRateLimitNotExceeded: vi.fn()
+		},
 		pagingValidation: {
 			ensurePageValueIsValid: vi.fn(),
 			ensurePageSizeValueIsValid: vi.fn()
