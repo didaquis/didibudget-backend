@@ -81,6 +81,12 @@ const graphqlPath = '/graphql';
 
 const initApplication = async (): Promise<void> => {
 	const app = express();
+	// Trust the single reverse proxy in front of the app (e.g. the Heroku router) so that req.ip
+	// reflects the real client IP from X-Forwarded-For. This is required for per-client login rate
+	// limiting to work; without it every request would appear to come from the proxy. Increase this
+	// number if additional trusted proxies are ever placed in front of the app.
+	const trustedProxyHops = 1;
+	app.set('trust proxy', trustedProxyHops);
 	if (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) {
 		app.use(helmet());
 	} else {

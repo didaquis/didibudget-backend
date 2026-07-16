@@ -39,7 +39,7 @@ const authValidations = {
 	},
 
 	/**
-	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. If user does not exist, it throws an error.
+	 * Uses the information in the Apollo Server context to retrieve the user's data from the database. The lookup is scoped to active users, so a token issued to a user that was later deactivated stops granting access before it expires. If the user does not exist or is not active, it throws an error.
 	 */
 	getUser: async (context: Context): Promise<IUser> => {
 		if (!context.user) {
@@ -47,7 +47,7 @@ const authValidations = {
 		}
 
 		const userUUID = context.user.uuid;
-		const user = await Users.findOne({ uuid: userUUID }).lean();
+		const user = await Users.findOne({ uuid: userUUID, isActive: true }).lean();
 		if (!user) {
 			throw new AuthenticationError('You must be logged in to perform this action');
 		}

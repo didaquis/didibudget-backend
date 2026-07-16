@@ -5,6 +5,7 @@ import { authValidations } from './authValidations.js';
 import { pagingValidations } from '#/helpers/pagingValidations.js';
 import { datetimeValidations } from '#/helpers/datetimeValidations.js';
 import { parameterValidations } from '#/helpers/parameterValidations.js';
+import { rateLimitValidations } from '#/helpers/rateLimitValidations.js';
 import { ENVIRONMENT } from '#/config/environment.js';
 import { logger } from '#/helpers/logger.js';
 import type { ExpressContextFunctionArgument } from '@as-integrations/express4';
@@ -17,6 +18,8 @@ import type { ModelsMap, IUser } from '#/data/models/index.js';
  */
 export interface Context {
 	user?: JwtTokenPayload;
+	/** Client IP of the incoming request, used as the key for login rate limiting. */
+	clientIp?: string;
 	di: {
 		model: ModelsMap;
 		jwt: {
@@ -27,6 +30,9 @@ export interface Context {
 			ensureThatUserIsLogged: (context: Context) => void;
 			getUser: (context: Context) => Promise<IUser>;
 			ensureThatUserIsAdministrator: (context: Context) => void;
+		};
+		rateLimitValidation: {
+			ensureLoginRateLimitNotExceeded: (key: string) => Promise<void>;
 		};
 		pagingValidation: {
 			ensurePageValueIsValid: (page: unknown) => void;
@@ -57,6 +63,9 @@ const setContext = async ({ req }: ExpressContextFunctionArgument): Promise<Cont
 			authValidation: {
 				...authValidations
 			},
+			rateLimitValidation: {
+				...rateLimitValidations
+			},
 			pagingValidation: {
 				...pagingValidations
 			},
@@ -68,6 +77,9 @@ const setContext = async ({ req }: ExpressContextFunctionArgument): Promise<Cont
 			},
 		}
 	};
+
+	// req.ip is resolved from X-Forwarded-For thanks to the Express "trust proxy" setting (see server.ts).
+	context.clientIp = req.ip ?? req.socket?.remoteAddress ?? 'unknown';
 
 	let token = req.headers['authorization'];
 

@@ -54,6 +54,7 @@ const mockJwtPayload: JwtTokenPayload = {
 
 const createMockContext = (): Context => ({
 	user: mockJwtPayload,
+	clientIp: '203.0.113.5',
 	di: {
 		model: {
 			Users: MockUsersConstructor
@@ -66,6 +67,9 @@ const createMockContext = (): Context => ({
 			ensureThatUserIsLogged: vi.fn(),
 			getUser: vi.fn().mockResolvedValue(mockUser),
 			ensureThatUserIsAdministrator: vi.fn()
+		},
+		rateLimitValidation: {
+			ensureLoginRateLimitNotExceeded: vi.fn()
 		},
 		pagingValidation: {
 			ensurePageValueIsValid: vi.fn(),
@@ -166,6 +170,36 @@ describe('auth resolvers', () => {
 				.rejects.toThrow(UserInputError);
 		});
 
+		test('Should enforce the login rate limit using the client IP', async () => {
+			const context = createMockContext();
+			const mockFindOne = vi.fn(() => ({
+				lean: vi.fn().mockResolvedValueOnce(mockUser)
+			}));
+			const mockFindOneAndUpdate = vi.fn(() => ({
+				lean: vi.fn().mockResolvedValueOnce(mockUser)
+			}));
+			MockUsersConstructor.findOne = mockFindOne;
+			MockUsersConstructor.findOneAndUpdate = mockFindOneAndUpdate;
+
+			await Mutation.authUser({}, { email: 'test@example.com', password: 'Valid1Pass' }, context);
+
+			expect(context.di.rateLimitValidation.ensureLoginRateLimitNotExceeded).toHaveBeenCalledWith('203.0.113.5');
+		});
+
+		test('Should reject without touching the database when the rate limit is exceeded', async () => {
+			const context = createMockContext();
+			const rateLimitError = new Error('Too many login attempts, please try again later');
+			(context.di.rateLimitValidation.ensureLoginRateLimitNotExceeded as ReturnType<typeof vi.fn>).mockRejectedValueOnce(rateLimitError);
+			const mockFindOne = vi.fn(() => ({
+				lean: vi.fn().mockResolvedValueOnce(mockUser)
+			}));
+			MockUsersConstructor.findOne = mockFindOne;
+
+			await expect(Mutation.authUser({}, { email: 'test@example.com', password: 'Valid1Pass' }, context))
+				.rejects.toThrow(rateLimitError);
+			expect(mockFindOne).not.toHaveBeenCalled();
+		});
+
 		test('Should throw UserInputError if user not found or inactive', async () => {
 			const context = createMockContext();
 			const mockFindOne = vi.fn(() => ({
@@ -175,6 +209,40 @@ describe('auth resolvers', () => {
 
 			await expect(Mutation.authUser({}, { email: 'test@example.com', password: 'Valid1Pass' }, context))
 				.rejects.toThrow(UserInputError);
+		});
+
+		test('Should use the same generic error message whether the user is missing or the password is wrong', async () => {
+			// User not found
+			const contextMissing = createMockContext();
+			MockUsersConstructor.findOne = vi.fn(() => ({
+				lean: vi.fn().mockResolvedValueOnce(null)
+			}));
+			const missingError = await Mutation.authUser({}, { email: 'ghost@example.com', password: 'Valid1Pass' }, contextMissing)
+				.catch((err: Error) => err);
+
+			// User found but wrong password
+			getBcryptCompare().mockResolvedValueOnce(false);
+			const contextWrongPass = createMockContext();
+			MockUsersConstructor.findOne = vi.fn(() => ({
+				lean: vi.fn().mockResolvedValueOnce(mockUser)
+			}));
+			const wrongPassError = await Mutation.authUser({}, { email: 'test@example.com', password: 'WrongPass1' }, contextWrongPass)
+				.catch((err: Error) => err);
+
+			expect((missingError as Error).message).toBe('Invalid credentials');
+			expect((wrongPassError as Error).message).toBe('Invalid credentials');
+		});
+
+		test('Should run a password comparison even when the user does not exist (avoid timing-based user enumeration)', async () => {
+			const context = createMockContext();
+			MockUsersConstructor.findOne = vi.fn(() => ({
+				lean: vi.fn().mockResolvedValueOnce(null)
+			}));
+
+			await Mutation.authUser({}, { email: 'ghost@example.com', password: 'Valid1Pass' }, context)
+				.catch(() => undefined);
+
+			expect(getBcryptCompare()).toHaveBeenCalled();
 		});
 
 		test('Should throw UserInputError if password is incorrect', async () => {
