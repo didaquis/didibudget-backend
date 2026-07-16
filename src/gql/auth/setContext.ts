@@ -7,7 +7,7 @@ import { datetimeValidations } from '#/helpers/datetimeValidations.js';
 import { parameterValidations } from '#/helpers/parameterValidations.js';
 import { ENVIRONMENT } from '#/config/environment.js';
 import { logger } from '#/helpers/logger.js';
-import type { ExpressContext } from 'apollo-server-express';
+import type { ExpressContextFunctionArgument } from '@as-integrations/express4';
 
 import * as models from '#/data/models/index.js';
 import type { ModelsMap, IUser } from '#/data/models/index.js';
@@ -47,7 +47,7 @@ export interface Context {
  * Context function for Apollo Server. Receives the Express request/response pair and returns
  * the application context available to all resolvers.
  */
-const setContext = async ({ req }: ExpressContext): Promise<Context> => {
+const setContext = async ({ req }: ExpressContextFunctionArgument): Promise<Context> => {
 	const context: Context = {
 		di: {
 			model: models,

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { parameterValidations } from '#/helpers/parameterValidations.js';
-import { UserInputError } from 'apollo-server-express';
+import { UserInputError } from '#/gql/errors.js';
 
 describe('parameterValidations', () => {
 	describe('isValidEnumValue', () => {

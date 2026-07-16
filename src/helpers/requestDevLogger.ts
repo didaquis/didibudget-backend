@@ -1,12 +1,18 @@
-import type { ApolloServerPlugin, GraphQLRequestListener, BaseContext } from 'apollo-server-plugin-base';
-import type { GraphQLRequestContext, GraphQLRequestContextWillSendResponse } from 'apollo-server-types';
-import type { GraphQLFormattedError } from 'graphql';
+import type {
+	ApolloServerPlugin,
+	GraphQLRequestListener,
+	BaseContext,
+	GraphQLRequestContext,
+	GraphQLRequestContextWillSendResponse
+} from '@apollo/server';
 
 import { logger } from './logger.js';
 
 const formatResponse = (requestContext: GraphQLRequestContextWillSendResponse<BaseContext>): string => {
 	const space = 2;
-	return JSON.stringify(requestContext.response.data, null, space);
+	const { body } = requestContext.response;
+	const data = body.kind === 'single' ? body.singleResult.data : undefined;
+	return JSON.stringify(data, null, space);
 };
 
 export const requestDevLogger: ApolloServerPlugin<BaseContext> = {
@@ -38,9 +44,12 @@ export const requestDevLogger: ApolloServerPlugin<BaseContext> = {
 				logger.debug('Response data:');
 				logger.debug(formatResponse(requestContext));
 
-				if (requestContext.response.errors) {
-					logger.debug(`Response errors (number of errors: ${requestContext.response.errors.length}):`);
-					requestContext.response.errors.forEach((err: GraphQLFormattedError) => logger.debug(err.message));
+				const { body } = requestContext.response;
+				const errors = body.kind === 'single' ? body.singleResult.errors : undefined;
+
+				if (errors) {
+					logger.debug(`Response errors (number of errors: ${errors.length}):`);
+					errors.forEach((err) => logger.debug(err.message));
 				}
 			}
 		};

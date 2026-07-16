@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { UserInputError } from 'apollo-server-express';
+import { UserInputError } from '#/gql/errors.js';
 import { datetimeValidations } from '#/helpers/datetimeValidations.js';
 
 describe('datetimeValidations', () => {

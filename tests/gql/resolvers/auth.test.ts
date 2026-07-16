@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, vi } from 'vitest';
-import { UserInputError } from 'apollo-server-express';
+import { UserInputError } from '#/gql/errors.js';
 import { Mutation } from '#/gql/resolvers/auth.js';
 import type { Context } from '#/gql/auth/setContext.js';
 import type { JwtTokenPayload } from '#/gql/auth/jwt.js';

@@ -1,4 +1,4 @@
-import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
+import { AuthenticationError, ForbiddenError, ValidationError } from '#/gql/errors.js';
 import { Users } from '#/data/models/index.js';
 import type { IUser } from '#/data/models/schemas/UsersSchema.js';
 import type { Context } from './setContext.js';
