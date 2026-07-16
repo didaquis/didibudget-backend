@@ -15,11 +15,19 @@ import resolvers from './gql/resolvers/index.js';
 import { getListOfIPV4Address } from './helpers/getListOfIPV4Address.js';
 import routesManager from './routes/routesManager.js';
 import { ENVIRONMENT } from './config/environment.js';
-import { environmentVariablesConfig } from './config/appConfig.js';
+import { environmentVariablesConfig, securityVariablesConfig, ensureJwtSecretIsSecure } from './config/appConfig.js';
 import { expenseCategories } from './config/defaultData.js';
 import { logger, endLogger } from './helpers/logger.js';
 import { requestDevLogger } from './helpers/requestDevLogger.js';
 import { createDatabaseIndexes, upsertDBWithExpenseCategories } from './helpers/upsertDatabase.js';
+
+try {
+	ensureJwtSecretIsSecure(securityVariablesConfig.secret, environmentVariablesConfig.environment);
+} catch (err) {
+	logger.error(`Startup failed: ${(err as Error).message}`);
+	const EXIT_CODE_FAILURE = 1;
+	process.exit(EXIT_CODE_FAILURE);
+}
 
 mongoose.set('strictQuery', true);
 
