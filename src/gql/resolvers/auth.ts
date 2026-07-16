@@ -1,5 +1,5 @@
 import { DeleteResult } from 'mongoose';
-import { UserInputError } from 'apollo-server-express';
+import { UserInputError } from '#/gql/errors.js';
 import bcrypt from 'bcrypt';
 import { isValidEmail, isStrongPassword } from '#/helpers/validations.js';
 import { globalVariablesConfig } from '#/config/appConfig.js';

@@ -8,7 +8,7 @@ This document serves as the primary context and instruction set for AI assistant
 **didibudget-backend** is a budget management API built with Node.js, Express, GraphQL, and MongoDB.
 - **Runtime:** Node.js 24.14.x
 - **Language:** TypeScript 5.9.x
-- **Framework:** Express 4.22.x + Apollo Server 3.13.x
+- **Framework:** Express 4.22.x + Apollo Server 5.x (`@apollo/server` with `@as-integrations/express4`)
 - **Database:** MongoDB 8.0+ (Mongoose ODM)
 - **GraphQL:** GraphQL 16.13.x with schema stitching
 - **Authentication:** JWT (jsonwebtoken 9.0.x)
@@ -58,7 +58,6 @@ tests/                   # Tests mirroring source structure
 - Before modifying database schemas (Mongoose models).
 - Before changing API routes or GraphQL types.
 - Before adding new dependencies or refactoring large services.
-- Before performing Git operations (commit, push, checkout).
 - Before changing authentication/authorization patterns
 - Before implementing complex caching strategies
 - Before break existing API contracts
@@ -216,11 +215,13 @@ registerExpense: async (_parent: unknown, { category, quantity, date }: { catego
 ```
 
 ### Error Handling
-Throw proper Apollo errors:
-- `AuthenticationError`: Missing or invalid token.
-- `ForbiddenError`: Insufficient permissions.
-- `UserInputError`: Invalid parameters.
-- `ValidationError`: Failed business logic validation.
+Throw the application error classes from `#/gql/errors.js` (`src/gql/errors.ts`). These extend `GraphQLError` and set the `extensions.code` that clients rely on. Do not import error classes from Apollo Server — Apollo Server v4+ no longer ships them.
+- `AuthenticationError` (code `UNAUTHENTICATED`): Missing or invalid token.
+- `ForbiddenError` (code `FORBIDDEN`): Insufficient permissions.
+- `UserInputError` (code `BAD_USER_INPUT`): Invalid parameters.
+- `ValidationError` (code `GRAPHQL_VALIDATION_FAILED`): Failed business logic validation.
+
+Keep these `extensions.code` values stable: the frontend branches on `error.extensions.code` (e.g. it logs the user out on `UNAUTHENTICATED`/`FORBIDDEN`).
 
 ---
 

@@ -21,7 +21,7 @@ Node 24.x is required (see `.nvmrc` / `engines`). Husky runs a pre-commit hook.
 
 ## Architecture
 
-**GraphQL API** (Apollo Server 3 on Express) backed by **MongoDB via Mongoose**. Entry point is [src/server.ts](src/server.ts).
+**GraphQL API** (Apollo Server 5 / `@apollo/server` on Express, wired via `@as-integrations/express4`) backed by **MongoDB via Mongoose**. Entry point is [src/server.ts](src/server.ts).
 
 **Dependency injection is the core pattern.** Resolvers never import models or validation helpers directly. Instead, [src/gql/auth/setContext.ts](src/gql/auth/setContext.ts) builds a `context.di` object (Mongoose models, JWT, auth/paging/datetime/parameter validations) that every resolver receives as its third argument. To add a capability available to resolvers, wire it into `setContext` and the `Context` interface there. Always type resolver context as `Context` from `setContext.js` — never `any`.
 

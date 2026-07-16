@@ -4,12 +4,14 @@ import helmet from 'helmet';
 import favicon from 'serve-favicon';
 import path from 'path';
 import cors from 'cors';
-import { ApolloServer, ExpressContext } from 'apollo-server-express';
-import { UserInputError } from 'apollo-server-errors';
-import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
-import { GraphQLError } from 'graphql';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express4';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
+import type { GraphQLFormattedError } from 'graphql';
 
 import { setContext } from './gql/auth/setContext.js';
+import type { Context } from './gql/auth/setContext.js';
 import typeDefs from './gql/types/index.js';
 import resolvers from './gql/resolvers/index.js';
 import { getListOfIPV4Address } from './helpers/getListOfIPV4Address.js';
@@ -75,36 +77,38 @@ db.once('open', async () => {
 	}
 });
 
+const graphqlPath = '/graphql';
+
 const initApplication = async (): Promise<void> => {
 	const app = express();
 	if (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) {
 		app.use(helmet());
 	} else {
-		// Allow GraphQL Playground on development environments
+		// Allow the Apollo Sandbox IDE on development environments
 		app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 	}
 	app.use(cors({ credentials: true }));
 	app.use(favicon(path.join(import.meta.dirname, 'public', 'favicon.ico')));
 	app.use('', routesManager);
 
-	const server = new ApolloServer<ExpressContext>({
+	const server = new ApolloServer<Context>({
 		typeDefs,
 		resolvers,
-		context: setContext,
 		introspection: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
-		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
-		formatError(error: GraphQLError) {
-			if (!(error.originalError instanceof UserInputError)) {
-				logger.error(error.message);
+		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageLocalDefault()], // Log all querys and their responses. Show Apollo Sandbox (do not use in production)
+		formatError(formattedError: GraphQLFormattedError): GraphQLFormattedError {
+			// User input errors are expected; everything else is logged as a server-side error
+			if (formattedError.extensions?.code !== 'BAD_USER_INPUT') {
+				logger.error(formattedError.message);
 			}
 
-			return error;
+			return formattedError;
 		},
 	});
 
 	await server.start();
 
-	server.applyMiddleware({ app: app });
+	app.use(graphqlPath, express.json(), expressMiddleware(server, { context: setContext }));
 
 	app.use((req: Request, res: Response) => {
 		res.status(404).send('404'); // eslint-disable-line no-magic-numbers
@@ -114,7 +118,7 @@ const initApplication = async (): Promise<void> => {
 		getListOfIPV4Address().forEach(ip => {
 			logger.info(`Application running on: http://${ip}:${environmentVariablesConfig.port}`);
 			if (environmentVariablesConfig.environment !== ENVIRONMENT.PRODUCTION) {
-				logger.info(`GraphQL Playground running on: http://${ip}:${environmentVariablesConfig.port}${server.graphqlPath}`);
+				logger.info(`GraphQL Sandbox running on: http://${ip}:${environmentVariablesConfig.port}${graphqlPath}`);
 			}
 		});
 	});

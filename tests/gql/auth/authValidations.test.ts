@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, vi } from 'vitest';
-import { AuthenticationError, ForbiddenError, ValidationError } from 'apollo-server-express';
+import { AuthenticationError, ForbiddenError, ValidationError } from '#/gql/errors.js';
 import { Users } from '#/data/models/index.js';
 import { authValidations } from '#/gql/auth/authValidations.js';
 import type { Context } from '#/gql/auth/setContext.js';
