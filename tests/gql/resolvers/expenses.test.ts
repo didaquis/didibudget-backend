@@ -31,9 +31,9 @@ const mockUser = {
 };
 
 vi.mock('#/data/models/index.js', () => {
-	const Expenses = vi.fn(() => ({
-		save: vi.fn()
-	}));
+	const Expenses = vi.fn(function () {
+		return { save: vi.fn() };
+	});
 
 	Object.assign(Expenses, {
 		find: vi.fn(() => ({
@@ -292,7 +292,7 @@ describe('expenses resolvers', () => {
 		test('Should check authentication', async () => {
 			const context = createMockContext();
 			const mockSave = vi.fn().mockResolvedValue(mockExpense);
-			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({ save: mockSave }));
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
 
 			await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
 
@@ -302,7 +302,7 @@ describe('expenses resolvers', () => {
 		test('Should validate date', async () => {
 			const context = createMockContext();
 			const mockSave = vi.fn().mockResolvedValue(mockExpense);
-			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({ save: mockSave }));
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
 
 			await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
 
@@ -312,7 +312,7 @@ describe('expenses resolvers', () => {
 		test('Should create expense with user_id', async () => {
 			const context = createMockContext();
 			const mockSave = vi.fn().mockResolvedValue(mockExpense);
-			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({ save: mockSave }));
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
 
 			await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
 
@@ -327,7 +327,7 @@ describe('expenses resolvers', () => {
 		test('Should return created expense', async () => {
 			const context = createMockContext();
 			const mockSave = vi.fn().mockResolvedValue(mockExpense);
-			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({ save: mockSave }));
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
 
 			const result = await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
 
@@ -337,7 +337,7 @@ describe('expenses resolvers', () => {
 		test('Should allow optional subcategory', async () => {
 			const context = createMockContext();
 			const mockSave = vi.fn().mockResolvedValue(mockExpense);
-			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({ save: mockSave }));
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
 
 			await Mutation.registerExpense({}, { category: 'cat-1', subcategory: 'sub-1', quantity: 50, date: '2024-01-15' }, context);
 
