@@ -6,14 +6,17 @@ This document serves as the primary context and instruction set for AI assistant
 
 ## 1. Project Overview & Tech Stack
 **didibudget-backend** is a budget management API built with Node.js, Express, GraphQL, and MongoDB.
-- **Runtime:** Node.js 24.14.x
-- **Language:** TypeScript 5.9.x
-- **Framework:** Express 4.22.x + Apollo Server 5.x (`@apollo/server` with `@as-integrations/express4`)
-- **Database:** MongoDB 8.0+ (Mongoose ODM)
-- **GraphQL:** GraphQL 16.13.x with schema stitching
-- **Authentication:** JWT (jsonwebtoken 9.0.x)
+
+Version numbers below are the majors the project targets; `package.json`, `package-lock.json`, and `.nvmrc` are the source of truth for exact versions.
+
+- **Runtime:** Node.js 24.x (see `.nvmrc` / `engines`)
+- **Language:** TypeScript 5.x
+- **Framework:** Express 4.x + Apollo Server 5.x (`@apollo/server` with `@as-integrations/express4`)
+- **Database:** MongoDB 8.0+ (Mongoose 8.x ODM)
+- **GraphQL:** GraphQL 16.x with schema stitching
+- **Authentication:** JWT (jsonwebtoken 9.x)
 - **Dev Server:** tsx (TypeScript execution with hot reload)
-- **Testing:** Vitest 3.2.x (native TypeScript support)
+- **Testing:** Vitest 3.x (native TypeScript support)
 - **Code Quality:** typescript-eslint (ESLint 9 flat config), Husky (pre-commit hooks)
 
 ### Project Structure
@@ -57,10 +60,9 @@ tests/                   # Tests mirroring source structure
 ### ⚠️ Ask First
 - Before modifying database schemas (Mongoose models).
 - Before changing API routes or GraphQL types.
-- Before adding new dependencies or refactoring large services.
 - Before changing authentication/authorization patterns
 - Before implementing complex caching strategies
-- Before break existing API contracts
+- Before breaking existing API contracts
 
 ### 🚫 Never Do
 - Commit `.env` files or any secrets.
@@ -88,7 +90,6 @@ type Expense {
 type Query {
   getExpenses: [Expense]
   getExpensesWithPagination(page: Int!, pageSize: Int!): PaginatedExpenses
-  deleteExpense(uuid: String!): Expense
 }
 
 type Mutation {
@@ -155,7 +156,7 @@ export const Mutation = {
   /**
    * Register a new expense for authenticated user
    */
-  registerExpense: async (_parent: unknown, { category, quantity, date }: { category: string; quantity: number; date: string }, context: Context): Promise<ExpenseDTO> => {
+  registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: { category: string; subcategory?: string; quantity: number; date: string }, context: Context): Promise<ExpenseDTO> => {
     context.di.authValidation.ensureThatUserIsLogged(context);
     context.di.datetimeValidation.ensureDateIsValid(date);
 
@@ -164,6 +165,7 @@ export const Mutation = {
     return new context.di.model.Expenses({
       user_id: user._id,
       category,
+      subcategory,
       quantity,
       date
     }).save()
@@ -193,7 +195,7 @@ export const Mutation = {
 Example with Authentication Checks:  
 
 ```typescript
-registerExpense: async (_parent: unknown, { category, quantity, date }: { category: string; quantity: number; date: string }, context: Context): Promise<ExpenseDTO> => {
+registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: { category: string; subcategory?: string; quantity: number; date: string }, context: Context): Promise<ExpenseDTO> => {
   // Always check authentication first
   context.di.authValidation.ensureThatUserIsLogged(context);
 
@@ -207,6 +209,7 @@ registerExpense: async (_parent: unknown, { category, quantity, date }: { catego
   return new context.di.model.Expenses({
     user_id: user._id,
     category,
+    subcategory,
     quantity,
     date
   }).save()
@@ -227,7 +230,7 @@ Keep these `extensions.code` values stable: the frontend branches on `error.exte
 
 ## 4. Testing & Workflow
 - **Coverage:** Aim for meaningful test coverage in `tests/`.
-- **Linting:** Run `npm run lint --fix` to auto-fix style issues.
+- **Linting:** Run `npm run lint -- --fix` to auto-fix style issues.
 - **Deployment:** Feature branches must pass all tests before being merged into master or pushed to a remote repository.
 - **Write tests** for new critical code
 - **Mock MongoDB** as needed
