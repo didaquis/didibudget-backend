@@ -11,7 +11,7 @@ import { TooManyRequestsError } from '#/gql/errors.js';
  * is ever scaled to several instances, swap RateLimiterMemory for the Redis-backed limiter from the
  * same library so the limit is shared across processes.
  */
-export const LOGIN_MAX_ATTEMPTS = 10;
+export const LOGIN_MAX_ATTEMPTS = 20;
 export const LOGIN_WINDOW_SECONDS = 15 * 60; // eslint-disable-line no-magic-numbers
 
 const loginRateLimiter = new RateLimiterMemory({
