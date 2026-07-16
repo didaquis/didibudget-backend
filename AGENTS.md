@@ -75,29 +75,9 @@ tests/                   # Tests mirroring source structure
 ## 3. API Design Patterns
 
 #### GraphQL Schema Definition
-Define types in `src/gql/types/` using clear structures and inputs.
-```graphql
-type Expense {
-  user_id: ID!
-  category: ID!
-  subcategory: ID
-  quantity: Float!
-  date: String!
-  currencyISO: String!
-  uuid: String!
-}
+Type definitions live in `src/gql/types/*` (one file per domain) and are aggregated by `src/gql/types/index.ts`. Reads go under `type Query`, writes under `type Mutation` — never mix them. Use `ID!` for required references, mark optional fields without `!`, and add matching `input` types for complex mutation arguments.
 
-type Query {
-  getExpenses: [Expense]
-  getExpensesWithPagination(page: Int!, pageSize: Int!): PaginatedExpenses
-}
-
-type Mutation {
-  registerExpense(category: ID!, subcategory: ID, quantity: Float!, date: String!): Expense
-  deleteExpense(uuid: String!): Expense
-  deleteAllExpenses: DeleteResult
-}
-```
+The canonical schema is the code itself — read the relevant type file rather than trusting a copy here, which would drift. For example, the expense types are defined in [src/gql/types/expenses.ts](src/gql/types/expenses.ts).
 
 #### Resolver Implementation
 Resolvers (in `src/gql/resolvers/`) must follow these rules:
@@ -107,115 +87,32 @@ Resolvers (in `src/gql/resolvers/`) must follow these rules:
 - Use `Context` from `#/gql/auth/setContext.js` for the context type — never use `any`.
 - Use `#/` path aliases for all imports within `src/`.
 
-**Example Implementation:**
+**Mandatory sequence — every resolver follows this skeleton:**
 ```typescript
 import type { Context } from '#/gql/auth/setContext.js';
 import { expenseDTO, type ExpenseDTO } from '#/dto/expenseDTO.js';
-import { getOffset } from '#/helpers/pagingUtilities.js';
 
-export const Query = {
-  /**
-   * Get all expenses for authenticated user
-   */
-  getExpenses: async (_parent: unknown, _args: unknown, context: Context): Promise<ExpenseDTO[]> => {
-    context.di.authValidation.ensureThatUserIsLogged(context);
+someResolver: async (_parent: unknown, args: SomeArgs, context: Context): Promise<ExpenseDTO> => {
+  context.di.authValidation.ensureThatUserIsLogged(context); // 1. auth first, always
+  context.di.datetimeValidation.ensureDateIsValid(args.date); // 2. validate input via context.di.*Validation
 
-    const user = await context.di.authValidation.getUser(context);
+  const user = await context.di.authValidation.getUser(context); // 3. resolve the user (throws if absent)
 
-    const sortCriteria = { date: 'asc' };
-    const allExpenses = await context.di.model.Expenses
-      .find({ user_id: user._id })
-      .sort(sortCriteria)
-      .lean();
+  // 4. every DB call is scoped by user_id: user._id for data isolation
+  const doc = await context.di.model.Expenses.find({ user_id: user._id }).lean();
 
-    return allExpenses.map((expense) => expenseDTO(expense));
-  },
-
-  /**
-   * Get expenses with pagination for authenticated user
-   */
-  getExpensesWithPagination: async (_parent: unknown, { page, pageSize }: { page: number; pageSize: number }, context: Context) => {
-    context.di.authValidation.ensureThatUserIsLogged(context);
-    context.di.pagingValidation.ensurePageValueIsValid(page);
-    context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
-
-    const user = await context.di.authValidation.getUser(context);
-
-    const offset = getOffset(page, pageSize);
-    const expenses = await context.di.model.Expenses
-      .find({ user_id: user._id })
-      .skip(offset)
-      .limit(pageSize)
-      .lean();
-
-    return expenses.map((expense) => expenseDTO(expense));
-  }
-};
-
-export const Mutation = {
-  /**
-   * Register a new expense for authenticated user
-   */
-  registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: { category: string; subcategory?: string; quantity: number; date: string }, context: Context): Promise<ExpenseDTO> => {
-    context.di.authValidation.ensureThatUserIsLogged(context);
-    context.di.datetimeValidation.ensureDateIsValid(date);
-
-    const user = await context.di.authValidation.getUser(context);
-
-    return new context.di.model.Expenses({
-      user_id: user._id,
-      category,
-      subcategory,
-      quantity,
-      date
-    }).save()
-      .then((expense) => expenseDTO(expense));
-  },
-
-  /**
-   * Delete expense for authenticated user
-   */
-  deleteExpense: async (_parent: unknown, { uuid }: { uuid: string }, context: Context): Promise<ExpenseDTO | null> => {
-    context.di.authValidation.ensureThatUserIsLogged(context);
-
-    const user = await context.di.authValidation.getUser(context);
-
-    return context.di.model.Expenses
-      .findOneAndDelete({ uuid, user_id: user._id })
-      .then((expense) => expense ? expenseDTO(expense) : null);
-  }
+  return expenseDTO(doc); // 5. format through a DTO, never return raw documents
 };
 ```
+
+This skeleton shows the *order*, which is non-negotiable. For the real, working resolvers (queries, mutations, pagination, sorting) read the source directly — e.g. [src/gql/resolvers/expenses.ts](src/gql/resolvers/expenses.ts) — rather than copying an example that may drift.
 
 ### Security & Data Isolation
-- **Authentication:** Use `context.di.authValidation.ensureThatUserIsLogged(context)`.
-- **Identity:** Always filter queries using `user_id: user._id` to ensure data isolation.
-- **Permissions:** Use `context.di.authValidation.ensureThatUserIsAdministrator(context)` for restricted actions.
-
-Example with Authentication Checks:  
-
-```typescript
-registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: { category: string; subcategory?: string; quantity: number; date: string }, context: Context): Promise<ExpenseDTO> => {
-  // Always check authentication first
-  context.di.authValidation.ensureThatUserIsLogged(context);
-
-  // Validate input parameters
-  context.di.datetimeValidation.ensureDateIsValid(date);
-
-  // Get authenticated user — always throws if not authenticated, never returns null
-  const user = await context.di.authValidation.getUser(context);
-
-  // Proceed with user_id = user._id to associate expense with this user
-  return new context.di.model.Expenses({
-    user_id: user._id,
-    category,
-    subcategory,
-    quantity,
-    date
-  }).save()
-    .then((expense) => expenseDTO(expense));
-}
-```
+These rules are non-negotiable and are baked into the resolver skeleton above:
+- **Authentication:** Call `context.di.authValidation.ensureThatUserIsLogged(context)` before any other logic.
+- **Identity:** Always filter *every* query and mutation by `user_id: user._id` to guarantee data isolation between users.
+- **Permissions:** Use `context.di.authValidation.ensureThatUserIsAdministrator(context)` for admin-restricted actions.
+- **DTOs:** Never return raw Mongoose documents; format through a DTO so internal fields are not leaked.
 
 ### Error Handling
 Throw the application error classes from `#/gql/errors.js` (`src/gql/errors.ts`). These extend `GraphQLError` and set the `extensions.code` that clients rely on. Do not import error classes from Apollo Server — Apollo Server v4+ no longer ships them.
