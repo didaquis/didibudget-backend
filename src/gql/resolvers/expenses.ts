@@ -7,6 +7,7 @@ import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expens
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
+import { isProvided } from '#/helpers/isProvided.js';
 import { CurrencyISO } from '#/data/CurrencyISO.js';
 import { Context } from '../auth/setContext.js';
 import { CategoryTypeValue } from '#/data/CategoryType.js';
@@ -61,10 +62,6 @@ interface SearchExpensesArgs {
 	pageSize: number;
 }
 
-/**
- * A GraphQL optional argument is absent when it is omitted or when the client sends an explicit null
- */
-const isProvided = <T>(value: T | null | undefined): value is T => value !== undefined && value !== null;
 
 /**
  * All resolvers related to expenses
@@ -337,7 +334,7 @@ export const Mutation = {
 	registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: RegisterExpenseArgs, context: Context): Promise<ExpenseDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.parameterValidations.isValidObjectId(category);
-		if (subcategory !== undefined && subcategory !== null) {
+		if (isProvided(subcategory)) {
 			context.di.parameterValidations.isValidObjectId(subcategory);
 		}
 		context.di.datetimeValidation.ensureDateIsValid(date);
