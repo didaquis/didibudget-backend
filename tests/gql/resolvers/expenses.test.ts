@@ -5,6 +5,7 @@ import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
 import * as models from '#/data/models/index.js';
 import { CategoryType } from '#/data/CategoryType.js';
 import { UserInputError, AuthenticationError } from '#/gql/errors.js';
+import { Types } from 'mongoose';
 
 const mockExpense = {
 	_id: 'expense-id-1',
@@ -611,6 +612,191 @@ describe('expenses resolvers', () => {
 			await expect(Query.searchExpenses({}, { ...searchArgs, category: 'nope' }, context)).rejects.toThrow(UserInputError);
 
 			expect(models.Expenses.aggregate).not.toHaveBeenCalled();
+		});
+
+		test('Should scope the search to the authenticated user', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			expect(getStages('$match')[0]).toStrictEqual({ $match: { user_id: 'user-id-1' } });
+		});
+
+		test('Should cast the identifiers to ObjectId and not leave them as strings', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, category: '507f1f77bcf86cd799439011', subcategory: '507f1f77bcf86cd799439012' }, context);
+
+			const match = getStages('$match')[0].$match as Record<string, unknown>;
+
+			expect(match.category).toBeInstanceOf(Types.ObjectId);
+			expect(match.subcategory).toBeInstanceOf(Types.ObjectId);
+			expect(String(match.category)).toBe('507f1f77bcf86cd799439011');
+		});
+
+		test('Should filter the date range inclusive on both ends', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z', endDate: '2024-12-31T23:59:59.999Z' }, context);
+
+			const match = getStages('$match')[0].$match as Record<string, unknown>;
+
+			expect(match.date).toStrictEqual({
+				$gte: new Date('2024-01-01T00:00:00.000Z'),
+				$lte: new Date('2024-12-31T23:59:59.999Z')
+			});
+		});
+
+		test('Should filter with an open upper end when only the start date is provided', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z' }, context);
+
+			const match = getStages('$match')[0].$match as Record<string, unknown>;
+
+			expect(match.date).toStrictEqual({ $gte: new Date('2024-01-01T00:00:00.000Z') });
+		});
+
+		test('Should filter with an open lower end when only the end date is provided', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, endDate: '2024-12-31T23:59:59.999Z' }, context);
+
+			const match = getStages('$match')[0].$match as Record<string, unknown>;
+
+			expect(match.date).toStrictEqual({ $lte: new Date('2024-12-31T23:59:59.999Z') });
+		});
+
+		test('Should accept a range of a single instant', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+			const instant = '2024-06-15T10:30:00.000Z';
+
+			await Query.searchExpenses({}, { ...searchArgs, startDate: instant, endDate: instant }, context);
+
+			const match = getStages('$match')[0].$match as Record<string, unknown>;
+
+			expect(match.date).toStrictEqual({ $gte: new Date(instant), $lte: new Date(instant) });
+		});
+
+		test('Should apply the amount filter over the converted field after the addFields stage', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, minQuantity: 23, maxQuantity: 24 }, context);
+
+			const pipeline = getPipeline();
+			const addFieldsIndex = pipeline.findIndex((stage) => Object.keys(stage)[0] === '$addFields');
+			const amountMatchIndex = pipeline.findIndex((stage, index) => index > 0 && Object.keys(stage)[0] === '$match');
+
+			expect(addFieldsIndex).toBeLessThan(amountMatchIndex);
+			expect(pipeline[amountMatchIndex]).toStrictEqual({ $match: { quantityNum: { $gte: 23, $lte: 24 } } });
+		});
+
+		test('Should apply the amount filter when the maximum is zero', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, maxQuantity: 0 }, context);
+
+			expect(getStages('$match')[1]).toStrictEqual({ $match: { quantityNum: { $lte: 0 } } });
+		});
+
+		test('Should search an exact amount when both ends are equal', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, minQuantity: 23.15, maxQuantity: 23.15 }, context);
+
+			expect(getStages('$match')[1]).toStrictEqual({ $match: { quantityNum: { $gte: 23.15, $lte: 23.15 } } });
+		});
+
+		test('Should omit the addFields stage when there is no need for the converted amount', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			expect(getStages('$addFields')).toHaveLength(0);
+		});
+
+		test('Should include the addFields stage when sorting by amount', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, sortBy: 'quantity' }, context);
+
+			expect(getStages('$addFields')).toStrictEqual([{ $addFields: { quantityNum: { $toDouble: '$quantity' } } }]);
+		});
+
+		test('Should sort by date descending by default', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			expect(getStages('$sort')[0]).toStrictEqual({ $sort: { date: -1, _id: -1 } });
+		});
+
+		test('Should sort by the converted amount when requested', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, sortBy: 'quantity', sortDirection: 'asc' }, context);
+
+			expect(getStages('$sort')[0]).toStrictEqual({ $sort: { quantityNum: 1, _id: 1 } });
+		});
+
+		test('Should place the sort stage outside and before the facet', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			const pipeline = getPipeline();
+			const sortIndex = pipeline.findIndex((stage) => Object.keys(stage)[0] === '$sort');
+			const facetIndex = pipeline.findIndex((stage) => Object.keys(stage)[0] === '$facet');
+
+			expect(sortIndex).toBeGreaterThanOrEqual(0);
+			expect(sortIndex).toBeLessThan(facetIndex);
+		});
+
+		test('Should paginate inside the facet', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { page: 3, pageSize: 10 }, context);
+
+			const facet = getStages('$facet')[0].$facet as Record<string, unknown[]>;
+
+			expect(facet.expenses).toStrictEqual([{ $skip: 20 }, { $limit: 10 }]);
+		});
+
+		test('Should break down by the category and subcategory pair with a deterministic order', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			const facet = getStages('$facet')[0].$facet as Record<string, Record<string, unknown>[]>;
+			const group = facet.breakdown[0].$group as Record<string, unknown>;
+
+			expect(group._id).toStrictEqual({ category: '$category', subcategory: '$subcategory' });
+			expect(facet.breakdown.at(-1)).toStrictEqual({ $sort: { sum: -1, category: 1, subcategory: 1 } });
+		});
+
+		test('Should query the database exactly once', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			expect(models.Expenses.aggregate).toHaveBeenCalledTimes(1);
 		});
 	});
 });

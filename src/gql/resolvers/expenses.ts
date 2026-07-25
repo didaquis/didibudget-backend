@@ -1,4 +1,4 @@
-import { DeleteResult, SortValues } from 'mongoose';
+import { DeleteResult, PipelineStage, SortValues, Types } from 'mongoose';
 
 import { expenseDTO, ExpenseDTO } from '#/dto/expenseDTO.js';
 import { expenseSearchDTO, ExpenseSearchResultDTO } from '#/dto/expenseSearchDTO.js';
@@ -204,7 +204,7 @@ export const Query = {
 	/**
 	 * Search expenses of a user filtering by category, subcategory, date range and amount range
 	 */
-	searchExpenses: async (_parent: unknown, { category, subcategory, startDate, endDate, minQuantity, maxQuantity, page, pageSize }: SearchExpensesArgs, context: Context): Promise<ExpenseSearchResultDTO> => {
+	searchExpenses: async (_parent: unknown, { category, subcategory, startDate, endDate, minQuantity, maxQuantity, sortBy = 'date', sortDirection = 'desc', page, pageSize }: SearchExpensesArgs, context: Context): Promise<ExpenseSearchResultDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.pagingValidation.ensurePageValueIsValid(page);
 		context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
@@ -236,7 +236,74 @@ export const Query = {
 
 		const user = await context.di.authValidation.getUser(context);
 
-		await context.di.model.Expenses.aggregate([{ $match: { user_id: user._id } }]);
+		const matchStage: Record<string, unknown> = { user_id: user._id };
+		if (isProvided(category)) {
+			matchStage.category = new Types.ObjectId(category);
+		}
+		if (isProvided(subcategory)) {
+			matchStage.subcategory = new Types.ObjectId(subcategory);
+		}
+		if (isProvided(startDate) || isProvided(endDate)) {
+			const dateFilter: Record<string, Date> = {};
+			if (isProvided(startDate)) {
+				dateFilter.$gte = new Date(startDate);
+			}
+			if (isProvided(endDate)) {
+				dateFilter.$lte = new Date(endDate);
+			}
+			matchStage.date = dateFilter;
+		}
+
+		const quantityFilter: Record<string, number> = {};
+		if (isProvided(minQuantity)) {
+			quantityFilter.$gte = minQuantity;
+		}
+		if (isProvided(maxQuantity)) {
+			quantityFilter.$lte = maxQuantity;
+		}
+
+		const hasQuantityFilter = isProvided(minQuantity) || isProvided(maxQuantity);
+		const needsQuantityField = hasQuantityFilter || sortBy === 'quantity';
+
+		// The annotation on sortStage is what keeps these from widening to number,
+		// which Mongoose rejects on a $sort stage
+		const ascendingOrder = 1;
+		const descendingOrder = -1;
+		const direction = sortDirection === 'asc' ? ascendingOrder : descendingOrder;
+		const sortStage: PipelineStage.Sort['$sort'] = sortBy === 'quantity'
+			? { quantityNum: direction, _id: direction }
+			: { date: direction, _id: direction };
+
+		const offset = getOffset(page, pageSize);
+
+		await context.di.model.Expenses.aggregate([
+			{ $match: matchStage },
+			...(needsQuantityField ? [{ $addFields: { quantityNum: { $toDouble: '$quantity' } } }] : []),
+			...(hasQuantityFilter ? [{ $match: { quantityNum: quantityFilter } }] : []),
+			{ $sort: sortStage },
+			{
+				$facet: {
+					expenses: [
+						{ $skip: offset },
+						{ $limit: pageSize }
+					],
+					totals: [
+						{ $group: { _id: null, totalSum: { $sum: { $toDouble: '$quantity' } }, totalCount: { $sum: 1 } } }
+					],
+					breakdown: [
+						{
+							$group: {
+								_id: { category: '$category', subcategory: '$subcategory' },
+								sum: { $sum: { $toDouble: '$quantity' } },
+								count: { $sum: 1 }
+							}
+						},
+						{ $project: { _id: 0, category: '$_id.category', subcategory: '$_id.subcategory', sum: 1, count: 1 } },
+						{ $sort: { sum: descendingOrder, category: ascendingOrder, subcategory: ascendingOrder } }
+					]
+				}
+			}
+		]);
 
 		return expenseSearchDTO([], paginationDTO(page, 0, 0), 0, CurrencyISO.EUR, []);
 	}
