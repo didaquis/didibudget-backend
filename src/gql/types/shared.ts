@@ -10,6 +10,12 @@ const shared: string = `
 		totalPages: Int!
 		totalCount: Int!
 	}
+
+	""" Sort direction """
+	enum SortDirection {
+		asc
+		desc
+	}
 `;
 
 export default shared;
