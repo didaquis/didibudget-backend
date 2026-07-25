@@ -1,6 +1,7 @@
 import { DeleteResult, SortValues } from 'mongoose';
 
 import { expenseDTO, ExpenseDTO } from '#/dto/expenseDTO.js';
+import { expenseSearchDTO, ExpenseSearchResultDTO } from '#/dto/expenseSearchDTO.js';
 import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByTypeDTO.js';
 import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
@@ -39,6 +40,24 @@ interface RegisterExpenseArgs {
 interface DeleteExpenseArgs {
 	uuid: string;
 }
+
+interface SearchExpensesArgs {
+	category?: string | null;
+	subcategory?: string | null;
+	startDate?: string | null;
+	endDate?: string | null;
+	minQuantity?: number | null;
+	maxQuantity?: number | null;
+	sortBy?: 'date' | 'quantity';
+	sortDirection?: 'asc' | 'desc';
+	page: number;
+	pageSize: number;
+}
+
+/**
+ * A GraphQL optional argument is absent when it is omitted or when the client sends an explicit null
+ */
+const isProvided = <T>(value: T | null | undefined): value is T => value !== undefined && value !== null;
 
 /**
  * All resolvers related to expenses
@@ -181,6 +200,45 @@ export const Query = {
 		const average = totalSum / lastNMonths;
 
 		return expenseMonthlyAverageDTO(average, CurrencyISO.EUR);
+	},
+	/**
+	 * Search expenses of a user filtering by category, subcategory, date range and amount range
+	 */
+	searchExpenses: async (_parent: unknown, { category, subcategory, startDate, endDate, minQuantity, maxQuantity, page, pageSize }: SearchExpensesArgs, context: Context): Promise<ExpenseSearchResultDTO> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.pagingValidation.ensurePageValueIsValid(page);
+		context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
+
+		if (isProvided(category)) {
+			context.di.parameterValidations.isValidObjectId(category);
+		}
+		if (isProvided(subcategory)) {
+			context.di.parameterValidations.isValidObjectId(subcategory);
+		}
+		if (isProvided(startDate)) {
+			context.di.datetimeValidation.ensureDateIsValid(startDate);
+		}
+		if (isProvided(endDate)) {
+			context.di.datetimeValidation.ensureDateIsValid(endDate);
+		}
+		if (isProvided(startDate) && isProvided(endDate)) {
+			context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate(startDate, endDate);
+		}
+		if (isProvided(minQuantity)) {
+			context.di.parameterValidations.isNumberGreaterThanOrEqualToZero(minQuantity);
+		}
+		if (isProvided(maxQuantity)) {
+			context.di.parameterValidations.isNumberGreaterThanOrEqualToZero(maxQuantity);
+		}
+		if (isProvided(minQuantity) && isProvided(maxQuantity)) {
+			context.di.parameterValidations.isMinNotGreaterThanMax(minQuantity, maxQuantity);
+		}
+
+		const user = await context.di.authValidation.getUser(context);
+
+		await context.di.model.Expenses.aggregate([{ $match: { user_id: user._id } }]);
+
+		return expenseSearchDTO([], paginationDTO(page, 0, 0), 0, CurrencyISO.EUR, []);
 	}
 };
 

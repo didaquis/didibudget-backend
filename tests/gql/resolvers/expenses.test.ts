@@ -4,7 +4,7 @@ import type { Context } from '#/gql/auth/setContext.js';
 import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
 import * as models from '#/data/models/index.js';
 import { CategoryType } from '#/data/CategoryType.js';
-import { UserInputError } from '#/gql/errors.js';
+import { UserInputError, AuthenticationError } from '#/gql/errors.js';
 
 const mockExpense = {
 	_id: 'expense-id-1',
@@ -94,6 +94,31 @@ const createMockContext = (): Context => ({
 		}
 	}
 });
+
+const emptyFacetResult = [{ expenses: [], totals: [], breakdown: [] }];
+
+const mockAggregateOnce = (result: unknown) => {
+	(models.Expenses.aggregate as ReturnType<typeof vi.fn>).mockResolvedValueOnce(result);
+};
+
+const getPipeline = (): Record<string, unknown>[] => {
+	return (models.Expenses.aggregate as ReturnType<typeof vi.fn>).mock.calls[0][0];
+};
+
+const getStages = (name: string): Record<string, unknown>[] => {
+	return getPipeline().filter((stage) => Object.keys(stage)[0] === name);
+};
+
+const searchArgs = { page: 1, pageSize: 10 };
+
+const nullArgumentCases = [
+	{ name: 'category', args: { category: null } },
+	{ name: 'subcategory', args: { subcategory: null } },
+	{ name: 'startDate', args: { startDate: null } },
+	{ name: 'endDate', args: { endDate: null } },
+	{ name: 'minQuantity', args: { minQuantity: null } },
+	{ name: 'maxQuantity', args: { maxQuantity: null } }
+];
 
 describe('expenses resolvers', () => {
 	beforeEach(() => {
@@ -476,6 +501,116 @@ describe('expenses resolvers', () => {
 			const result = await Mutation.deleteAllExpenses({}, {}, context);
 
 			expect(result).toEqual(mockResult);
+		});
+	});
+
+	describe('Query.searchExpenses', () => {
+		test('Should check authentication', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			expect(context.di.authValidation.ensureThatUserIsLogged).toHaveBeenCalledWith(context);
+		});
+
+		test('Should validate page and pageSize', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, searchArgs, context);
+
+			expect(context.di.pagingValidation.ensurePageValueIsValid).toHaveBeenCalledWith(1);
+			expect(context.di.pagingValidation.ensurePageSizeValueIsValid).toHaveBeenCalledWith(10);
+		});
+
+		test('Should validate the identifiers when they are provided', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, category: '507f1f77bcf86cd799439011', subcategory: '507f1f77bcf86cd799439012' }, context);
+
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledWith('507f1f77bcf86cd799439012');
+		});
+
+		test('Should validate the dates when they are provided', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z', endDate: '2024-12-31T23:59:59.999Z' }, context);
+
+			expect(context.di.datetimeValidation.ensureDateIsValid).toHaveBeenCalledWith('2024-01-01T00:00:00.000Z');
+			expect(context.di.datetimeValidation.ensureDateIsValid).toHaveBeenCalledWith('2024-12-31T23:59:59.999Z');
+			expect(context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate).toHaveBeenCalledWith('2024-01-01T00:00:00.000Z', '2024-12-31T23:59:59.999Z');
+		});
+
+		test('Should not compare the dates when only one of them is provided', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z' }, context);
+
+			expect(context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate).not.toHaveBeenCalled();
+		});
+
+		test('Should validate the amounts when they are provided', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, minQuantity: 23, maxQuantity: 24 }, context);
+
+			expect(context.di.parameterValidations.isNumberGreaterThanOrEqualToZero).toHaveBeenCalledWith(23);
+			expect(context.di.parameterValidations.isNumberGreaterThanOrEqualToZero).toHaveBeenCalledWith(24);
+			expect(context.di.parameterValidations.isMinNotGreaterThanMax).toHaveBeenCalledWith(23, 24);
+		});
+
+		test('Should validate an amount of zero', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			await Query.searchExpenses({}, { ...searchArgs, maxQuantity: 0 }, context);
+
+			expect(context.di.parameterValidations.isNumberGreaterThanOrEqualToZero).toHaveBeenCalledWith(0);
+		});
+
+		for (const nullArgumentCase of nullArgumentCases) {
+			test(`Should treat ${nullArgumentCase.name} sent as an explicit null as absent`, async () => {
+				const context = createMockContext();
+				mockAggregateOnce(emptyFacetResult);
+
+				await Query.searchExpenses({}, { ...searchArgs, ...nullArgumentCase.args }, context);
+
+				expect(context.di.parameterValidations.isValidObjectId).not.toHaveBeenCalled();
+				expect(context.di.datetimeValidation.ensureDateIsValid).not.toHaveBeenCalled();
+				expect(context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate).not.toHaveBeenCalled();
+				expect(context.di.parameterValidations.isNumberGreaterThanOrEqualToZero).not.toHaveBeenCalled();
+				expect(context.di.parameterValidations.isMinNotGreaterThanMax).not.toHaveBeenCalled();
+				expect(getStages('$match')).toStrictEqual([{ $match: { user_id: 'user-id-1' } }]);
+			});
+		}
+
+		test('Should propagate the error when the user is not logged in', async () => {
+			const context = createMockContext();
+			(context.di.authValidation.ensureThatUserIsLogged as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				throw new AuthenticationError('You must be logged in');
+			});
+
+			await expect(Query.searchExpenses({}, searchArgs, context)).rejects.toThrow(AuthenticationError);
+
+			expect(context.di.authValidation.getUser).not.toHaveBeenCalled();
+			expect(models.Expenses.aggregate).not.toHaveBeenCalled();
+		});
+
+		test('Should not query the database when a validation fails', async () => {
+			const context = createMockContext();
+			(context.di.parameterValidations.isValidObjectId as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				throw new UserInputError('The identifier provided is not valid');
+			});
+
+			await expect(Query.searchExpenses({}, { ...searchArgs, category: 'nope' }, context)).rejects.toThrow(UserInputError);
+
+			expect(models.Expenses.aggregate).not.toHaveBeenCalled();
 		});
 	});
 });
