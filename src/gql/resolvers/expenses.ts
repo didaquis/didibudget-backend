@@ -31,7 +31,6 @@ interface GetExpensesMonthlyAverageArgs {
 
 interface RegisterExpenseArgs {
 	category: string;
-	/** GraphQL allows the client to send an explicit null, not only to omit the argument */
 	subcategory?: string | null;
 	quantity: number;
 	date: string;
