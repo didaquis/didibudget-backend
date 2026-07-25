@@ -374,4 +374,11 @@ export const expenseCategories: ExpenseCategory[] = [
 		emojis: ['💰', '💼'],
 		categoryType: CategoryType.INVESTMENT,
 	},
+	{
+		name: 'Personal care and beauty services (hair salon)',
+		inmutableKey: '4715a13fe2e704aa1151',
+		subcategories: [],
+		emojis: ['💇', '💅'],
+		categoryType: CategoryType.EXPENSE,
+	},
 ];
