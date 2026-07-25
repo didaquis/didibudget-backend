@@ -31,7 +31,8 @@ interface GetExpensesMonthlyAverageArgs {
 
 interface RegisterExpenseArgs {
 	category: string;
-	subcategory?: string;
+	/** GraphQL allows the client to send an explicit null, not only to omit the argument */
+	subcategory?: string | null;
 	quantity: number;
 	date: string;
 }
@@ -191,7 +192,7 @@ export const Mutation = {
 	registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: RegisterExpenseArgs, context: Context): Promise<ExpenseDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.parameterValidations.isValidObjectId(category);
-		if (subcategory !== undefined) {
+		if (subcategory !== undefined && subcategory !== null) {
 			context.di.parameterValidations.isValidObjectId(subcategory);
 		}
 		context.di.datetimeValidation.ensureDateIsValid(date);

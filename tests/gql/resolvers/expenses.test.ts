@@ -382,6 +382,17 @@ describe('expenses resolvers', () => {
 			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledTimes(1);
 		});
 
+		test('Should not validate the subcategory identifier when it is null', async () => {
+			const context = createMockContext();
+			const mockSave = vi.fn().mockResolvedValue(mockExpense);
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
+
+			await Mutation.registerExpense({}, { category: 'cat-1', subcategory: null, quantity: 50, date: '2024-01-15' }, context);
+
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledTimes(1);
+			expect(context.di.parameterValidations.isValidObjectId).not.toHaveBeenCalledWith(null);
+		});
+
 		test('Should not save the expense when the identifier is invalid', async () => {
 			const context = createMockContext();
 			(context.di.parameterValidations.isValidObjectId as ReturnType<typeof vi.fn>).mockImplementation(() => {

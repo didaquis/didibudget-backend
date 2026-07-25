@@ -128,6 +128,19 @@ describe('recurringExpenseSuggestion resolvers', () => {
 			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledTimes(1);
 		});
 
+		test('Should not validate the subcategory identifier when it is null', async () => {
+			const context = createMockContext();
+			mockSuccessfulSave();
+
+			await Mutation.registerRecurringExpenseSuggestion({}, {
+				...validArgs,
+				suggestedExpense: { category: 'category-id-1', subcategory: null, quantity: 50 }
+			}, context);
+
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledTimes(1);
+			expect(context.di.parameterValidations.isValidObjectId).not.toHaveBeenCalledWith(null);
+		});
+
 		test('Should not create the suggestion when the identifier is invalid', async () => {
 			const context = createMockContext();
 			(context.di.parameterValidations.isValidObjectId as ReturnType<typeof vi.fn>).mockImplementation(() => {
