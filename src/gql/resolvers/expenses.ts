@@ -31,7 +31,7 @@ interface GetExpensesMonthlyAverageArgs {
 
 interface RegisterExpenseArgs {
 	category: string;
-	subcategory?: string;
+	subcategory?: string | null;
 	quantity: number;
 	date: string;
 }
@@ -190,6 +190,10 @@ export const Mutation = {
 	 */
 	registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: RegisterExpenseArgs, context: Context): Promise<ExpenseDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.parameterValidations.isValidObjectId(category);
+		if (subcategory !== undefined && subcategory !== null) {
+			context.di.parameterValidations.isValidObjectId(subcategory);
+		}
 		context.di.datetimeValidation.ensureDateIsValid(date);
 
 		const user = await context.di.authValidation.getUser(context);

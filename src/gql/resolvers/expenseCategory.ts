@@ -32,6 +32,7 @@ export const Query = {
 	 */
 	getExpenseCategoryById: async (_parent: unknown, { category }: GetExpenseCategoryByIdArgs, context: Context): Promise<PopulatedExpenseCategory | null> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.parameterValidations.isValidObjectId(category);
 
 		const sortCriteria: Record<string, SortValues> = { name: 'asc' };
 		const result = await context.di.model.ExpenseCategory

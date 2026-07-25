@@ -26,4 +26,15 @@ export const parameterValidations = {
 			throw new UserInputError(`The value provided should be an integer between ${min} and ${max}`);
 		}
 	},
+
+	/**
+	 * Check if the parameter is a well formed MongoDB identifier
+	 */
+	isValidObjectId: (value: unknown): void => {
+		const objectIdPattern = /^[a-fA-F0-9]{24}$/;
+
+		if (typeof value !== 'string' || !objectIdPattern.test(value)) {
+			throw new UserInputError('The identifier provided is not valid');
+		}
+	},
 };

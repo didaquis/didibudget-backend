@@ -82,7 +82,8 @@ const createMockContext = (): Context => ({
 		},
 		parameterValidations: {
 			isValidEnumValue: vi.fn(),
-			isIntegerBetween: vi.fn()
+			isIntegerBetween: vi.fn(),
+			isValidObjectId: vi.fn()
 		}
 	}
 });

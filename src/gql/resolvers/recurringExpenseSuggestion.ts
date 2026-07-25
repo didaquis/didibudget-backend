@@ -84,6 +84,10 @@ export const Mutation = {
 	 */
 	registerRecurringExpenseSuggestion: async (_parent: unknown, { isActive, startDay, endDay, suggestedExpense }: RegisterRecurringExpenseSuggestionArgs, context: Context): Promise<RecurringExpenseSuggestionDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.parameterValidations.isValidObjectId(suggestedExpense.category);
+		if (suggestedExpense.subcategory !== undefined && suggestedExpense.subcategory !== null) {
+			context.di.parameterValidations.isValidObjectId(suggestedExpense.subcategory);
+		}
 
 		const user = await context.di.authValidation.getUser(context);
 

@@ -4,6 +4,7 @@ import type { Context } from '#/gql/auth/setContext.js';
 import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
 import * as models from '#/data/models/index.js';
 import { CategoryType } from '#/data/CategoryType.js';
+import { UserInputError } from '#/gql/errors.js';
 
 const mockExpense = {
 	_id: 'expense-id-1',
@@ -85,7 +86,8 @@ const createMockContext = (): Context => ({
 		},
 		parameterValidations: {
 			isValidEnumValue: vi.fn(),
-			isIntegerBetween: vi.fn()
+			isIntegerBetween: vi.fn(),
+			isValidObjectId: vi.fn()
 		}
 	}
 });
@@ -348,6 +350,58 @@ describe('expenses resolvers', () => {
 				quantity: 50,
 				date: '2024-01-15'
 			});
+		});
+
+		test('Should validate the category identifier', async () => {
+			const context = createMockContext();
+			const mockSave = vi.fn().mockResolvedValue(mockExpense);
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
+
+			await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
+
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledWith('cat-1');
+		});
+
+		test('Should validate the subcategory identifier when it is provided', async () => {
+			const context = createMockContext();
+			const mockSave = vi.fn().mockResolvedValue(mockExpense);
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
+
+			await Mutation.registerExpense({}, { category: 'cat-1', subcategory: 'sub-1', quantity: 50, date: '2024-01-15' }, context);
+
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledWith('sub-1');
+		});
+
+		test('Should not validate the subcategory identifier when it is omitted', async () => {
+			const context = createMockContext();
+			const mockSave = vi.fn().mockResolvedValue(mockExpense);
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
+
+			await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
+
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledTimes(1);
+		});
+
+		test('Should not validate the subcategory identifier when it is null', async () => {
+			const context = createMockContext();
+			const mockSave = vi.fn().mockResolvedValue(mockExpense);
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
+
+			await Mutation.registerExpense({}, { category: 'cat-1', subcategory: null, quantity: 50, date: '2024-01-15' }, context);
+
+			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledTimes(1);
+			expect(context.di.parameterValidations.isValidObjectId).not.toHaveBeenCalledWith(null);
+		});
+
+		test('Should not save the expense when the identifier is invalid', async () => {
+			const context = createMockContext();
+			(context.di.parameterValidations.isValidObjectId as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				throw new UserInputError('The identifier provided is not valid');
+			});
+
+			await expect(Mutation.registerExpense({}, { category: 'nope', quantity: 50, date: '2024-01-15' }, context)).rejects.toThrow(UserInputError);
+
+			expect(models.Expenses).not.toHaveBeenCalled();
 		});
 	});
 
