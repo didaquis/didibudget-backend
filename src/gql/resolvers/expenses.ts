@@ -269,8 +269,6 @@ export const Query = {
 		const hasQuantityFilter = isProvided(minQuantity) || isProvided(maxQuantity);
 		const needsQuantityField = hasQuantityFilter || sortBy === 'quantity';
 
-		// The annotation on sortStage is what keeps these from widening to number,
-		// which Mongoose rejects on a $sort stage
 		const ascendingOrder = 1;
 		const descendingOrder = -1;
 		const direction = sortDirection === 'asc' ? ascendingOrder : descendingOrder;
