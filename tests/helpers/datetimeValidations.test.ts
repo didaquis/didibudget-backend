@@ -64,4 +64,26 @@ describe('datetimeValidations', () => {
 			expect(() => datetimeValidations.ensureStartDateIsEarlierThanEndDate('2024-12-31', '2024-01-01')).toThrow('The start date is not earlier than the end date');
 		});
 	});
+
+	describe('ensureStartDateIsNotLaterThanEndDate', () => {
+		test('Should not throw if start date is earlier than end date', () => {
+			expect(() => datetimeValidations.ensureStartDateIsNotLaterThanEndDate('2024-01-01', '2024-12-31')).not.toThrow();
+		});
+
+		test('Should not throw if both dates are equal', () => {
+			expect(() => datetimeValidations.ensureStartDateIsNotLaterThanEndDate('2024-06-15', '2024-06-15')).not.toThrow();
+		});
+
+		test('Should throw UserInputError if start date is later than end date', () => {
+			expect(() => datetimeValidations.ensureStartDateIsNotLaterThanEndDate('2024-12-31', '2024-01-01')).toThrow(UserInputError);
+			expect(() => datetimeValidations.ensureStartDateIsNotLaterThanEndDate('2024-12-31', '2024-01-01')).toThrow('The start date is later than the end date');
+		});
+
+		test('Should compare dates as instants and not as text', () => {
+			const startDate = '2024-06-15T00:00:00.000Z';
+			const endDate = '2024-06-15T02:00:00.000+01:00';
+
+			expect(() => datetimeValidations.ensureStartDateIsNotLaterThanEndDate(startDate, endDate)).not.toThrow();
+		});
+	});
 });

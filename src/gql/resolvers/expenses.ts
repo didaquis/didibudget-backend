@@ -1,14 +1,17 @@
-import { DeleteResult, SortValues } from 'mongoose';
+import { DeleteResult, PipelineStage, SortValues, Types } from 'mongoose';
 
 import { expenseDTO, ExpenseDTO } from '#/dto/expenseDTO.js';
+import { expenseSearchDTO, ExpenseSearchResultDTO } from '#/dto/expenseSearchDTO.js';
 import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByTypeDTO.js';
 import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
+import { isProvided } from '#/helpers/isProvided.js';
 import { CurrencyISO } from '#/data/CurrencyISO.js';
 import { Context } from '../auth/setContext.js';
 import { CategoryTypeValue } from '#/data/CategoryType.js';
+import type { IExpense } from '#/data/models/index.js';
 
 interface GetExpensesWithPaginationArgs {
 	page: number;
@@ -39,6 +42,26 @@ interface RegisterExpenseArgs {
 interface DeleteExpenseArgs {
 	uuid: string;
 }
+
+interface SearchExpensesAggregationResult {
+	expenses: IExpense[];
+	totals: { totalSum: number; totalCount: number }[];
+	breakdown: { category: Types.ObjectId; subcategory?: Types.ObjectId; sum: number; count: number }[];
+}
+
+interface SearchExpensesArgs {
+	category?: string | null;
+	subcategory?: string | null;
+	startDate?: string | null;
+	endDate?: string | null;
+	minQuantity?: number | null;
+	maxQuantity?: number | null;
+	sortBy?: 'date' | 'quantity';
+	sortDirection?: 'asc' | 'desc';
+	page: number;
+	pageSize: number;
+}
+
 
 /**
  * All resolvers related to expenses
@@ -181,6 +204,123 @@ export const Query = {
 		const average = totalSum / lastNMonths;
 
 		return expenseMonthlyAverageDTO(average, CurrencyISO.EUR);
+	},
+	/**
+	 * Search expenses of a user filtering by category, subcategory, date range and amount range
+	 */
+	searchExpenses: async (_parent: unknown, { category, subcategory, startDate, endDate, minQuantity, maxQuantity, sortBy = 'date', sortDirection = 'desc', page, pageSize }: SearchExpensesArgs, context: Context): Promise<ExpenseSearchResultDTO> => {
+		context.di.authValidation.ensureThatUserIsLogged(context);
+		context.di.pagingValidation.ensurePageValueIsValid(page);
+		context.di.pagingValidation.ensurePageSizeValueIsValid(pageSize);
+
+		if (isProvided(category)) {
+			context.di.parameterValidations.isValidObjectId(category);
+		}
+		if (isProvided(subcategory)) {
+			context.di.parameterValidations.isValidObjectId(subcategory);
+		}
+		if (isProvided(startDate)) {
+			context.di.datetimeValidation.ensureDateIsValid(startDate);
+		}
+		if (isProvided(endDate)) {
+			context.di.datetimeValidation.ensureDateIsValid(endDate);
+		}
+		if (isProvided(startDate) && isProvided(endDate)) {
+			context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate(startDate, endDate);
+		}
+		if (isProvided(minQuantity)) {
+			context.di.parameterValidations.isNumberGreaterThanOrEqualToZero(minQuantity);
+		}
+		if (isProvided(maxQuantity)) {
+			context.di.parameterValidations.isNumberGreaterThanOrEqualToZero(maxQuantity);
+		}
+		if (isProvided(minQuantity) && isProvided(maxQuantity)) {
+			context.di.parameterValidations.isMinNotGreaterThanMax(minQuantity, maxQuantity);
+		}
+
+		const user = await context.di.authValidation.getUser(context);
+
+		const matchStage: Record<string, unknown> = { user_id: user._id };
+		if (isProvided(category)) {
+			matchStage.category = new Types.ObjectId(category);
+		}
+		if (isProvided(subcategory)) {
+			matchStage.subcategory = new Types.ObjectId(subcategory);
+		}
+		if (isProvided(startDate) || isProvided(endDate)) {
+			const dateFilter: Record<string, Date> = {};
+			if (isProvided(startDate)) {
+				dateFilter.$gte = new Date(startDate);
+			}
+			if (isProvided(endDate)) {
+				dateFilter.$lte = new Date(endDate);
+			}
+			matchStage.date = dateFilter;
+		}
+
+		const quantityFilter: Record<string, number> = {};
+		if (isProvided(minQuantity)) {
+			quantityFilter.$gte = minQuantity;
+		}
+		if (isProvided(maxQuantity)) {
+			quantityFilter.$lte = maxQuantity;
+		}
+
+		const hasQuantityFilter = isProvided(minQuantity) || isProvided(maxQuantity);
+		const needsQuantityField = hasQuantityFilter || sortBy === 'quantity';
+
+		const ascendingOrder = 1;
+		const descendingOrder = -1;
+		const direction = sortDirection === 'asc' ? ascendingOrder : descendingOrder;
+		const sortStage: PipelineStage.Sort['$sort'] = sortBy === 'quantity'
+			? { quantityNum: direction, _id: direction }
+			: { date: direction, _id: direction };
+
+		const offset = getOffset(page, pageSize);
+
+		const aggregationResult = await context.di.model.Expenses.aggregate<SearchExpensesAggregationResult>([
+			{ $match: matchStage },
+			...(needsQuantityField ? [{ $addFields: { quantityNum: { $toDouble: '$quantity' } } }] : []),
+			...(hasQuantityFilter ? [{ $match: { quantityNum: quantityFilter } }] : []),
+			{ $sort: sortStage },
+			{
+				$facet: {
+					expenses: [
+						{ $skip: offset },
+						{ $limit: pageSize }
+					],
+					totals: [
+						{ $group: { _id: null, totalSum: { $sum: { $toDouble: '$quantity' } }, totalCount: { $sum: 1 } } }
+					],
+					breakdown: [
+						{
+							$group: {
+								_id: { category: '$category', subcategory: '$subcategory' },
+								sum: { $sum: { $toDouble: '$quantity' } },
+								count: { $sum: 1 }
+							}
+						},
+						{ $project: { _id: 0, category: '$_id.category', subcategory: '$_id.subcategory', sum: 1, count: 1 } },
+						{ $sort: { sum: descendingOrder, category: ascendingOrder, subcategory: ascendingOrder } }
+					]
+				}
+			}
+		]);
+
+		const [searchResult] = aggregationResult;
+		const totals = searchResult.totals.at(0);
+
+		const totalSum = totals?.totalSum ?? 0;
+		const totalCount = totals?.totalCount ?? 0;
+		const totalPages = getTotalPagesNumber(totalCount, pageSize);
+
+		return expenseSearchDTO(
+			searchResult.expenses.map((expense) => expenseDTO(expense)),
+			paginationDTO(page, totalPages, totalCount),
+			totalSum,
+			CurrencyISO.EUR,
+			searchResult.breakdown
+		);
 	}
 };
 
@@ -191,7 +331,7 @@ export const Mutation = {
 	registerExpense: async (_parent: unknown, { category, subcategory, quantity, date }: RegisterExpenseArgs, context: Context): Promise<ExpenseDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.parameterValidations.isValidObjectId(category);
-		if (subcategory !== undefined && subcategory !== null) {
+		if (isProvided(subcategory)) {
 			context.di.parameterValidations.isValidObjectId(subcategory);
 		}
 		context.di.datetimeValidation.ensureDateIsValid(date);

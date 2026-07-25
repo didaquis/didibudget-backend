@@ -1,4 +1,5 @@
 import { recurringExpenseSuggestionDTO, RecurringExpenseSuggestionDTO, type SuggestedExpensePopulated } from '#/dto/recurringExpenseSuggestionDTO.js';
+import { isProvided } from '#/helpers/isProvided.js';
 import { Context } from '../auth/setContext.js';
 interface GetRecurringExpenseSuggestionsByDayArgs {
 	day: number;
@@ -85,7 +86,7 @@ export const Mutation = {
 	registerRecurringExpenseSuggestion: async (_parent: unknown, { isActive, startDay, endDay, suggestedExpense }: RegisterRecurringExpenseSuggestionArgs, context: Context): Promise<RecurringExpenseSuggestionDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 		context.di.parameterValidations.isValidObjectId(suggestedExpense.category);
-		if (suggestedExpense.subcategory !== undefined && suggestedExpense.subcategory !== null) {
+		if (isProvided(suggestedExpense.subcategory)) {
 			context.di.parameterValidations.isValidObjectId(suggestedExpense.subcategory);
 		}
 

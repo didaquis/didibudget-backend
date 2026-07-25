@@ -37,4 +37,22 @@ export const parameterValidations = {
 			throw new UserInputError('The identifier provided is not valid');
 		}
 	},
+
+	/**
+	 * Check if the parameter is a number greater than or equal to zero
+	 */
+	isNumberGreaterThanOrEqualToZero: (value: unknown): void => {
+		if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+			throw new UserInputError('The value provided should be a number greater than or equal to zero');
+		}
+	},
+
+	/**
+	 * Check that a minimum value is not greater than its maximum value
+	 */
+	isMinNotGreaterThanMax: (min: number, max: number): void => {
+		if (min > max) {
+			throw new UserInputError('The minimum value provided is greater than the maximum value');
+		}
+	},
 };

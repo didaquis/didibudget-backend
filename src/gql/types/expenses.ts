@@ -25,6 +25,29 @@ const expenses: string = `
 		pagination: PaginationData
 	}
 
+	""" Field used to sort a search of expenses """
+	enum ExpenseSortField {
+		date
+		quantity
+	}
+
+	""" Aggregated expenses for a given category/subcategory pair """
+	type ExpenseBreakdownEntry {
+		category: ID!
+		subcategory: ID
+		sum: Float!
+		count: Int!
+	}
+
+	""" Result of a search of expenses """
+	type ExpenseSearchResult {
+		expenses: [Expense!]!
+		pagination: PaginationData!
+		totalSum: Float!
+		currencyISO: String!
+		breakdown: [ExpenseBreakdownEntry!]!
+	}
+
 	type Query {
 		""" Get list of expenses for a specific user """
 		getExpenses: [Expense]
@@ -40,6 +63,20 @@ const expenses: string = `
 
 		""" Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types. """
 		getExpensesMonthlyAverage(lastNMonths: Int!, excludedCategoryTypes: [CategoryType!]): ExpensesMonthlyAverage!
+
+		""" Search expenses of a user filtering by category, subcategory, date range and amount range """
+		searchExpenses(
+			category: ID
+			subcategory: ID
+			startDate: String
+			endDate: String
+			minQuantity: Float
+			maxQuantity: Float
+			sortBy: ExpenseSortField = date
+			sortDirection: SortDirection = desc
+			page: Int!
+			pageSize: Int!
+		): ExpenseSearchResult!
 	}
 
 	type Mutation {
