@@ -307,20 +307,19 @@ export const Query = {
 			}
 		]);
 
-		// $facet always yields an array of exactly one element, but a mock may not
-		const emptyResult: SearchExpensesAggregationResult = { expenses: [], totals: [], breakdown: [] };
-		const { expenses, totals, breakdown } = aggregationResult[0] ?? emptyResult;
+		const [searchResult] = aggregationResult;
+		const totals = searchResult.totals.at(0);
 
-		const noResults = { totalSum: 0, totalCount: 0 };
-		const { totalSum, totalCount } = totals[0] ?? noResults;
+		const totalSum = totals?.totalSum ?? 0;
+		const totalCount = totals?.totalCount ?? 0;
 		const totalPages = getTotalPagesNumber(totalCount, pageSize);
 
 		return expenseSearchDTO(
-			expenses.map((expense) => expenseDTO(expense)),
+			searchResult.expenses.map((expense) => expenseDTO(expense)),
 			paginationDTO(page, totalPages, totalCount),
 			totalSum,
 			CurrencyISO.EUR,
-			breakdown
+			searchResult.breakdown
 		);
 	}
 };
