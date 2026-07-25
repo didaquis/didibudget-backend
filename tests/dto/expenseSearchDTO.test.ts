@@ -23,12 +23,16 @@ describe('expenseSearchDTO', () => {
 		expect(result.totalSum).toBe(150.76);
 	});
 
+	// The values avoid the exact half cent on purpose: roundToTwoDecimals delegates on toFixed,
+	// so whether 10.005 rounds up or down depends on how the number lands in binary
 	test('Should round every breakdown sum to two decimals', () => {
 		const result = expenseSearchDTO([], pagination, 0, 'EUR', [
-			{ category: 'category-id-1', subcategory: 'subcategory-id-1', sum: 10.005, count: 2 }
+			{ category: 'category-id-1', sum: 10.00789, count: 2 },
+			{ category: 'category-id-2', sum: 5.00123, count: 1 }
 		]);
 
 		expect(result.breakdown[0].sum).toBe(10.01);
+		expect(result.breakdown[1].sum).toBe(5);
 	});
 
 	test('Should convert identifiers to strings', () => {

@@ -798,5 +798,76 @@ describe('expenses resolvers', () => {
 
 			expect(models.Expenses.aggregate).toHaveBeenCalledTimes(1);
 		});
+
+		test('Should return an empty result without throwing when nothing matches', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			const result = await Query.searchExpenses({}, searchArgs, context);
+
+			expect(result.expenses).toEqual([]);
+			expect(result.breakdown).toEqual([]);
+			expect(result.totalSum).toBe(0);
+			expect(result.pagination).toStrictEqual({ currentPage: 1, totalPages: 0, totalCount: 0 });
+		});
+
+		test('Should return the page of expenses formatted through the DTO', async () => {
+			const context = createMockContext();
+			mockAggregateOnce([{
+				expenses: [mockExpense],
+				totals: [{ totalSum: 50, totalCount: 1 }],
+				breakdown: []
+			}]);
+
+			const result = await Query.searchExpenses({}, searchArgs, context);
+
+			expect(result.expenses).toHaveLength(1);
+			expect(result.expenses[0]).toHaveProperty('uuid', 'expense-uuid-1');
+		});
+
+		test('Should return the totals of the whole filtered set', async () => {
+			const context = createMockContext();
+			mockAggregateOnce([{
+				expenses: [],
+				totals: [{ totalSum: 1234.567, totalCount: 25 }],
+				breakdown: []
+			}]);
+
+			const result = await Query.searchExpenses({}, searchArgs, context);
+
+			expect(result.totalSum).toBe(1234.57);
+			expect(result.pagination).toStrictEqual({ currentPage: 1, totalPages: 3, totalCount: 25 });
+		});
+
+		test('Should return the breakdown with rounded sums and string identifiers', async () => {
+			const context = createMockContext();
+			mockAggregateOnce([{
+				expenses: [],
+				totals: [{ totalSum: 30, totalCount: 3 }],
+				breakdown: [
+					{ category: new Types.ObjectId('507f1f77bcf86cd799439011'), subcategory: new Types.ObjectId('507f1f77bcf86cd799439012'), sum: 20.00789, count: 2 },
+					{ category: new Types.ObjectId('507f1f77bcf86cd799439013'), sum: 10, count: 1 }
+				]
+			}]);
+
+			const result = await Query.searchExpenses({}, searchArgs, context);
+
+			expect(result.breakdown[0]).toStrictEqual({
+				category: '507f1f77bcf86cd799439011',
+				subcategory: '507f1f77bcf86cd799439012',
+				sum: 20.01,
+				count: 2
+			});
+			expect(result.breakdown[1].subcategory).toBeNull();
+		});
+
+		test('Should always return euros as the currency', async () => {
+			const context = createMockContext();
+			mockAggregateOnce(emptyFacetResult);
+
+			const result = await Query.searchExpenses({}, searchArgs, context);
+
+			expect(result.currencyISO).toBe('EUR');
+		});
 	});
 });

@@ -10,6 +10,7 @@ import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRange
 import { CurrencyISO } from '#/data/CurrencyISO.js';
 import { Context } from '../auth/setContext.js';
 import { CategoryTypeValue } from '#/data/CategoryType.js';
+import type { IExpense } from '#/data/models/index.js';
 
 interface GetExpensesWithPaginationArgs {
 	page: number;
@@ -39,6 +40,12 @@ interface RegisterExpenseArgs {
 
 interface DeleteExpenseArgs {
 	uuid: string;
+}
+
+interface SearchExpensesAggregationResult {
+	expenses: IExpense[];
+	totals: { totalSum: number; totalCount: number }[];
+	breakdown: { category: Types.ObjectId; subcategory?: Types.ObjectId; sum: number; count: number }[];
 }
 
 interface SearchExpensesArgs {
@@ -276,7 +283,7 @@ export const Query = {
 
 		const offset = getOffset(page, pageSize);
 
-		await context.di.model.Expenses.aggregate([
+		const aggregationResult = await context.di.model.Expenses.aggregate<SearchExpensesAggregationResult>([
 			{ $match: matchStage },
 			...(needsQuantityField ? [{ $addFields: { quantityNum: { $toDouble: '$quantity' } } }] : []),
 			...(hasQuantityFilter ? [{ $match: { quantityNum: quantityFilter } }] : []),
@@ -305,7 +312,21 @@ export const Query = {
 			}
 		]);
 
-		return expenseSearchDTO([], paginationDTO(page, 0, 0), 0, CurrencyISO.EUR, []);
+		// $facet always yields an array of exactly one element, but a mock may not
+		const emptyResult: SearchExpensesAggregationResult = { expenses: [], totals: [], breakdown: [] };
+		const { expenses, totals, breakdown } = aggregationResult[0] ?? emptyResult;
+
+		const noResults = { totalSum: 0, totalCount: 0 };
+		const { totalSum, totalCount } = totals[0] ?? noResults;
+		const totalPages = getTotalPagesNumber(totalCount, pageSize);
+
+		return expenseSearchDTO(
+			expenses.map((expense) => expenseDTO(expense)),
+			paginationDTO(page, totalPages, totalCount),
+			totalSum,
+			CurrencyISO.EUR,
+			breakdown
+		);
 	}
 };
 
