@@ -23,5 +23,14 @@ export const datetimeValidations = {
 		if (startDate >= endDate) {
 			throw new UserInputError('The start date is not earlier than the end date');
 		}
+	},
+
+	/**
+	 * Check if a date is not later than other. Both ends of the range are considered valid
+	 */
+	ensureStartDateIsNotLaterThanEndDate: (startDate: Date | string, endDate: Date | string): void => {
+		if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
+			throw new UserInputError('The start date is later than the end date');
+		}
 	}
 };

@@ -70,4 +70,48 @@ describe('parameterValidations', () => {
 			expect(() => parameterValidations.isValidObjectId('nope')).toThrow('The identifier provided is not valid');
 		});
 	});
+
+	describe('isNumberGreaterThanOrEqualToZero', () => {
+		test('Should not throw if value is a positive number', () => {
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(23.15)).not.toThrow();
+		});
+
+		test('Should not throw if value is zero', () => {
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(0)).not.toThrow();
+		});
+
+		test('Should throw UserInputError if value is negative', () => {
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(-1)).toThrow(UserInputError);
+		});
+
+		test('Should throw UserInputError if value is not a finite number', () => {
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(Infinity)).toThrow(UserInputError);
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(NaN)).toThrow(UserInputError);
+		});
+
+		test('Should throw UserInputError if value is not a number', () => {
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero('23.15')).toThrow(UserInputError);
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(null)).toThrow(UserInputError);
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(undefined)).toThrow(UserInputError);
+		});
+
+		test('Should throw an error with a descriptive message', () => {
+			expect(() => parameterValidations.isNumberGreaterThanOrEqualToZero(-1)).toThrow('The value provided should be a number greater than or equal to zero');
+		});
+	});
+
+	describe('isMinNotGreaterThanMax', () => {
+		test('Should not throw if min is lower than max', () => {
+			expect(() => parameterValidations.isMinNotGreaterThanMax(23, 24)).not.toThrow();
+		});
+
+		test('Should not throw if min is equal to max', () => {
+			expect(() => parameterValidations.isMinNotGreaterThanMax(23.15, 23.15)).not.toThrow();
+		});
+
+		test('Should throw UserInputError if min is greater than max', () => {
+			expect(() => parameterValidations.isMinNotGreaterThanMax(24, 23)).toThrow(UserInputError);
+			expect(() => parameterValidations.isMinNotGreaterThanMax(24, 23)).toThrow('The minimum value provided is greater than the maximum value');
+		});
+	});
 });

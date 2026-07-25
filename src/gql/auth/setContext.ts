@@ -42,11 +42,14 @@ export interface Context {
 		datetimeValidation: {
 			ensureDateIsValid: (value: unknown) => void;
 			ensureStartDateIsEarlierThanEndDate: (startDate: Date | string, endDate: Date | string) => void;
+			ensureStartDateIsNotLaterThanEndDate: (startDate: Date | string, endDate: Date | string) => void;
 		};
 		parameterValidations: {
 			isValidEnumValue: (value: unknown, enumObj: Record<string, unknown>) => void;
 			isIntegerBetween: (value: unknown, min: number, max: number) => void;
 			isValidObjectId: (value: unknown) => void;
+			isNumberGreaterThanOrEqualToZero: (value: unknown) => void;
+			isMinNotGreaterThanMax: (min: number, max: number) => void;
 		};
 	};
 }

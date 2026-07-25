@@ -78,12 +78,15 @@ const createMockContext = (): Context => ({
 		},
 		datetimeValidation: {
 			ensureDateIsValid: vi.fn(),
-			ensureStartDateIsEarlierThanEndDate: vi.fn()
+			ensureStartDateIsEarlierThanEndDate: vi.fn(),
+			ensureStartDateIsNotLaterThanEndDate: vi.fn()
 		},
 		parameterValidations: {
 			isValidEnumValue: vi.fn(),
 			isIntegerBetween: vi.fn(),
-			isValidObjectId: vi.fn()
+			isValidObjectId: vi.fn(),
+			isNumberGreaterThanOrEqualToZero: vi.fn(),
+			isMinNotGreaterThanMax: vi.fn()
 		}
 	}
 });
