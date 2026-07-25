@@ -35,4 +35,39 @@ describe('parameterValidations', () => {
 			expect(() => parameterValidations.isIntegerBetween(0, 1, 10)).toThrow('The value provided should be an integer between 1 and 10');
 		});
 	});
+
+	describe('isValidObjectId', () => {
+		test('Should not throw if value is a well formed identifier', () => {
+			expect(() => parameterValidations.isValidObjectId('507f1f77bcf86cd799439011')).not.toThrow();
+			expect(() => parameterValidations.isValidObjectId('507F1F77BCF86CD799439011')).not.toThrow();
+		});
+
+		test('Should throw UserInputError if value is a twelve characters string', () => {
+			expect(() => parameterValidations.isValidObjectId('personalcare')).toThrow(UserInputError);
+		});
+
+		test('Should throw UserInputError if value length is not twenty four characters', () => {
+			expect(() => parameterValidations.isValidObjectId('507f1f77bcf86cd79943901')).toThrow(UserInputError);
+			expect(() => parameterValidations.isValidObjectId('507f1f77bcf86cd7994390111')).toThrow(UserInputError);
+		});
+
+		test('Should throw UserInputError if value contains non hexadecimal characters', () => {
+			expect(() => parameterValidations.isValidObjectId('507f1f77bcf86cd79943901z')).toThrow(UserInputError);
+		});
+
+		test('Should throw UserInputError if value is an empty string', () => {
+			expect(() => parameterValidations.isValidObjectId('')).toThrow(UserInputError);
+		});
+
+		test('Should throw UserInputError if value is not a string', () => {
+			expect(() => parameterValidations.isValidObjectId(null)).toThrow(UserInputError);
+			expect(() => parameterValidations.isValidObjectId(undefined)).toThrow(UserInputError);
+			expect(() => parameterValidations.isValidObjectId(123)).toThrow(UserInputError);
+			expect(() => parameterValidations.isValidObjectId({})).toThrow(UserInputError);
+		});
+
+		test('Should throw an error with a descriptive message', () => {
+			expect(() => parameterValidations.isValidObjectId('nope')).toThrow('The identifier provided is not valid');
+		});
+	});
 });

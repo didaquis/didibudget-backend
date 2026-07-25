@@ -46,6 +46,7 @@ export interface Context {
 		parameterValidations: {
 			isValidEnumValue: (value: unknown, enumObj: Record<string, unknown>) => void;
 			isIntegerBetween: (value: unknown, min: number, max: number) => void;
+			isValidObjectId: (value: unknown) => void;
 		};
 	};
 }
