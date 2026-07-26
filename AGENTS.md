@@ -11,7 +11,7 @@ Version numbers below are the majors the project targets; `package.json`, `packa
 
 - **Runtime:** Node.js 24.x (see `.nvmrc` / `engines`)
 - **Language:** TypeScript 5.x
-- **Framework:** Express 4.x + Apollo Server 5.x (`@apollo/server` with `@as-integrations/express4`)
+- **Framework:** Express 5.x + Apollo Server 5.x (`@apollo/server` with `@as-integrations/express5`)
 - **Database:** MongoDB 8.0+ (Mongoose 8.x ODM)
 - **GraphQL:** GraphQL 16.x with schema stitching
 - **Authentication:** JWT (jsonwebtoken 9.x)
@@ -56,6 +56,7 @@ tests/                   # Tests mirroring source structure
 - **Documentation:** Use TypeScript types/interfaces + descriptive comments for complex functions and logic.
 - **Environment:** Reference `.env` for secrets; never hardcode credentials.
 - **Separation of Concerns:** Keep logic in resolvers/helpers and formatting in `dto/`.
+- **Keep docs in sync:** When a change affects anything documented in `README.md`, `CLAUDE.md`, or `AGENTS.md` (tech stack, versions, commands, architecture, project structure), update those files as part of the same change.
 
 ### ⚠️ Ask First
 - Before modifying database schemas (Mongoose models).
