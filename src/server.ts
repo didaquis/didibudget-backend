@@ -5,7 +5,7 @@ import favicon from 'serve-favicon';
 import path from 'path';
 import cors from 'cors';
 import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@as-integrations/express4';
+import { expressMiddleware } from '@as-integrations/express5';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
 import type { GraphQLFormattedError } from 'graphql';
@@ -95,7 +95,7 @@ const initApplication = async (): Promise<void> => {
 	}
 	app.use(cors({ credentials: true }));
 	app.use(favicon(path.join(import.meta.dirname, 'public', 'favicon.ico')));
-	app.use('', routesManager);
+	app.use(routesManager);
 
 	const server = new ApolloServer<Context>({
 		typeDefs,

@@ -8,7 +8,7 @@ import { parameterValidations } from '#/helpers/parameterValidations.js';
 import { rateLimitValidations } from '#/helpers/rateLimitValidations.js';
 import { ENVIRONMENT } from '#/config/environment.js';
 import { logger } from '#/helpers/logger.js';
-import type { ExpressContextFunctionArgument } from '@as-integrations/express4';
+import type { ExpressContextFunctionArgument } from '@as-integrations/express5';
 
 import * as models from '#/data/models/index.js';
 import type { ModelsMap, IUser } from '#/data/models/index.js';
