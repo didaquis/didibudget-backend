@@ -235,7 +235,7 @@ describe('getMostUsedExpenseCategories', () => {
 		expect(result[0].subcategoryName).toBeNull();
 	});
 
-	test('Should sort by total count with deterministic tie-breaker keys', async () => {
+	test('Should sort by total count, then by most recent use, with deterministic tie-breaker keys', async () => {
 		mockUsage([]);
 
 		await Query.getMostUsedExpenseCategories(null, { days: 90, limit: 6 }, createMockContext());
@@ -245,8 +245,20 @@ describe('getMostUsedExpenseCategories', () => {
 
 		expect(sortStage).toEqual({
 			total: -1,
+			lastUsed: -1,
 			'_id.category': 1,
 			'_id.subcategory': 1
 		});
+	});
+
+	test('Should accumulate lastUsed as the maximum date in each group', async () => {
+		mockUsage([]);
+
+		await Query.getMostUsedExpenseCategories(null, { days: 90, limit: 6 }, createMockContext());
+
+		const pipeline = (models.Expenses.aggregate as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
+		const groupStage = pipeline[1].$group;
+
+		expect(groupStage.lastUsed).toEqual({ $max: '$date' });
 	});
 });

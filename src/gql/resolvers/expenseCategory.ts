@@ -18,6 +18,7 @@ interface CategoryUsageGroup {
 		subcategory: Types.ObjectId | null;
 	};
 	total: number;
+	lastUsed: Date;
 }
 
 type PopulatedExpenseCategory = Omit<IExpenseCategory, 'subcategories'> & { subcategories: IExpenseSubcategory[] };
@@ -82,8 +83,8 @@ export const Query = {
 
 		const usage = await context.di.model.Expenses.aggregate<CategoryUsageGroup>([
 			{ $match: { user_id: user._id, date: { $gte: startDate } } },
-			{ $group: { _id: { category: '$category', subcategory: '$subcategory' }, total: { $sum: 1 } } },
-			{ $sort: { total: -1, '_id.category': 1, '_id.subcategory': 1 } },
+			{ $group: { _id: { category: '$category', subcategory: '$subcategory' }, total: { $sum: 1 }, lastUsed: { $max: '$date' } } },
+			{ $sort: { total: -1, lastUsed: -1, '_id.category': 1, '_id.subcategory': 1 } },
 			{ $limit: limit }
 		]);
 
