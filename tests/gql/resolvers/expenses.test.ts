@@ -786,7 +786,7 @@ describe('expenses resolvers', () => {
 			const facet = getStages('$facet')[0].$facet as Record<string, Record<string, unknown>[]>;
 			const group = facet.breakdown[0].$group as Record<string, unknown>;
 
-			expect(group._id).toStrictEqual({ category: '$category', subcategory: '$subcategory' });
+			expect(group._id).toStrictEqual({ category: '$category', subcategory: { $ifNull: ['$subcategory', null] } });
 			expect(facet.breakdown.at(-1)).toStrictEqual({ $sort: { sum: -1, category: 1, subcategory: 1 } });
 		});
 

@@ -295,7 +295,7 @@ export const Query = {
 					breakdown: [
 						{
 							$group: {
-								_id: { category: '$category', subcategory: '$subcategory' },
+								_id: { category: '$category', subcategory: { $ifNull: ['$subcategory', null] } },
 								sum: { $sum: { $toDouble: '$quantity' } },
 								count: { $sum: 1 }
 							}
