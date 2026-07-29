@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildASTSchema, validateSchema } from 'graphql';
+import { buildASTSchema, validateSchema, type GraphQLObjectType } from 'graphql';
 import typeDefs from '#/gql/types/index.js';
 
 const schema = buildASTSchema(typeDefs);
@@ -48,5 +48,35 @@ describe('GraphQL schema', () => {
 
 		expect(sortField).toBeDefined();
 		expect(sortDirection).toBeDefined();
+	});
+
+	test('Should expose getMostUsedExpenseCategories returning a non nullable list', () => {
+		const field = schema.getQueryType()?.getFields().getMostUsedExpenseCategories;
+
+		expect(field).toBeDefined();
+		expect(String(field?.type)).toBe('[MostUsedExpenseCategory]!');
+	});
+
+	test('Should default the arguments of getMostUsedExpenseCategories', () => {
+		const field = schema.getQueryType()?.getFields().getMostUsedExpenseCategories;
+		const args = Object.fromEntries((field?.args ?? []).map((arg) => [arg.name, arg.defaultValue]));
+
+		expect(args.days).toBe(90);
+		expect(args.limit).toBe(6);
+	});
+
+	test('Should declare every field of MostUsedExpenseCategory with its type', () => {
+		const type = schema.getType('MostUsedExpenseCategory');
+		const fields = Object.fromEntries(Object.entries((type as GraphQLObjectType).getFields()).map(([name, field]) => [name, String(field.type)]));
+
+		expect(fields).toStrictEqual({
+			category: 'ID!',
+			categoryName: 'String!',
+			categoryEmojis: '[String]!',
+			subcategory: 'ID',
+			subcategoryName: 'String',
+			subcategoryEmojis: '[String]!',
+			total: 'Int!'
+		});
 	});
 });
