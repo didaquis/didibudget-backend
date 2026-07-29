@@ -234,4 +234,19 @@ describe('getMostUsedExpenseCategories', () => {
 		expect(result[0].subcategory).toBeNull();
 		expect(result[0].subcategoryName).toBeNull();
 	});
+
+	test('Should sort by total count with deterministic tie-breaker keys', async () => {
+		mockUsage([]);
+
+		await Query.getMostUsedExpenseCategories(null, { days: 90, limit: 6 }, createMockContext());
+
+		const pipeline = (models.Expenses.aggregate as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
+		const sortStage = pipeline[2].$sort;
+
+		expect(sortStage).toEqual({
+			total: -1,
+			'_id.category': 1,
+			'_id.subcategory': 1
+		});
+	});
 });

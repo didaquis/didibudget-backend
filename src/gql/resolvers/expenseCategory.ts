@@ -80,10 +80,10 @@ export const Query = {
 
 		const startDate = new Date(Date.now() - (days * MILLISECONDS_IN_A_DAY));
 
-		const usage: CategoryUsageGroup[] = await context.di.model.Expenses.aggregate([
+		const usage = await context.di.model.Expenses.aggregate<CategoryUsageGroup>([
 			{ $match: { user_id: user._id, date: { $gte: startDate } } },
 			{ $group: { _id: { category: '$category', subcategory: '$subcategory' }, total: { $sum: 1 } } },
-			{ $sort: { total: -1 } },
+			{ $sort: { total: -1, '_id.category': 1, '_id.subcategory': 1 } },
 			{ $limit: limit }
 		]);
 
