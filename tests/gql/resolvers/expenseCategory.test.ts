@@ -274,13 +274,4 @@ describe('getMostUsedExpenseCategories', () => {
 		expect(groupStage.lastUsed).toEqual({ $max: '$date' });
 	});
 
-	test('Should use defaults when arguments are null', async () => {
-		const context = createMockContext();
-		mockUsage([]);
-
-		await Query.getMostUsedExpenseCategories(null, { days: null, limit: null }, context);
-
-		expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(90, 1, 365);
-		expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(6, 1, 20);
-	});
 });

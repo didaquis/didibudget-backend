@@ -57,12 +57,12 @@ describe('GraphQL schema', () => {
 		expect(String(field?.type)).toBe('[MostUsedExpenseCategory]!');
 	});
 
-	test('Should not set SDL defaults on getMostUsedExpenseCategories arguments (handled in resolver)', () => {
+	test('Should declare getMostUsedExpenseCategories arguments as required non-null Int', () => {
 		const field = schema.getQueryType()?.getFields().getMostUsedExpenseCategories;
-		const args = Object.fromEntries((field?.args ?? []).map((arg) => [arg.name, arg.defaultValue]));
+		const args = Object.fromEntries((field?.args ?? []).map((arg) => [arg.name, { type: String(arg.type), default: arg.defaultValue ?? null }]));
 
-		expect(args.days).toBeUndefined();
-		expect(args.limit).toBeUndefined();
+		expect(args.days).toStrictEqual({ type: 'Int!', default: null });
+		expect(args.limit).toStrictEqual({ type: 'Int!', default: null });
 	});
 
 	test('Should declare every field of MostUsedExpenseCategory with its type', () => {

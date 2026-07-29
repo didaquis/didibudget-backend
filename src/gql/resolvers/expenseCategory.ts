@@ -2,7 +2,6 @@ import { SortValues, Types } from 'mongoose';
 import { Context } from '../auth/setContext.js';
 import type { IExpenseCategory, IExpenseSubcategory } from '#/data/models/index.js';
 import { mostUsedExpenseCategoryDTO, type MostUsedExpenseCategoryDTO } from '#/dto/mostUsedExpenseCategoryDTO.js';
-import { isProvided } from '#/helpers/isProvided.js';
 import { MILLISECONDS_IN_A_DAY } from '#/helpers/dateConstants.js';
 
 interface GetExpenseCategoryByIdArgs {
@@ -10,12 +9,9 @@ interface GetExpenseCategoryByIdArgs {
 }
 
 interface GetMostUsedExpenseCategoriesArgs {
-	days: number | null | undefined;
-	limit: number | null | undefined;
+	days: number;
+	limit: number;
 }
-
-const DEFAULT_DAYS = 90;
-const DEFAULT_LIMIT = 6;
 
 interface CategoryUsageGroup {
 	_id: {
@@ -75,22 +71,18 @@ export const Query = {
 	 */
 	getMostUsedExpenseCategories: async (_parent: unknown, { days, limit }: GetMostUsedExpenseCategoriesArgs, context: Context): Promise<MostUsedExpenseCategoryDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
-
-		const effectiveDays = isProvided(days) ? days : DEFAULT_DAYS;
-		const effectiveLimit = isProvided(limit) ? limit : DEFAULT_LIMIT;
-
-		context.di.parameterValidations.isIntegerBetween(effectiveDays, MIN_DAYS, MAX_DAYS);
-		context.di.parameterValidations.isIntegerBetween(effectiveLimit, MIN_LIMIT, MAX_LIMIT);
+		context.di.parameterValidations.isIntegerBetween(days, MIN_DAYS, MAX_DAYS);
+		context.di.parameterValidations.isIntegerBetween(limit, MIN_LIMIT, MAX_LIMIT);
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const startDate = new Date(Date.now() - (effectiveDays * MILLISECONDS_IN_A_DAY));
+		const startDate = new Date(Date.now() - (days * MILLISECONDS_IN_A_DAY));
 
 		const usage = await context.di.model.Expenses.aggregate<CategoryUsageGroup>([
 			{ $match: { user_id: user._id, date: { $gte: startDate, $lte: new Date() } } },
 			{ $group: { _id: { category: '$category', subcategory: { $ifNull: ['$subcategory', null] } }, total: { $sum: 1 }, lastUsed: { $max: '$date' } } },
 			{ $sort: { total: -1, lastUsed: -1, '_id.category': 1, '_id.subcategory': 1 } },
-			{ $limit: effectiveLimit }
+			{ $limit: limit }
 		]);
 
 		if (!usage.length) {
