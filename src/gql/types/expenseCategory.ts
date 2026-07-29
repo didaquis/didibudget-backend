@@ -39,7 +39,7 @@ const expenseCategory: string = `
 		getExpenseCategoryById(category: ID!): ExpenseCategory
 
 		""" Get the expense categories this user has used the most within a period """
-		getMostUsedExpenseCategories(days: Int = 90, limit: Int = 6): [MostUsedExpenseCategory]!
+		getMostUsedExpenseCategories(days: Int, limit: Int): [MostUsedExpenseCategory]!
 	}
 `;
 

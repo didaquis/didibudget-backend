@@ -2,15 +2,20 @@ import { SortValues, Types } from 'mongoose';
 import { Context } from '../auth/setContext.js';
 import type { IExpenseCategory, IExpenseSubcategory } from '#/data/models/index.js';
 import { mostUsedExpenseCategoryDTO, type MostUsedExpenseCategoryDTO } from '#/dto/mostUsedExpenseCategoryDTO.js';
+import { isProvided } from '#/helpers/isProvided.js';
+import { MILLISECONDS_IN_A_DAY } from '#/helpers/dateConstants.js';
 
 interface GetExpenseCategoryByIdArgs {
 	category: string;
 }
 
 interface GetMostUsedExpenseCategoriesArgs {
-	days: number;
-	limit: number;
+	days: number | null | undefined;
+	limit: number | null | undefined;
 }
+
+const DEFAULT_DAYS = 90;
+const DEFAULT_LIMIT = 6;
 
 interface CategoryUsageGroup {
 	_id: {
@@ -27,11 +32,7 @@ const MIN_DAYS = 1;
 const MAX_DAYS = 365;
 const MIN_LIMIT = 1;
 const MAX_LIMIT = 20;
-const HOURS_IN_A_DAY = 24;
-const MINUTES_IN_AN_HOUR = 60;
-const SECONDS_IN_A_MINUTE = 60;
-const MILLISECONDS_IN_A_SECOND = 1000;
-const MILLISECONDS_IN_A_DAY = HOURS_IN_A_DAY * MINUTES_IN_AN_HOUR * SECONDS_IN_A_MINUTE * MILLISECONDS_IN_A_SECOND;
+
 
 /**
  * All resolvers related to Expense Category
@@ -74,18 +75,22 @@ export const Query = {
 	 */
 	getMostUsedExpenseCategories: async (_parent: unknown, { days, limit }: GetMostUsedExpenseCategoriesArgs, context: Context): Promise<MostUsedExpenseCategoryDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
-		context.di.parameterValidations.isIntegerBetween(days, MIN_DAYS, MAX_DAYS);
-		context.di.parameterValidations.isIntegerBetween(limit, MIN_LIMIT, MAX_LIMIT);
+
+		const effectiveDays = isProvided(days) ? days : DEFAULT_DAYS;
+		const effectiveLimit = isProvided(limit) ? limit : DEFAULT_LIMIT;
+
+		context.di.parameterValidations.isIntegerBetween(effectiveDays, MIN_DAYS, MAX_DAYS);
+		context.di.parameterValidations.isIntegerBetween(effectiveLimit, MIN_LIMIT, MAX_LIMIT);
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const startDate = new Date(Date.now() - (days * MILLISECONDS_IN_A_DAY));
+		const startDate = new Date(Date.now() - (effectiveDays * MILLISECONDS_IN_A_DAY));
 
 		const usage = await context.di.model.Expenses.aggregate<CategoryUsageGroup>([
-			{ $match: { user_id: user._id, date: { $gte: startDate } } },
-			{ $group: { _id: { category: '$category', subcategory: '$subcategory' }, total: { $sum: 1 }, lastUsed: { $max: '$date' } } },
+			{ $match: { user_id: user._id, date: { $gte: startDate, $lte: new Date() } } },
+			{ $group: { _id: { category: '$category', subcategory: { $ifNull: ['$subcategory', null] } }, total: { $sum: 1 }, lastUsed: { $max: '$date' } } },
 			{ $sort: { total: -1, lastUsed: -1, '_id.category': 1, '_id.subcategory': 1 } },
-			{ $limit: limit }
+			{ $limit: effectiveLimit }
 		]);
 
 		if (!usage.length) {

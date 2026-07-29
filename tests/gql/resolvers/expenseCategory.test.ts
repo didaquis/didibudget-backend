@@ -204,7 +204,19 @@ describe('getMostUsedExpenseCategories', () => {
 
 		expect(pipeline[0].$match.user_id).toBe('user-id-1');
 		expect(pipeline[0].$match.date.$gte).toBeInstanceOf(Date);
+		expect(pipeline[0].$match.date.$lte).toBeInstanceOf(Date);
 		expect(pipeline[3].$limit).toBe(6);
+	});
+
+	test('Should exclude future-dated expenses by setting an upper bound on the date', async () => {
+		mockUsage([]);
+
+		await Query.getMostUsedExpenseCategories(null, { days: 90, limit: 6 }, createMockContext());
+
+		const pipeline = (models.Expenses.aggregate as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
+		const now = Date.now();
+
+		expect(pipeline[0].$match.date.$lte.getTime()).toBeLessThanOrEqual(now);
 	});
 
 	test('Should return an empty list when the user has no expenses in the period', async () => {
@@ -260,5 +272,15 @@ describe('getMostUsedExpenseCategories', () => {
 		const groupStage = pipeline[1].$group;
 
 		expect(groupStage.lastUsed).toEqual({ $max: '$date' });
+	});
+
+	test('Should use defaults when arguments are null', async () => {
+		const context = createMockContext();
+		mockUsage([]);
+
+		await Query.getMostUsedExpenseCategories(null, { days: null, limit: null }, context);
+
+		expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(90, 1, 365);
+		expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(6, 1, 20);
 	});
 });
