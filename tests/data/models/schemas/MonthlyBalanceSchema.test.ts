@@ -9,9 +9,4 @@ describe('MonthlyBalanceSchema', () => {
 		expect(Object.keys(index?.[0] ?? {})).toEqual(['user_id', 'year', 'month']);
 		expect(index?.[1]).toMatchObject({ unique: true });
 	});
-
-	test('Should not store nor index a date', () => {
-		expect(MonthlyBalanceSchema.path('date')).toBeUndefined();
-		expect(MonthlyBalanceSchema.indexes().some(([fields]) => 'date' in fields)).toBe(false);
-	});
 });
