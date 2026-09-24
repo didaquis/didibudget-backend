@@ -3,7 +3,7 @@ import { DeleteResult, mongo, SortValues } from 'mongoose';
 import { MonthValue } from '#/data/Month.js';
 import { monthlyBalanceDTO, MonthlyBalanceDTO } from '#/dto/monthlyBalanceDTO.js';
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
-import { formatMonth, getMonthNumber, getTransitionalDate, MAX_YEAR, MIN_YEAR } from '#/helpers/monthlyBalanceMonth.js';
+import { formatMonth, getMonthNumber, MAX_YEAR, MIN_YEAR } from '#/helpers/monthlyBalanceMonth.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
 import { UserInputError } from '#/gql/errors.js';
 import { Context } from '../auth/setContext.js';
@@ -92,8 +92,7 @@ export const Mutation = {
 		const user = await context.di.authValidation.getUser(context);
 
 		try {
-			const date = getTransitionalDate(year, monthNumber);
-			const monthlyBalance = await new context.di.model.MonthlyBalance({ user_id: user._id, balance, year, month: monthNumber, date }).save();
+			const monthlyBalance = await new context.di.model.MonthlyBalance({ user_id: user._id, balance, year, month: monthNumber }).save();
 
 			return monthlyBalanceDTO(monthlyBalance);
 		} catch (error) {

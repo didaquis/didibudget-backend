@@ -107,15 +107,8 @@ describe('GraphQL schema', () => {
 			balance: 'Float!',
 			year: 'Int!',
 			month: 'Month!',
-			date: 'String!',
 			currencyISO: 'String!',
 			uuid: 'String!'
 		});
-	});
-
-	test('Should deprecate the date of MonthlyBalance in favour of year and month', () => {
-		const type = schema.getType('MonthlyBalance') as GraphQLObjectType;
-
-		expect(type.getFields().date.deprecationReason).toBe('Use year and month instead. It will be removed.');
 	});
 });

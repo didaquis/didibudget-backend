@@ -7,8 +7,6 @@ export interface MonthlyBalanceDTO {
 	balance: string;
 	year: number;
 	month: MonthValue;
-	/** @deprecated Kept only until clients stop requesting it */
-	date: string | Date;
 	currencyISO: string;
 	uuid: string;
 }
@@ -17,7 +15,6 @@ interface MonthlyBalanceDTOInput {
 	balance: Types.Decimal128;
 	year: number;
 	month: number;
-	date: string | Date;
 	currencyISO: string;
 	uuid: string;
 }
@@ -30,7 +27,6 @@ export const monthlyBalanceDTO = (monthlyBalance: MonthlyBalanceDTOInput): Month
 		balance: monthlyBalance.balance.toString(),
 		year: monthlyBalance.year,
 		month: getMonthName(monthlyBalance.month),
-		date: monthlyBalance.date,
 		currencyISO: monthlyBalance.currencyISO,
 		uuid: monthlyBalance.uuid
 	};

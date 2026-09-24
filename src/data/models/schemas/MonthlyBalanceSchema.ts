@@ -14,7 +14,6 @@ export interface IMonthlyBalance {
 	balance: Types.Decimal128;
 	year: number;
 	month: number;
-	date: Date;
 	currencyISO: string;
 	uuid: string;
 }
@@ -41,10 +40,6 @@ const MonthlyBalanceSchema = new Schema<IMonthlyBalance>({
 		min: 1,
 		max: 12
 	},
-	date: {
-		type: Date,
-		required: true
-	},
 	currencyISO: {
 		type: String,
 		required: true,
@@ -58,7 +53,6 @@ const MonthlyBalanceSchema = new Schema<IMonthlyBalance>({
 	}
 });
 
-MonthlyBalanceSchema.index({ user_id: 1, date: -1 });
 MonthlyBalanceSchema.index({ user_id: 1, year: 1, month: 1 }, { unique: true });
 
 export default MonthlyBalanceSchema;

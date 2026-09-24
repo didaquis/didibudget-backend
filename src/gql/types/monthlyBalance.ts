@@ -19,7 +19,6 @@ const monthlyBalance: string = `
 		balance: Float!
 		year: Int!
 		month: Month!
-		date: String! @deprecated(reason: "Use year and month instead. It will be removed.")
 		currencyISO: String!
 		uuid: String!
 	}
