@@ -234,8 +234,7 @@ describe('monthlyBalance resolvers', () => {
 			await Query.getMonthlyBalances({}, {}, createMockContext());
 
 			expect(models.MonthlyBalance.find).toHaveBeenCalledWith({ user_id: 'user-id-1' });
-			expect(chain.sort).toHaveBeenCalledWith({ year: 'asc', month: 'asc' });
-			expect(Object.keys(chain.sort.mock.calls[0][0])).toEqual(['year', 'month']);
+			expect(Object.entries(chain.sort.mock.calls[0][0])).toEqual([['year', 'asc'], ['month', 'asc']]);
 		});
 	});
 
@@ -247,8 +246,7 @@ describe('monthlyBalance resolvers', () => {
 			await Query.getMonthlyBalancesWithPagination({}, { page: 1, pageSize: 10 }, createMockContext());
 
 			expect(models.MonthlyBalance.find).toHaveBeenCalledWith({ user_id: 'user-id-1' });
-			expect(chain.sort).toHaveBeenCalledWith({ year: 'desc', month: 'desc' });
-			expect(Object.keys(chain.sort.mock.calls[0][0])).toEqual(['year', 'month']);
+			expect(Object.entries(chain.sort.mock.calls[0][0])).toEqual([['year', 'desc'], ['month', 'desc']]);
 		});
 	});
 });
