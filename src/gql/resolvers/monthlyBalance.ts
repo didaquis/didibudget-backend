@@ -82,8 +82,7 @@ export const Query = {
 
 export const Mutation = {
 	/**
-	 * Register a monthly balance. A user can have only one balance per month:
-	 * a repeated month is rejected, never overwritten (delete it first to correct it).
+	 * Register a monthly balance. A user can have only one balance per month
 	 */
 	registerMonthlyBalance: async (_parent: unknown, { balance, year, month }: RegisterMonthlyBalanceArgs, context: Context): Promise<MonthlyBalanceDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
