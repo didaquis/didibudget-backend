@@ -1,8 +1,25 @@
 const monthlyBalance: string = `
+	enum Month {
+		JANUARY
+		FEBRUARY
+		MARCH
+		APRIL
+		MAY
+		JUNE
+		JULY
+		AUGUST
+		SEPTEMBER
+		OCTOBER
+		NOVEMBER
+		DECEMBER
+	}
+
 	type MonthlyBalance {
 		user_id: ID!
 		balance: Float!
-		date: String!
+		year: Int!
+		month: Month!
+		date: String! @deprecated(reason: "Use year and month instead. It will be removed.")
 		currencyISO: String!
 		uuid: String!
 	}
@@ -22,7 +39,7 @@ const monthlyBalance: string = `
 
 	type Mutation {
 		""" It allows register a monthly balance """
-		registerMonthlyBalance(balance: Float!, date: String!): MonthlyBalance
+		registerMonthlyBalance(balance: Float!, year: Int!, month: Month!): MonthlyBalance
 
 		""" It allows delete a monthly balance """
 		deleteMonthlyBalance(uuid: String!): MonthlyBalance

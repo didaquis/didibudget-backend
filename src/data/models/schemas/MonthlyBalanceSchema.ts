@@ -3,6 +3,7 @@ import mongoose, { Schema, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CurrencyISO } from '#/data/CurrencyISO.js';
+import { MAX_YEAR, MIN_YEAR } from '#/helpers/monthlyBalanceMonth.js';
 
 /**
  * Monthly Balance schema
@@ -11,6 +12,8 @@ export interface IMonthlyBalance {
 	_id: Types.ObjectId;
 	user_id: Types.ObjectId;
 	balance: Types.Decimal128;
+	year: number;
+	month: number;
 	date: Date;
 	currencyISO: string;
 	uuid: string;
@@ -25,6 +28,18 @@ const MonthlyBalanceSchema = new Schema<IMonthlyBalance>({
 	balance: {
 		type: mongoose.Schema.Types.Decimal128,
 		required: true,
+	},
+	year: {
+		type: Number,
+		required: true,
+		min: MIN_YEAR,
+		max: MAX_YEAR
+	},
+	month: {
+		type: Number,
+		required: true,
+		min: 1,
+		max: 12
 	},
 	date: {
 		type: Date,
@@ -44,5 +59,6 @@ const MonthlyBalanceSchema = new Schema<IMonthlyBalance>({
 });
 
 MonthlyBalanceSchema.index({ user_id: 1, date: -1 });
+MonthlyBalanceSchema.index({ user_id: 1, year: 1, month: 1 }, { unique: true });
 
 export default MonthlyBalanceSchema;

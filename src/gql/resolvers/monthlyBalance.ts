@@ -1,8 +1,11 @@
-import { DeleteResult, SortValues } from 'mongoose';
+import { DeleteResult, mongo, SortValues } from 'mongoose';
 
+import { MonthValue } from '#/data/Month.js';
 import { monthlyBalanceDTO, MonthlyBalanceDTO } from '#/dto/monthlyBalanceDTO.js';
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
+import { formatMonth, getMonthNumber, getTransitionalDate, MAX_YEAR, MIN_YEAR } from '#/helpers/monthlyBalanceMonth.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
+import { UserInputError } from '#/gql/errors.js';
 import { Context } from '../auth/setContext.js';
 
 interface GetMonthlyBalancesWithPaginationArgs {
@@ -12,12 +15,26 @@ interface GetMonthlyBalancesWithPaginationArgs {
 
 interface RegisterMonthlyBalanceArgs {
 	balance: number;
-	date: string;
+	year: number;
+	month: MonthValue;
 }
 
 interface DeleteMonthlyBalanceArgs {
 	uuid: string;
 }
+
+const MONGO_DUPLICATE_KEY_ERROR_CODE = 11000;
+
+const duplicatedMonthError = (year: number, monthNumber: number): UserInputError => {
+	return new UserInputError(`A monthly balance already exists for ${formatMonth(year, monthNumber)}`);
+};
+
+/**
+ * `uuid` has a unique index too, so the error code alone does not mean a repeated month
+ */
+const isDuplicatedMonthError = (error: unknown): boolean => {
+	return error instanceof mongo.MongoServerError && error.code === MONGO_DUPLICATE_KEY_ERROR_CODE && error.keyPattern?.month !== undefined;
+};
 
 /**
  * All resolvers related to monthly balances
@@ -31,7 +48,7 @@ export const Query = {
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const sortCriteria: Record<string, SortValues> = { date: 'asc' };
+		const sortCriteria: Record<string, SortValues> = { year: 'asc', month: 'asc' };
 		const allMonthlyBalances = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
 
 		return allMonthlyBalances.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
@@ -47,7 +64,7 @@ export const Query = {
 		const user = await context.di.authValidation.getUser(context);
 
 		const offset = getOffset(page, pageSize);
-		const sortCriteria: Record<string, SortValues> = { date: 'desc' };
+		const sortCriteria: Record<string, SortValues> = { year: 'desc', month: 'desc' };
 
 		const getTotalCount = context.di.model.MonthlyBalance.countDocuments({ user_id: user._id });
 		const getMonthlyBalances = context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();
@@ -65,16 +82,28 @@ export const Query = {
 
 export const Mutation = {
 	/**
-	 * Register a monthly balance
+	 * Register a monthly balance. A user can have only one balance per month
 	 */
-	registerMonthlyBalance: async (_parent: unknown, { balance, date }: RegisterMonthlyBalanceArgs, context: Context): Promise<MonthlyBalanceDTO> => {
+	registerMonthlyBalance: async (_parent: unknown, { balance, year, month }: RegisterMonthlyBalanceArgs, context: Context): Promise<MonthlyBalanceDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
-		context.di.datetimeValidation.ensureDateIsValid(date);
+		context.di.parameterValidations.isIntegerBetween(year, MIN_YEAR, MAX_YEAR);
 
+		const monthNumber = getMonthNumber(month);
 		const user = await context.di.authValidation.getUser(context);
 
-		return new context.di.model.MonthlyBalance({ user_id: user._id, balance, date }).save()
-			.then((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
+		try {
+			const date = getTransitionalDate(year, monthNumber);
+			const monthlyBalance = await new context.di.model.MonthlyBalance({ user_id: user._id, balance, year, month: monthNumber, date }).save();
+
+			return monthlyBalanceDTO(monthlyBalance);
+		} catch (error) {
+			// The unique index { user_id, year, month } is what enforces one balance per month
+			if (isDuplicatedMonthError(error)) {
+				throw duplicatedMonthError(year, monthNumber);
+			}
+
+			throw error;
+		}
 	},
 	/**
 	 * Delete one registry of monthly balance

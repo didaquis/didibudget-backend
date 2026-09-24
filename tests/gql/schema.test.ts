@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { buildASTSchema, validateSchema, type GraphQLObjectType } from 'graphql';
+import { buildASTSchema, validateSchema, type GraphQLEnumType, type GraphQLObjectType } from 'graphql';
 import typeDefs from '#/gql/types/index.js';
+import { Month } from '#/data/Month.js';
 
 const schema = buildASTSchema(typeDefs);
 
@@ -78,5 +79,43 @@ describe('GraphQL schema', () => {
 			subcategoryEmojis: '[String]!',
 			total: 'Int!'
 		});
+	});
+
+	test('Should declare every argument of registerMonthlyBalance with its type', () => {
+		const field = schema.getMutationType()?.getFields().registerMonthlyBalance;
+		const args = Object.fromEntries((field?.args ?? []).map((arg) => [arg.name, String(arg.type)]));
+
+		expect(args).toStrictEqual({
+			balance: 'Float!',
+			year: 'Int!',
+			month: 'Month!'
+		});
+	});
+
+	test('Should declare the months of the year in calendar order, matching the server values', () => {
+		const type = schema.getType('Month') as GraphQLEnumType;
+
+		expect(type.getValues().map((value) => value.name)).toStrictEqual(Object.values(Month));
+	});
+
+	test('Should declare every field of MonthlyBalance with its type', () => {
+		const type = schema.getType('MonthlyBalance') as GraphQLObjectType;
+		const fields = Object.fromEntries(Object.entries(type.getFields()).map(([name, field]) => [name, String(field.type)]));
+
+		expect(fields).toStrictEqual({
+			user_id: 'ID!',
+			balance: 'Float!',
+			year: 'Int!',
+			month: 'Month!',
+			date: 'String!',
+			currencyISO: 'String!',
+			uuid: 'String!'
+		});
+	});
+
+	test('Should deprecate the date of MonthlyBalance in favour of year and month', () => {
+		const type = schema.getType('MonthlyBalance') as GraphQLObjectType;
+
+		expect(type.getFields().date.deprecationReason).toBe('Use year and month instead. It will be removed.');
 	});
 });
