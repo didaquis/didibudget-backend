@@ -17,13 +17,20 @@ interface StoredBalance {
 	uuid: string;
 }
 
-// In-memory stand-in for the monthlybalances collection
+// In-memory stand-in for the monthlybalances collection, including its unique index { user_id, year, month }
 const db = vi.hoisted(() => ({ balances: [] as StoredBalance[], nextUuid: 1 }));
 
-vi.mock('#/data/models/index.js', () => {
+vi.mock('#/data/models/index.js', async () => {
+	const { mongo } = await import('mongoose');
+
 	const MonthlyBalance = vi.fn(function (doc: Omit<StoredBalance, 'currencyISO' | 'uuid'>) {
 		return {
 			save: vi.fn(async () => {
+				const isRepeatedMonth = db.balances.some((stored) => stored.user_id === doc.user_id && stored.year === doc.year && stored.month === doc.month);
+				if (isRepeatedMonth) {
+					throw new mongo.MongoServerError({ message: 'E11000 duplicate key error collection: monthlybalances', code: 11000, keyPattern: { user_id: 1, year: 1, month: 1 } });
+				}
+
 				const saved = { ...doc, currencyISO: 'EUR', uuid: `balance-uuid-${db.nextUuid++}` };
 				db.balances.push(saved);
 				return saved;
@@ -32,9 +39,6 @@ vi.mock('#/data/models/index.js', () => {
 	});
 
 	Object.assign(MonthlyBalance, {
-		findOne: vi.fn((filter: { user_id: string; year: number; month: number }) => ({
-			lean: vi.fn(async () => db.balances.find((stored) => stored.user_id === filter.user_id && stored.year === filter.year && stored.month === filter.month) ?? null)
-		})),
 		findOneAndDelete: vi.fn(async (filter: { uuid: string; user_id: string }) => {
 			const index = db.balances.findIndex((stored) => stored.uuid === filter.uuid && stored.user_id === filter.user_id);
 			return index === -1 ? null : db.balances.splice(index, 1)[0];
@@ -148,14 +152,14 @@ describe('monthlyBalance resolvers', () => {
 			});
 		});
 
-		test('Should reject a second balance for the same user and month without saving it', async () => {
+		test('Should reject a second balance for the same user and month', async () => {
 			const context = createMockContext();
 			await register(context);
 
 			await expectDuplicatedMonthError(register(context, 2026, Month.JANUARY, 999), 'January 2026');
 
-			expect(models.MonthlyBalance).toHaveBeenCalledTimes(1);
 			expect(db.balances).toHaveLength(1);
+			expect(db.balances[0].balance).toBe(1234.56);
 		});
 
 		test('Should allow two users to have a balance for the same month', async () => {
@@ -186,12 +190,6 @@ describe('monthlyBalance resolvers', () => {
 			expect(db.balances).toHaveLength(1);
 		});
 
-		test('Should turn a duplicate key error on the month index into the same user input error', async () => {
-			failNextSaveWith(duplicateKeyError({ user_id: 1, year: 1, month: 1 }));
-
-			await expectDuplicatedMonthError(register(createMockContext(), 2025, Month.DECEMBER), 'December 2025');
-		});
-
 		test('Should not hide duplicate key errors from other indexes', async () => {
 			const error = duplicateKeyError({ uuid: 1 });
 			failNextSaveWith(error);
@@ -207,7 +205,6 @@ describe('monthlyBalance resolvers', () => {
 
 			await expect(register(context)).rejects.toThrow(AuthenticationError);
 
-			expect(models.MonthlyBalance.findOne).not.toHaveBeenCalled();
 			expect(models.MonthlyBalance).not.toHaveBeenCalled();
 		});
 
@@ -220,7 +217,7 @@ describe('monthlyBalance resolvers', () => {
 			await expect(register(context, 1900)).rejects.toThrow(UserInputError);
 
 			expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(1900, 2000, 2250);
-			expect(models.MonthlyBalance.findOne).not.toHaveBeenCalled();
+			expect(models.MonthlyBalance).not.toHaveBeenCalled();
 		});
 
 		test('Should return the year and the month name of the registered balance', async () => {

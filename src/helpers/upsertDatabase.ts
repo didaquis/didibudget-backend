@@ -19,7 +19,7 @@ export interface ExpenseCategoryInput {
 /**
  * The unique index { user_id, year, month } cannot be built while a document has no year or month, or a user has
  * two balances in the same month. Historical data must not take the API down: log it loudly and keep starting.
- * The check in `registerMonthlyBalance` still rejects repeated months.
+ * Until it is fixed, `registerMonthlyBalance` does NOT reject repeated months, so this log must be acted on.
  */
 const createMonthlyBalanceIndexes = async (): Promise<void> => {
 	try {

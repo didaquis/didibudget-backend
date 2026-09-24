@@ -91,18 +91,13 @@ export const Mutation = {
 		const monthNumber = getMonthNumber(month);
 		const user = await context.di.authValidation.getUser(context);
 
-		const existingMonthlyBalance = await context.di.model.MonthlyBalance.findOne({ user_id: user._id, year, month: monthNumber }).lean();
-		if (existingMonthlyBalance) {
-			throw duplicatedMonthError(year, monthNumber);
-		}
-
 		try {
 			const date = getTransitionalDate(year, monthNumber);
 			const monthlyBalance = await new context.di.model.MonthlyBalance({ user_id: user._id, balance, year, month: monthNumber, date }).save();
 
 			return monthlyBalanceDTO(monthlyBalance);
 		} catch (error) {
-			// Two simultaneous requests can both pass the check above; the unique index stops the second one
+			// The unique index { user_id, year, month } is what enforces one balance per month
 			if (isDuplicatedMonthError(error)) {
 				throw duplicatedMonthError(year, monthNumber);
 			}
