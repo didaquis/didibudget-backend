@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { Month } from '#/data/Month.js';
-import { formatMonth, getMonthName, getMonthNumber, getTransitionalDate } from '#/helpers/monthlyBalanceMonth.js';
+import { formatMonth, getMonthName, getMonthNumber } from '#/helpers/monthlyBalanceMonth.js';
 
 describe('monthlyBalanceMonth', () => {
 	describe('getMonthNumber', () => {
@@ -27,13 +27,6 @@ describe('monthlyBalanceMonth', () => {
 		test('Should format a month for people', () => {
 			expect(formatMonth(2026, 1)).toBe('January 2026');
 			expect(formatMonth(2025, 12)).toBe('December 2025');
-		});
-	});
-
-	describe('getTransitionalDate', () => {
-		test('Should return day 1 of the month at noon UTC', () => {
-			expect(getTransitionalDate(2026, 1).toISOString()).toBe('2026-01-01T12:00:00.000Z');
-			expect(getTransitionalDate(2025, 12).toISOString()).toBe('2025-12-01T12:00:00.000Z');
 		});
 	});
 });

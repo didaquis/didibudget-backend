@@ -12,7 +12,6 @@ interface StoredBalance {
 	balance: number;
 	year: number;
 	month: number;
-	date: Date;
 	currencyISO: string;
 	uuid: string;
 }
@@ -147,8 +146,7 @@ describe('monthlyBalance resolvers', () => {
 				user_id: 'user-id-1',
 				balance: 1234.56,
 				year: 2026,
-				month: 1,
-				date: new Date('2026-01-01T12:00:00.000Z')
+				month: 1
 			});
 		});
 
