@@ -3,8 +3,8 @@ import { Month, MonthValue } from '#/data/Month.js';
 /**
  * Sanity bounds for the year of a monthly balance
  */
-export const MIN_YEAR = 1970;
-export const MAX_YEAR = 2100;
+export const MIN_YEAR = 2000;
+export const MAX_YEAR = 2250;
 
 /**
  * Month numbers go from 1 to 12; array indexes and `Date.UTC()` months go from 0 to 11

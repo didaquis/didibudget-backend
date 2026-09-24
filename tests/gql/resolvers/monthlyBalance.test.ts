@@ -214,12 +214,12 @@ describe('monthlyBalance resolvers', () => {
 		test('Should reject a year out of range before touching the database', async () => {
 			const context = createMockContext();
 			(context.di.parameterValidations.isIntegerBetween as ReturnType<typeof vi.fn>).mockImplementation(() => {
-				throw new UserInputError('The value provided should be an integer between 1970 and 2100');
+				throw new UserInputError('The value provided should be an integer between 2000 and 2250');
 			});
 
 			await expect(register(context, 1900)).rejects.toThrow(UserInputError);
 
-			expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(1900, 1970, 2100);
+			expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(1900, 2000, 2250);
 			expect(models.MonthlyBalance.findOne).not.toHaveBeenCalled();
 		});
 
