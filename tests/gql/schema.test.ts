@@ -97,4 +97,25 @@ describe('GraphQL schema', () => {
 
 		expect(type.getValues().map((value) => value.name)).toStrictEqual(Object.values(Month));
 	});
+
+	test('Should declare every field of MonthlyBalance with its type', () => {
+		const type = schema.getType('MonthlyBalance') as GraphQLObjectType;
+		const fields = Object.fromEntries(Object.entries(type.getFields()).map(([name, field]) => [name, String(field.type)]));
+
+		expect(fields).toStrictEqual({
+			user_id: 'ID!',
+			balance: 'Float!',
+			year: 'Int!',
+			month: 'Month!',
+			date: 'String!',
+			currencyISO: 'String!',
+			uuid: 'String!'
+		});
+	});
+
+	test('Should deprecate the date of MonthlyBalance in favour of year and month', () => {
+		const type = schema.getType('MonthlyBalance') as GraphQLObjectType;
+
+		expect(type.getFields().date.deprecationReason).toBe('Use year and month instead. It will be removed.');
+	});
 });

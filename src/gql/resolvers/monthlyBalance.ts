@@ -48,7 +48,7 @@ export const Query = {
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const sortCriteria: Record<string, SortValues> = { date: 'asc' };
+		const sortCriteria: Record<string, SortValues> = { year: 'asc', month: 'asc' };
 		const allMonthlyBalances = await context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).lean();
 
 		return allMonthlyBalances.map((monthlyBalance) => monthlyBalanceDTO(monthlyBalance));
@@ -64,7 +64,7 @@ export const Query = {
 		const user = await context.di.authValidation.getUser(context);
 
 		const offset = getOffset(page, pageSize);
-		const sortCriteria: Record<string, SortValues> = { date: 'desc' };
+		const sortCriteria: Record<string, SortValues> = { year: 'desc', month: 'desc' };
 
 		const getTotalCount = context.di.model.MonthlyBalance.countDocuments({ user_id: user._id });
 		const getMonthlyBalances = context.di.model.MonthlyBalance.find({ user_id: user._id }).sort(sortCriteria).skip(offset).limit(pageSize).lean();

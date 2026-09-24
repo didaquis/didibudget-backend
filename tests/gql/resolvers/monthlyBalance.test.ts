@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { mongo } from 'mongoose';
-import { Mutation } from '#/gql/resolvers/monthlyBalance.js';
+import { Mutation, Query } from '#/gql/resolvers/monthlyBalance.js';
 import type { Context } from '#/gql/auth/setContext.js';
 import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
 import * as models from '#/data/models/index.js';
@@ -38,7 +38,9 @@ vi.mock('#/data/models/index.js', () => {
 		findOneAndDelete: vi.fn(async (filter: { uuid: string; user_id: string }) => {
 			const index = db.balances.findIndex((stored) => stored.uuid === filter.uuid && stored.user_id === filter.user_id);
 			return index === -1 ? null : db.balances.splice(index, 1)[0];
-		})
+		}),
+		find: vi.fn(),
+		countDocuments: vi.fn()
 	});
 
 	return { MonthlyBalance };
@@ -111,6 +113,18 @@ const expectDuplicatedMonthError = async (promise: Promise<unknown>, monthLabel:
 	expect(error).toBeInstanceOf(UserInputError);
 	expect(error).toHaveProperty('message', `A monthly balance already exists for ${monthLabel}`);
 	expect(error).toHaveProperty('extensions.code', 'BAD_USER_INPUT');
+};
+
+const mockFindChain = () => {
+	const chain = {
+		sort: vi.fn().mockReturnThis(),
+		skip: vi.fn().mockReturnThis(),
+		limit: vi.fn().mockReturnThis(),
+		lean: vi.fn().mockResolvedValue([])
+	};
+	(models.MonthlyBalance.find as ReturnType<typeof vi.fn>).mockReturnValueOnce(chain);
+
+	return chain;
 };
 
 describe('monthlyBalance resolvers', () => {
@@ -207,6 +221,37 @@ describe('monthlyBalance resolvers', () => {
 
 			expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(1900, 1970, 2100);
 			expect(models.MonthlyBalance.findOne).not.toHaveBeenCalled();
+		});
+
+		test('Should return the year and the month name of the registered balance', async () => {
+			const result = await register(createMockContext(), 2025, Month.DECEMBER);
+
+			expect(result).toMatchObject({ year: 2025, month: 'DECEMBER' });
+		});
+	});
+
+	describe('Query.getMonthlyBalances', () => {
+		test('Should sort the balances of the user by year and then by month, oldest first', async () => {
+			const chain = mockFindChain();
+
+			await Query.getMonthlyBalances({}, {}, createMockContext());
+
+			expect(models.MonthlyBalance.find).toHaveBeenCalledWith({ user_id: 'user-id-1' });
+			expect(chain.sort).toHaveBeenCalledWith({ year: 'asc', month: 'asc' });
+			expect(Object.keys(chain.sort.mock.calls[0][0])).toEqual(['year', 'month']);
+		});
+	});
+
+	describe('Query.getMonthlyBalancesWithPagination', () => {
+		test('Should sort the balances of the user by year and then by month, newest first', async () => {
+			const chain = mockFindChain();
+			(models.MonthlyBalance.countDocuments as ReturnType<typeof vi.fn>).mockResolvedValueOnce(0);
+
+			await Query.getMonthlyBalancesWithPagination({}, { page: 1, pageSize: 10 }, createMockContext());
+
+			expect(models.MonthlyBalance.find).toHaveBeenCalledWith({ user_id: 'user-id-1' });
+			expect(chain.sort).toHaveBeenCalledWith({ year: 'desc', month: 'desc' });
+			expect(Object.keys(chain.sort.mock.calls[0][0])).toEqual(['year', 'month']);
 		});
 	});
 });
