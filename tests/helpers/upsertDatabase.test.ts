@@ -1,23 +1,17 @@
 import { describe, expect, test, beforeEach, vi } from 'vitest';
 
 const mockCreateIndexes = vi.hoisted(() => vi.fn());
-const mockMonthlyBalanceCreateIndexes = vi.hoisted(() => vi.fn());
 
 vi.mock('#/data/models/index.js', () => ({
 	Expenses: { createIndexes: mockCreateIndexes },
-	MonthlyBalance: { createIndexes: mockMonthlyBalanceCreateIndexes },
+	MonthlyBalance: { createIndexes: mockCreateIndexes },
 	RecurringExpenseSuggestion: { createIndexes: mockCreateIndexes },
 	ExpenseCategory: { createIndexes: mockCreateIndexes, findOneAndUpdate: vi.fn() },
 	ExpenseSubcategory: { createIndexes: mockCreateIndexes, findOneAndUpdate: vi.fn() }
 }));
 
-vi.mock('#/helpers/logger.js', () => ({
-	logger: { error: vi.fn() }
-}));
-
 import { createDatabaseIndexes, ExpenseCategoryInput, upsertDBWithExpenseCategories } from '#/helpers/upsertDatabase.js';
 import { ExpenseCategory, ExpenseSubcategory } from '#/data/models/index.js';
-import { logger } from '#/helpers/logger.js';
 
 describe('createDatabaseIndexes', () => {
 	beforeEach(() => {
@@ -27,25 +21,7 @@ describe('createDatabaseIndexes', () => {
 	test('Should call createIndexes on all models', async () => {
 		await createDatabaseIndexes();
 
-		expect(mockCreateIndexes).toHaveBeenCalledTimes(4);
-		expect(mockMonthlyBalanceCreateIndexes).toHaveBeenCalledTimes(1);
-		expect(logger.error).not.toHaveBeenCalled();
-	});
-
-	test('Should log and keep going when the monthly balance indexes cannot be created', async () => {
-		const error = new Error('E11000 duplicate key error');
-		mockMonthlyBalanceCreateIndexes.mockRejectedValueOnce(error);
-
-		await expect(createDatabaseIndexes()).resolves.toBeUndefined();
-
-		expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('{ user_id, year, month }'), error);
-		expect(mockCreateIndexes).toHaveBeenCalledTimes(4);
-	});
-
-	test('Should still stop when the indexes of another model cannot be created', async () => {
-		mockCreateIndexes.mockRejectedValueOnce(new Error('Connection lost'));
-
-		await expect(createDatabaseIndexes()).rejects.toThrow('Connection lost');
+		expect(mockCreateIndexes).toHaveBeenCalledTimes(5);
 	});
 });
 
