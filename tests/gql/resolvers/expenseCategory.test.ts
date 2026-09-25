@@ -1,8 +1,7 @@
 import { Types } from 'mongoose';
 import { describe, expect, test, beforeEach, vi } from 'vitest';
 import { Query } from '#/gql/resolvers/expenseCategory.js';
-import type { Context } from '#/gql/auth/setContext.js';
-import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
+import { createMockContext } from '../../mocks/createMockContext.js';
 import * as models from '#/data/models/index.js';
 import { UserInputError } from '#/gql/errors.js';
 
@@ -13,20 +12,6 @@ const mockCategory = {
 	emojis: ['🚗'],
 	uuid: 'category-uuid-1',
 	categoryType: 'expense'
-};
-
-const mockJwtPayload: JwtTokenPayload = {
-	email: 'test@example.com',
-	isAdmin: false,
-	isActive: true,
-	uuid: 'user-uuid-1',
-	registrationDate: '2024-01-01T00:00:00.000Z'
-};
-
-const mockUser = {
-	_id: 'user-id-1',
-	uuid: 'user-uuid-1',
-	email: 'test@example.com'
 };
 
 vi.mock('#/data/models/index.js', () => ({
@@ -41,42 +26,6 @@ vi.mock('#/data/models/index.js', () => ({
 		aggregate: vi.fn()
 	}
 }));
-
-const createMockContext = (): Context => ({
-	user: mockJwtPayload,
-	di: {
-		model: models as unknown as Context['di']['model'],
-		jwt: {
-			createAuthToken: vi.fn(() => 'mock-token')
-		},
-		authValidation: {
-			ensureLimitOfUsersIsNotReached: vi.fn(),
-			ensureThatUserIsLogged: vi.fn(),
-			getUser: vi.fn().mockResolvedValue(mockUser),
-			ensureThatUserIsAdministrator: vi.fn()
-		},
-		rateLimitValidation: {
-			ensureLoginRateLimitNotExceeded: vi.fn(),
-			ensureRegisterRateLimitNotExceeded: vi.fn()
-		},
-		pagingValidation: {
-			ensurePageValueIsValid: vi.fn(),
-			ensurePageSizeValueIsValid: vi.fn()
-		},
-		datetimeValidation: {
-			ensureDateIsValid: vi.fn(),
-			ensureStartDateIsEarlierThanEndDate: vi.fn(),
-			ensureStartDateIsNotLaterThanEndDate: vi.fn()
-		},
-		parameterValidations: {
-			isValidEnumValue: vi.fn(),
-			isIntegerBetween: vi.fn(),
-			isValidObjectId: vi.fn(),
-			isNumberGreaterThanOrEqualToZero: vi.fn(),
-			isMinNotGreaterThanMax: vi.fn()
-		}
-	}
-});
 
 const mockFindOneChain = (result: unknown) => {
 	(models.ExpenseCategory.findOne as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
