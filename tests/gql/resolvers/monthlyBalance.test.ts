@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { mongo } from 'mongoose';
 import { Mutation, Query } from '#/gql/resolvers/monthlyBalance.js';
 import type { Context } from '#/gql/auth/setContext.js';
-import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
 import * as models from '#/data/models/index.js';
 import { Month, MonthValue } from '#/data/Month.js';
 import { AuthenticationError, UserInputError } from '#/gql/errors.js';
+import { createMockContext, mockUser } from '../../mocks/createMockContext.js';
 
 interface StoredBalance {
 	user_id: string;
@@ -49,52 +49,8 @@ vi.mock('#/data/models/index.js', async () => {
 	return { MonthlyBalance };
 });
 
-const mockJwtPayload: JwtTokenPayload = {
-	email: 'first@example.com',
-	isAdmin: false,
-	isActive: true,
-	uuid: 'user-uuid-1',
-	registrationDate: '2024-01-01T00:00:00.000Z'
-};
-
-const firstUser = { _id: 'user-id-1', uuid: 'user-uuid-1', email: 'first@example.com' };
+const firstUser = mockUser;
 const secondUser = { _id: 'user-id-2', uuid: 'user-uuid-2', email: 'second@example.com' };
-
-const createMockContext = (user = firstUser): Context => ({
-	user: mockJwtPayload,
-	di: {
-		model: models as unknown as Context['di']['model'],
-		jwt: {
-			createAuthToken: vi.fn(() => 'mock-token')
-		},
-		authValidation: {
-			ensureLimitOfUsersIsNotReached: vi.fn(),
-			ensureThatUserIsLogged: vi.fn(),
-			getUser: vi.fn().mockResolvedValue(user),
-			ensureThatUserIsAdministrator: vi.fn()
-		},
-		rateLimitValidation: {
-			ensureLoginRateLimitNotExceeded: vi.fn(),
-			ensureRegisterRateLimitNotExceeded: vi.fn()
-		},
-		pagingValidation: {
-			ensurePageValueIsValid: vi.fn(),
-			ensurePageSizeValueIsValid: vi.fn()
-		},
-		datetimeValidation: {
-			ensureDateIsValid: vi.fn(),
-			ensureStartDateIsEarlierThanEndDate: vi.fn(),
-			ensureStartDateIsNotLaterThanEndDate: vi.fn()
-		},
-		parameterValidations: {
-			isValidEnumValue: vi.fn(),
-			isIntegerBetween: vi.fn(),
-			isValidObjectId: vi.fn(),
-			isNumberGreaterThanOrEqualToZero: vi.fn(),
-			isMinNotGreaterThanMax: vi.fn()
-		}
-	}
-});
 
 const register = (context: Context, year = 2026, month: MonthValue = Month.JANUARY, balance = 1234.56) => {
 	return Mutation.registerMonthlyBalance({}, { balance, year, month }, context);
@@ -161,8 +117,8 @@ describe('monthlyBalance resolvers', () => {
 		});
 
 		test('Should allow two users to have a balance for the same month', async () => {
-			await register(createMockContext(firstUser));
-			await register(createMockContext(secondUser));
+			await register(createMockContext({ user: firstUser }));
+			await register(createMockContext({ user: secondUser }));
 
 			expect(db.balances.map((stored) => stored.user_id)).toEqual(['user-id-1', 'user-id-2']);
 		});

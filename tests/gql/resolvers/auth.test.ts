@@ -1,9 +1,8 @@
 import { describe, expect, test, beforeEach, vi } from 'vitest';
 import { UserInputError } from '#/gql/errors.js';
 import { Mutation } from '#/gql/resolvers/auth.js';
-import type { Context } from '#/gql/auth/setContext.js';
-import type { JwtTokenPayload } from '#/gql/auth/jwt.js';
 import * as bcryptModule from 'bcrypt';
+import { createMockContext, mockUser } from '../../mocks/createMockContext.js';
 
 vi.mock('bcrypt', () => ({
 	default: {
@@ -19,77 +18,34 @@ interface MockUsersModel {
 	deleteOne: ReturnType<typeof vi.fn>;
 }
 
-const mockSave = vi.fn();
+const { mockSave, MockUsersConstructor } = vi.hoisted(() => {
+	const mockSave = vi.fn();
 
-const MockUsersConstructor = vi.fn(function () {
-	return { save: mockSave };
-}) as unknown as ReturnType<typeof vi.fn> & MockUsersModel;
+	const MockUsersConstructor = vi.fn(function () {
+		return { save: mockSave };
+	}) as unknown as ReturnType<typeof vi.fn> & MockUsersModel;
 
-MockUsersConstructor.find = vi.fn();
-MockUsersConstructor.findOne = vi.fn();
-MockUsersConstructor.findOneAndUpdate = vi.fn();
-MockUsersConstructor.deleteOne = vi.fn();
+	MockUsersConstructor.find = vi.fn();
+	MockUsersConstructor.findOne = vi.fn();
+	MockUsersConstructor.findOneAndUpdate = vi.fn();
+	MockUsersConstructor.deleteOne = vi.fn();
+
+	return { mockSave, MockUsersConstructor };
+});
 
 vi.mock('#/data/models/index.js', () => ({
 	Users: MockUsersConstructor
 }));
 
-const mockUser = {
-	_id: 'mock-id',
-	uuid: 'user-uuid-1',
-	email: 'test@example.com',
+const mockStoredUser = {
+	...mockUser,
 	password: 'hashedPassword',
 	isAdmin: false,
 	isActive: true,
 	registrationDate: new Date('2024-01-01')
 };
 
-const mockJwtPayload: JwtTokenPayload = {
-	email: 'test@example.com',
-	isAdmin: false,
-	isActive: true,
-	uuid: 'user-uuid-1',
-	registrationDate: '2024-01-01T00:00:00.000Z'
-};
-
-const createMockContext = (): Context => ({
-	user: mockJwtPayload,
-	clientIp: '203.0.113.5',
-	di: {
-		model: {
-			Users: MockUsersConstructor
-		} as unknown as Context['di']['model'],
-		jwt: {
-			createAuthToken: vi.fn(() => 'mock-token')
-		},
-		authValidation: {
-			ensureLimitOfUsersIsNotReached: vi.fn(),
-			ensureThatUserIsLogged: vi.fn(),
-			getUser: vi.fn().mockResolvedValue(mockUser),
-			ensureThatUserIsAdministrator: vi.fn()
-		},
-		rateLimitValidation: {
-			ensureLoginRateLimitNotExceeded: vi.fn(),
-			ensureRegisterRateLimitNotExceeded: vi.fn()
-		},
-		pagingValidation: {
-			ensurePageValueIsValid: vi.fn(),
-			ensurePageSizeValueIsValid: vi.fn()
-		},
-		datetimeValidation: {
-			ensureDateIsValid: vi.fn(),
-			ensureStartDateIsEarlierThanEndDate: vi.fn(),
-			ensureStartDateIsNotLaterThanEndDate: vi.fn()
-		},
-		parameterValidations: {
-			isValidEnumValue: vi.fn(),
-			isIntegerBetween: vi.fn(),
-			isValidObjectId: vi.fn(),
-			isNumberGreaterThanOrEqualToZero: vi.fn(),
-			isMinNotGreaterThanMax: vi.fn()
-		}
-	}
-});
+const createAuthContext = () => createMockContext({ user: mockStoredUser, clientIp: '203.0.113.5' });
 
 const getBcryptCompare = () => {
 	const mocked = vi.mocked(bcryptModule.default);
@@ -104,36 +60,36 @@ describe('auth resolvers', () => {
 
 	describe('registerUser', () => {
 		test('Should throw UserInputError if email is empty', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			await expect(Mutation.registerUser({}, { email: '', password: 'Valid1Pass' }, context))
 				.rejects.toThrow(UserInputError);
 		});
 
 		test('Should throw UserInputError if password is empty', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			await expect(Mutation.registerUser({}, { email: 'test@example.com', password: '' }, context))
 				.rejects.toThrow(UserInputError);
 		});
 
 		test('Should throw UserInputError if email format is invalid', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			await expect(Mutation.registerUser({}, { email: 'invalid-email', password: 'Valid1Pass' }, context))
 				.rejects.toThrow(UserInputError);
 		});
 
 		test('Should throw UserInputError if password is weak', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			await expect(Mutation.registerUser({}, { email: 'test@example.com', password: 'weak' }, context))
 				.rejects.toThrow(UserInputError);
 		});
 
 		test('Should throw UserInputError if email is already registered', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFind = vi.fn(() => ({
 				estimatedDocumentCount: vi.fn().mockResolvedValueOnce(0)
 			}));
 			const mockFindOne = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			MockUsersConstructor.find = mockFind;
 			MockUsersConstructor.findOne = mockFindOne;
@@ -143,17 +99,17 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should return token on successful registration', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFind = vi.fn(() => ({
 				estimatedDocumentCount: vi.fn().mockResolvedValueOnce(0)
 			}));
 			const mockFindOne = vi.fn()
 				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(null) })
-				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockStoredUser) });
 			MockUsersConstructor.find = mockFind;
 			MockUsersConstructor.findOne = mockFindOne;
 
-			mockSave.mockResolvedValueOnce(mockUser);
+			mockSave.mockResolvedValueOnce(mockStoredUser);
 
 			const result = await Mutation.registerUser({}, { email: 'new@example.com', password: 'Valid1Pass' }, context);
 
@@ -162,16 +118,16 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should enforce the registration rate limit using the client IP', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFind = vi.fn(() => ({
 				estimatedDocumentCount: vi.fn().mockResolvedValueOnce(0)
 			}));
 			const mockFindOne = vi.fn()
 				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(null) })
-				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockStoredUser) });
 			MockUsersConstructor.find = mockFind;
 			MockUsersConstructor.findOne = mockFindOne;
-			mockSave.mockResolvedValueOnce(mockUser);
+			mockSave.mockResolvedValueOnce(mockStoredUser);
 
 			await Mutation.registerUser({}, { email: 'new@example.com', password: 'Valid1Pass' }, context);
 
@@ -179,7 +135,7 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should reject without touching the database when the registration rate limit is exceeded', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const rateLimitError = new Error('Too many registration attempts, please try again later');
 			(context.di.rateLimitValidation.ensureRegisterRateLimitNotExceeded as ReturnType<typeof vi.fn>).mockRejectedValueOnce(rateLimitError);
 			const mockFind = vi.fn(() => ({
@@ -201,24 +157,24 @@ describe('auth resolvers', () => {
 
 	describe('authUser', () => {
 		test('Should throw UserInputError if email is empty', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			await expect(Mutation.authUser({}, { email: '', password: 'Valid1Pass' }, context))
 				.rejects.toThrow(UserInputError);
 		});
 
 		test('Should throw UserInputError if password is empty', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			await expect(Mutation.authUser({}, { email: 'test@example.com', password: '' }, context))
 				.rejects.toThrow(UserInputError);
 		});
 
 		test('Should enforce the login rate limit using the client IP', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFindOne = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			const mockFindOneAndUpdate = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			MockUsersConstructor.findOne = mockFindOne;
 			MockUsersConstructor.findOneAndUpdate = mockFindOneAndUpdate;
@@ -229,11 +185,11 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should reject without touching the database when the rate limit is exceeded', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const rateLimitError = new Error('Too many login attempts, please try again later');
 			(context.di.rateLimitValidation.ensureLoginRateLimitNotExceeded as ReturnType<typeof vi.fn>).mockRejectedValueOnce(rateLimitError);
 			const mockFindOne = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			MockUsersConstructor.findOne = mockFindOne;
 
@@ -243,7 +199,7 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should throw UserInputError if user not found or inactive', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFindOne = vi.fn(() => ({
 				lean: vi.fn().mockResolvedValueOnce(null)
 			}));
@@ -255,7 +211,7 @@ describe('auth resolvers', () => {
 
 		test('Should use the same generic error message whether the user is missing or the password is wrong', async () => {
 			// User not found
-			const contextMissing = createMockContext();
+			const contextMissing = createAuthContext();
 			MockUsersConstructor.findOne = vi.fn(() => ({
 				lean: vi.fn().mockResolvedValueOnce(null)
 			}));
@@ -264,9 +220,9 @@ describe('auth resolvers', () => {
 
 			// User found but wrong password
 			getBcryptCompare().mockResolvedValueOnce(false);
-			const contextWrongPass = createMockContext();
+			const contextWrongPass = createAuthContext();
 			MockUsersConstructor.findOne = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			const wrongPassError = await Mutation.authUser({}, { email: 'test@example.com', password: 'WrongPass1' }, contextWrongPass)
 				.catch((err: Error) => err);
@@ -276,7 +232,7 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should run a password comparison even when the user does not exist (avoid timing-based user enumeration)', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			MockUsersConstructor.findOne = vi.fn(() => ({
 				lean: vi.fn().mockResolvedValueOnce(null)
 			}));
@@ -290,9 +246,9 @@ describe('auth resolvers', () => {
 		test('Should throw UserInputError if password is incorrect', async () => {
 			getBcryptCompare().mockResolvedValueOnce(false);
 
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFindOne = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			MockUsersConstructor.findOne = mockFindOne;
 
@@ -301,12 +257,12 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should return token on successful authentication', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFindOne = vi.fn()
-				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) })
-				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockStoredUser) })
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockStoredUser) });
 			const mockFindOneAndUpdate = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			MockUsersConstructor.findOne = mockFindOne;
 			MockUsersConstructor.findOneAndUpdate = mockFindOneAndUpdate;
@@ -318,12 +274,12 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should update lastLogin on successful authentication', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockFindOne = vi.fn()
-				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) })
-				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockUser) });
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockStoredUser) })
+				.mockReturnValueOnce({ lean: vi.fn().mockResolvedValueOnce(mockStoredUser) });
 			const mockFindOneAndUpdate = vi.fn(() => ({
-				lean: vi.fn().mockResolvedValueOnce(mockUser)
+				lean: vi.fn().mockResolvedValueOnce(mockStoredUser)
 			}));
 			MockUsersConstructor.findOne = mockFindOne;
 			MockUsersConstructor.findOneAndUpdate = mockFindOneAndUpdate;
@@ -340,7 +296,7 @@ describe('auth resolvers', () => {
 
 	describe('deleteMyUserAccount', () => {
 		test('Should check authentication before deletion', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockDeleteResult = { deletedCount: 1 };
 			const mockDeleteOne = vi.fn().mockResolvedValueOnce(mockDeleteResult);
 			MockUsersConstructor.deleteOne = mockDeleteOne;
@@ -351,7 +307,7 @@ describe('auth resolvers', () => {
 		});
 
 		test('Should delete user by uuid', async () => {
-			const context = createMockContext();
+			const context = createAuthContext();
 			const mockDeleteResult = { deletedCount: 1 };
 			const mockDeleteOne = vi.fn().mockResolvedValueOnce(mockDeleteResult);
 			MockUsersConstructor.deleteOne = mockDeleteOne;
