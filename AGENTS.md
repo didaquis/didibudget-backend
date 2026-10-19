@@ -16,7 +16,7 @@ Version numbers below are the majors the project targets; `package.json`, `packa
 - **GraphQL:** GraphQL 16.x with schema stitching
 - **Authentication:** JWT (jsonwebtoken 9.x)
 - **Dev Server:** tsx (TypeScript execution with hot reload)
-- **Testing:** Vitest 3.x (native TypeScript support)
+- **Testing:** Vitest 5.x (native TypeScript support)
 - **Code Quality:** typescript-eslint (ESLint 9 flat config), Husky (pre-commit hooks)
 
 ### Project Structure
