@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "clean": "rimraf logs dist",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "keywords": [
     "budget",
