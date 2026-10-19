@@ -16,7 +16,7 @@ Version numbers below are the majors the project targets; `package.json`, `packa
 - **GraphQL:** GraphQL 16.x with schema stitching
 - **Authentication:** JWT (jsonwebtoken 9.x)
 - **Dev Server:** tsx (TypeScript execution with hot reload)
-- **Testing:** Vitest 3.x (native TypeScript support)
+- **Testing:** Vitest 5.x (native TypeScript support)
 - **Code Quality:** typescript-eslint (ESLint 9 flat config), Husky (pre-commit hooks)
 
 ### Project Structure
@@ -44,7 +44,7 @@ tests/                   # Tests mirroring source structure
 - **Type check:** `npm run typecheck`
 - **Lint code:** `npm run lint` (ESLint)
 - **Fix linting issues:** `npm run lint -- --fix`
-- **Clean logs:** `npm run clean` (removes logs/ directory)
+- **Clean:** `npm run clean` (removes `logs/` and `dist/`)
 
 ---
 
@@ -88,7 +88,7 @@ Resolvers (in `src/gql/resolvers/`) must follow these rules:
 - Use `Context` from `#/gql/auth/setContext.js` for the context type — never use `any`.
 - Use `#/` path aliases for all imports within `src/`.
 
-**Mandatory sequence — every resolver follows this skeleton:**
+**Every resolver follows this order:**
 ```typescript
 import type { Context } from '#/gql/auth/setContext.js';
 import { expenseDTO, type ExpenseDTO } from '#/dto/expenseDTO.js';
@@ -106,10 +106,10 @@ someResolver: async (_parent: unknown, args: SomeArgs, context: Context): Promis
 };
 ```
 
-This skeleton shows the *order*, which is non-negotiable. For the real, working resolvers (queries, mutations, pagination, sorting) read the source directly — e.g. [src/gql/resolvers/expenses.ts](src/gql/resolvers/expenses.ts) — rather than copying an example that may drift.
+This skeleton shows the *order*. For the real, working resolvers (queries, mutations, pagination, sorting) read the source directly — e.g. [src/gql/resolvers/expenses.ts](src/gql/resolvers/expenses.ts) — rather than copying an example that may drift.
 
 ### Security & Data Isolation
-These rules are non-negotiable and are baked into the resolver skeleton above:
+These rules keep each user's data isolated from other users, and are built into the resolver skeleton above:
 - **Authentication:** Call `context.di.authValidation.ensureThatUserIsLogged(context)` before any other logic.
 - **Identity:** Always filter *every* query and mutation by `user_id: user._id` to guarantee data isolation between users.
 - **Permissions:** Use `context.di.authValidation.ensureThatUserIsAdministrator(context)` for admin-restricted actions.
@@ -121,24 +121,21 @@ Throw the application error classes from `#/gql/errors.js` (`src/gql/errors.ts`)
 - `ForbiddenError` (code `FORBIDDEN`): Insufficient permissions.
 - `UserInputError` (code `BAD_USER_INPUT`): Invalid parameters.
 - `ValidationError` (code `GRAPHQL_VALIDATION_FAILED`): Failed business logic validation.
+- `TooManyRequestsError` (code `TOO_MANY_REQUESTS`): Rate limit exceeded.
 
 Keep these `extensions.code` values stable: the frontend branches on `error.extensions.code` (e.g. it logs the user out on `UNAUTHENTICATED`/`FORBIDDEN`).
 
 ---
 
 ## 4. Testing & Workflow
-- **Coverage:** Aim for meaningful test coverage in `tests/`.
 - **Linting:** Run `npm run lint -- --fix` to auto-fix style issues.
 - **Deployment:** Feature branches must pass all tests before being merged into master or pushed to a remote repository.
-- **Write tests** for new critical code
 - **Mock MongoDB** as needed
 
 
 ## 5. Performance Considerations
-- Use `.select()` to limit fields in queries
-- Implement pagination for large result sets
-- Consider N+1 query problems with nested resolvers
-- Use indexes on frequently queried fields
+- Paginate list queries with the existing paging helpers (`src/helpers/pagingUtilities.ts`, `context.di.pagingValidation`).
+- Indexes are declared in the Mongoose schemas, so adding one is a schema change: ask first (see §2).
 
 ---
 
