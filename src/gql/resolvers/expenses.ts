@@ -111,9 +111,7 @@ export const Query = {
 	 */
 	getExpensesBetweenDates: async (_parent: unknown, { startDate, endDate }: GetExpensesBetweenDatesArgs, context: Context): Promise<ExpenseDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
-		context.di.datetimeValidation.ensureDayIsValid(startDate);
-		context.di.datetimeValidation.ensureDayIsValid(endDate);
-		context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay(startDate, endDate);
+		context.di.datetimeValidation.ensureDayRangeIsValid(startDate, endDate);
 
 		const user = await context.di.authValidation.getUser(context);
 
@@ -221,15 +219,7 @@ export const Query = {
 		if (isProvided(subcategory)) {
 			context.di.parameterValidations.isValidObjectId(subcategory);
 		}
-		if (isProvided(startDate)) {
-			context.di.datetimeValidation.ensureDayIsValid(startDate);
-		}
-		if (isProvided(endDate)) {
-			context.di.datetimeValidation.ensureDayIsValid(endDate);
-		}
-		if (isProvided(startDate) && isProvided(endDate)) {
-			context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay(startDate, endDate);
-		}
+		context.di.datetimeValidation.ensureDayRangeIsValid(startDate, endDate);
 		if (isProvided(minQuantity)) {
 			context.di.parameterValidations.isNumberGreaterThanOrEqualToZero(minQuantity);
 		}

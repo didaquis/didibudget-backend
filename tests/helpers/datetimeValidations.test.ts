@@ -29,18 +29,41 @@ describe('datetimeValidations', () => {
 		});
 	});
 
-	describe('ensureStartDayIsNotLaterThanEndDay', () => {
+	describe('ensureDayRangeIsValid', () => {
 		test('Should not throw for a range of a single day', () => {
-			expect(() => datetimeValidations.ensureStartDayIsNotLaterThanEndDay('2026-03-15', '2026-03-15')).not.toThrow();
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-15', '2026-03-15')).not.toThrow();
 		});
 
 		test('Should not throw when the start day is earlier', () => {
-			expect(() => datetimeValidations.ensureStartDayIsNotLaterThanEndDay('2025-12-31', '2026-01-01')).not.toThrow();
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2025-12-31', '2026-01-01')).not.toThrow();
 		});
 
 		test('Should throw UserInputError when the start day is later', () => {
-			expect(() => datetimeValidations.ensureStartDayIsNotLaterThanEndDay('2026-03-16', '2026-03-15')).toThrow(UserInputError);
-			expect(() => datetimeValidations.ensureStartDayIsNotLaterThanEndDay('2026-03-16', '2026-03-15')).toThrow('The start date is later than the end date');
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-16', '2026-03-15')).toThrow(UserInputError);
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-16', '2026-03-15')).toThrow('The start date is later than the end date');
+		});
+
+		test('Should throw UserInputError when either day is not valid', () => {
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-02-30', '2026-03-15')).toThrow('The day provided is not valid');
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-01', '2026-03-15T00:00:00.000Z')).toThrow('The day provided is not valid');
+		});
+
+		test('Should check the day before the order', () => {
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-12-31', '2026-02-30')).toThrow('The day provided is not valid');
+		});
+
+		test('Should accept an open end, and validate the end that is provided', () => {
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-01', null)).not.toThrow();
+			expect(() => datetimeValidations.ensureDayRangeIsValid(undefined, '2026-03-01')).not.toThrow();
+			expect(() => datetimeValidations.ensureDayRangeIsValid(null, '2026-02-30')).toThrow('The day provided is not valid');
+		});
+
+		test('Should accept a range with no ends', () => {
+			expect(() => datetimeValidations.ensureDayRangeIsValid(null, undefined)).not.toThrow();
+		});
+
+		test('Should not accept an empty string as an absent end', () => {
+			expect(() => datetimeValidations.ensureDayRangeIsValid('', '2026-03-01')).toThrow('The day provided is not valid');
 		});
 	});
 });

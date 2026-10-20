@@ -176,15 +176,24 @@ describe('expenses resolvers', () => {
 			});
 		};
 
-		test('Should validate both days and their order', async () => {
+		test('Should validate the range of days', async () => {
 			const context = createMockContext();
 			mockFindOnce([]);
 
 			await Query.getExpensesBetweenDates({}, { startDate: '2024-01-01', endDate: '2024-12-31' }, context);
 
-			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-01-01');
-			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-12-31');
-			expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).toHaveBeenCalledWith('2024-01-01', '2024-12-31');
+			expect(context.di.datetimeValidation.ensureDayRangeIsValid).toHaveBeenCalledWith('2024-01-01', '2024-12-31');
+		});
+
+		test('Should not query the database when the range of days is invalid', async () => {
+			const context = createMockContext();
+			(context.di.datetimeValidation.ensureDayRangeIsValid as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				throw new UserInputError('The start date is later than the end date');
+			});
+
+			await expect(Query.getExpensesBetweenDates({}, { startDate: '2024-12-31', endDate: '2024-01-01' }, context)).rejects.toThrow(UserInputError);
+
+			expect(models.Expenses.find).not.toHaveBeenCalled();
 		});
 
 		test('Should find the expenses of both days inclusive', async () => {
@@ -551,24 +560,22 @@ describe('expenses resolvers', () => {
 			expect(context.di.parameterValidations.isValidObjectId).toHaveBeenCalledWith('507f1f77bcf86cd799439012');
 		});
 
-		test('Should validate the dates when they are provided', async () => {
+		test('Should validate the range of days', async () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
 
 			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01', endDate: '2024-12-31' }, context);
 
-			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-01-01');
-			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-12-31');
-			expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).toHaveBeenCalledWith('2024-01-01', '2024-12-31');
+			expect(context.di.datetimeValidation.ensureDayRangeIsValid).toHaveBeenCalledWith('2024-01-01', '2024-12-31');
 		});
 
-		test('Should not compare the dates when only one of them is provided', async () => {
+		test('Should validate a range with only one end', async () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
 
 			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01' }, context);
 
-			expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).not.toHaveBeenCalled();
+			expect(context.di.datetimeValidation.ensureDayRangeIsValid).toHaveBeenCalledWith('2024-01-01', undefined);
 		});
 
 		test('Should validate the amounts when they are provided', async () => {
@@ -599,8 +606,6 @@ describe('expenses resolvers', () => {
 				await Query.searchExpenses({}, { ...searchArgs, ...nullArgumentCase.args }, context);
 
 				expect(context.di.parameterValidations.isValidObjectId).not.toHaveBeenCalled();
-				expect(context.di.datetimeValidation.ensureDayIsValid).not.toHaveBeenCalled();
-				expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).not.toHaveBeenCalled();
 				expect(context.di.parameterValidations.isNumberGreaterThanOrEqualToZero).not.toHaveBeenCalled();
 				expect(context.di.parameterValidations.isMinNotGreaterThanMax).not.toHaveBeenCalled();
 				expect(getStages('$match')).toStrictEqual([{ $match: { user_id: 'user-id-1' } }]);

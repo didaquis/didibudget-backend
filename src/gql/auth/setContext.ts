@@ -42,7 +42,7 @@ export interface Context {
 		datetimeValidation: {
 			ensureDayIsValid: (value: unknown) => void;
 			ensureMonthIsValid: (value: unknown) => void;
-			ensureStartDayIsNotLaterThanEndDay: (startDay: string, endDay: string) => void;
+			ensureDayRangeIsValid: (startDay?: unknown, endDay?: unknown) => void;
 		};
 		parameterValidations: {
 			isValidEnumValue: (value: unknown, enumObj: Record<string, unknown>) => void;

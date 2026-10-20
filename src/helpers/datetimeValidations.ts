@@ -1,4 +1,5 @@
 import { UserInputError } from '#/gql/errors.js';
+import { isProvided } from '#/helpers/isProvided.js';
 import { isValidDay, isValidMonth } from '#/helpers/spendingDay.js';
 
 /**
@@ -25,10 +26,14 @@ export const datetimeValidations = {
 	},
 
 	/**
-	 * Check if a day is not later than other. Both days must be valid `YYYY-MM-DD` strings, which sort as dates
+	 * Check a range of days, both inclusive. An end that is not provided leaves the range open on that side;
+	 * an end that is provided must be a valid `YYYY-MM-DD` day, and the start can't be later than the end
 	 */
-	ensureStartDayIsNotLaterThanEndDay: (startDay: string, endDay: string): void => {
-		if (startDay > endDay) {
+	ensureDayRangeIsValid: (startDay?: unknown, endDay?: unknown): void => {
+		[startDay, endDay].filter(isProvided).forEach(datetimeValidations.ensureDayIsValid);
+
+		// Valid days sort as text in the same order as dates
+		if (isProvided(startDay) && isProvided(endDay) && String(startDay) > String(endDay)) {
 			throw new UserInputError('The start date is later than the end date');
 		}
 	}
