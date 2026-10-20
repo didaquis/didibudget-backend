@@ -188,7 +188,7 @@ describe('expenses resolvers', () => {
 		test('Should not query the database when the range of days is invalid', async () => {
 			const context = createMockContext();
 			(context.di.datetimeValidation.ensureDayRangeIsValid as ReturnType<typeof vi.fn>).mockImplementation(() => {
-				throw new UserInputError('The start date is later than the end date');
+				throw new UserInputError('The start day is later than the end day');
 			});
 
 			await expect(Query.getExpensesBetweenDates({}, { startDate: '2024-12-31', endDate: '2024-01-01' }, context)).rejects.toThrow(UserInputError);

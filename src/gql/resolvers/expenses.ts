@@ -206,7 +206,7 @@ export const Query = {
 		return expenseMonthlyAverageDTO(average, CurrencyISO.EUR);
 	},
 	/**
-	 * Search expenses of a user filtering by category, subcategory, date range and amount range
+	 * Search expenses of a user filtering by category, subcategory, day range (`YYYY-MM-DD`, both inclusive) and amount range
 	 */
 	searchExpenses: async (_parent: unknown, { category, subcategory, startDate, endDate, minQuantity, maxQuantity, sortBy = 'date', sortDirection = 'desc', page, pageSize }: SearchExpensesArgs, context: Context): Promise<ExpenseSearchResultDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);

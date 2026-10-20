@@ -3,6 +3,8 @@
  * Every value here is built with `Date.UTC`, never with the process timezone.
  */
 
+import { isProvided } from '#/helpers/isProvided.js';
+
 const DAY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const MONTH_PATTERN = /^(\d{4})-(0[1-9]|1[0-2])$/;
 
@@ -74,11 +76,11 @@ export const dayToStoredDate = (day: string): Date => {
 export const dayRangeToBounds = (startDay?: string | null, endDay?: string | null): { $gte?: Date; $lt?: Date } => {
 	const bounds: { $gte?: Date; $lt?: Date } = {};
 
-	if (startDay) {
+	if (isProvided(startDay)) {
 		const { year, month, day } = toDayParts(startDay);
 		bounds.$gte = new Date(Date.UTC(year, month - MONTH_INDEX_OFFSET, day));
 	}
-	if (endDay) {
+	if (isProvided(endDay)) {
 		const { year, month, day } = toDayParts(endDay);
 		bounds.$lt = new Date(Date.UTC(year, month - MONTH_INDEX_OFFSET, day + NEXT_DAY_OFFSET));
 	}

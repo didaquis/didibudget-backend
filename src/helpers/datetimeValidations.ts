@@ -34,7 +34,7 @@ export const datetimeValidations = {
 
 		// Valid days sort as text in the same order as dates
 		if (isProvided(startDay) && isProvided(endDay) && String(startDay) > String(endDay)) {
-			throw new UserInputError('The start date is later than the end date');
+			throw new UserInputError('The start day is later than the end day');
 		}
 	}
 };

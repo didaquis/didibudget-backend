@@ -40,7 +40,7 @@ describe('datetimeValidations', () => {
 
 		test('Should throw UserInputError when the start day is later', () => {
 			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-16', '2026-03-15')).toThrow(UserInputError);
-			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-16', '2026-03-15')).toThrow('The start date is later than the end date');
+			expect(() => datetimeValidations.ensureDayRangeIsValid('2026-03-16', '2026-03-15')).toThrow('The start day is later than the end day');
 		});
 
 		test('Should throw UserInputError when either day is not valid', () => {

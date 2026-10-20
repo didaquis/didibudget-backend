@@ -53,6 +53,11 @@ describe('spendingDay', () => {
 			expect(dayRangeToBounds(null, '2025-12-31')).toStrictEqual({ $lt: new Date('2026-01-01T00:00:00.000Z') });
 		});
 
+		test('Should not treat an empty string as an absent end', () => {
+			expect(() => dayRangeToBounds('', '2026-03-01')).toThrow();
+			expect(() => dayRangeToBounds('2026-03-01', '')).toThrow();
+		});
+
 		test('Should leave out the end that is not provided', () => {
 			expect(dayRangeToBounds('2026-03-01', undefined)).toStrictEqual({ $gte: new Date('2026-03-01T00:00:00.000Z') });
 			expect(dayRangeToBounds(null, null)).toStrictEqual({});
