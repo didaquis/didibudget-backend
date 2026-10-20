@@ -42,4 +42,6 @@ When adding a feature, add a type file and a resolver file, then register both i
 - **ESM with `NodeNext`**: local imports use `.js` extensions even though sources are `.ts` (e.g. `import { logger } from '#/helpers/logger.js'`).
 - **Path alias `#/*` → `src/*`**: configured in three places — `tsconfig.json` (types), `vitest.config.js` (tests, as `#`), and `tsc-alias` (build output). Keep them in sync.
 - **ESLint style is enforced**: tabs for indentation, single quotes, required semicolons, `no-magic-numbers` (warn). Tests relax `no-magic-numbers`.
+- **Spending dates are calendar days** stored at 12:00 UTC. The API takes days as `YYYY-MM-DD` and months as `YYYY-MM`; every day calculation goes through `src/helpers/spendingDay.ts` (`Date.UTC`), never the process timezone.
+- **Tests run with `TZ=Europe/Madrid`** (`test.env` in `vitest.config.js`). Expected dates are fixed UTC instants, never `new Date(y, m, d)`.
 - **Tests mock the models module** with `vi.mock('#/data/models/index.js')` rather than hitting a real database; `tests/` mirrors `src/`.
