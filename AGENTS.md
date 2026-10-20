@@ -95,7 +95,7 @@ import { expenseDTO, type ExpenseDTO } from '#/dto/expenseDTO.js';
 
 someResolver: async (_parent: unknown, args: SomeArgs, context: Context): Promise<ExpenseDTO> => {
   context.di.authValidation.ensureThatUserIsLogged(context); // 1. auth first, always
-  context.di.datetimeValidation.ensureDateIsValid(args.date); // 2. validate input via context.di.*Validation
+  context.di.datetimeValidation.ensureDayIsValid(args.date); // 2. validate input via context.di.*Validation
 
   const user = await context.di.authValidation.getUser(context); // 3. resolve the user (throws if absent)
 

@@ -40,9 +40,9 @@ export interface Context {
 			ensurePageSizeValueIsValid: (pageSize: unknown) => void;
 		};
 		datetimeValidation: {
-			ensureDateIsValid: (value: unknown) => void;
-			ensureStartDateIsEarlierThanEndDate: (startDate: Date | string, endDate: Date | string) => void;
-			ensureStartDateIsNotLaterThanEndDate: (startDate: Date | string, endDate: Date | string) => void;
+			ensureDayIsValid: (value: unknown) => void;
+			ensureMonthIsValid: (value: unknown) => void;
+			ensureDayRangeIsValid: (startDay?: unknown, endDay?: unknown) => void;
 		};
 		parameterValidations: {
 			isValidEnumValue: (value: unknown, enumObj: Record<string, unknown>) => void;

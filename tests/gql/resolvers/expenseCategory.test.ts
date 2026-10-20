@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { describe, expect, test, beforeEach, vi } from 'vitest';
+import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest';
 import { Query } from '#/gql/resolvers/expenseCategory.js';
 import { createMockContext } from '../../mocks/createMockContext.js';
 import * as models from '#/data/models/index.js';
@@ -105,6 +105,10 @@ describe('getMostUsedExpenseCategories', () => {
 		vi.clearAllMocks();
 	});
 
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
 	test('Should return the used categories resolved with their names and emojis', async () => {
 		mockUsage([{ _id: { category: categoryId, subcategory: subcategoryId }, total: 7 }]);
 		mockCatalogue(
@@ -153,19 +157,19 @@ describe('getMostUsedExpenseCategories', () => {
 
 		expect(pipeline[0].$match.user_id).toBe('user-id-1');
 		expect(pipeline[0].$match.date.$gte).toBeInstanceOf(Date);
-		expect(pipeline[0].$match.date.$lte).toBeInstanceOf(Date);
 		expect(pipeline[3].$limit).toBe(6);
 	});
 
-	test('Should exclude future-dated expenses by setting an upper bound on the date', async () => {
+	test('Should count a spending of today in the morning, although it is stored at 12:00 UTC', async () => {
+		vi.useFakeTimers({ toFake: ['Date'] });
+		vi.setSystemTime(new Date('2026-10-20T07:00:00.000Z'));
 		mockUsage([]);
 
 		await Query.getMostUsedExpenseCategories(null, { days: 90, limit: 6 }, createMockContext());
 
 		const pipeline = (models.Expenses.aggregate as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0];
-		const now = Date.now();
 
-		expect(pipeline[0].$match.date.$lte.getTime()).toBeLessThanOrEqual(now);
+		expect(pipeline[0].$match.date).toStrictEqual({ $gte: new Date('2026-07-22T07:00:00.000Z') });
 	});
 
 	test('Should return an empty list when the user has no expenses in the period', async () => {

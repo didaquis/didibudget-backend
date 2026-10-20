@@ -79,7 +79,8 @@ export const Query = {
 		const startDate = new Date(Date.now() - (days * MILLISECONDS_IN_A_DAY));
 
 		const usage = await context.di.model.Expenses.aggregate<CategoryUsageGroup>([
-			{ $match: { user_id: user._id, date: { $gte: startDate, $lte: new Date() } } },
+			// No upper bound: a spending of today is stored at 12:00 UTC, which can still be in the future
+			{ $match: { user_id: user._id, date: { $gte: startDate } } },
 			{ $group: { _id: { category: '$category', subcategory: { $ifNull: ['$subcategory', null] } }, total: { $sum: 1 }, lastUsed: { $max: '$date' } } },
 			{ $sort: { total: -1, lastUsed: -1, '_id.category': 1, '_id.subcategory': 1 } },
 			{ $limit: limit }

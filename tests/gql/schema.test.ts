@@ -51,6 +51,17 @@ describe('GraphQL schema', () => {
 		expect(sortDirection).toBeDefined();
 	});
 
+	test('Should declare every argument of getExpensesMonthlyAverage with its type', () => {
+		const field = schema.getQueryType()?.getFields().getExpensesMonthlyAverage;
+		const args = Object.fromEntries((field?.args ?? []).map((arg) => [arg.name, String(arg.type)]));
+
+		expect(args).toStrictEqual({
+			lastNMonths: 'Int!',
+			excludedCategoryTypes: '[CategoryType!]',
+			currentMonth: 'String!'
+		});
+	});
+
 	test('Should expose getMostUsedExpenseCategories returning a non nullable list', () => {
 		const field = schema.getQueryType()?.getFields().getMostUsedExpenseCategories;
 

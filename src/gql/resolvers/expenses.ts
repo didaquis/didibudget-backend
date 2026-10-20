@@ -6,7 +6,7 @@ import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByType
 import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
-import { getLastMonthsRangeExcludingCurrent } from '#/helpers/getLastMonthsRangeExcludingCurrent.js';
+import { dayRangeToBounds, dayToStoredDate, getMonthlyAverageWindow } from '#/helpers/spendingDay.js';
 import { isProvided } from '#/helpers/isProvided.js';
 import { CurrencyISO } from '#/data/CurrencyISO.js';
 import { Context } from '../auth/setContext.js';
@@ -30,6 +30,7 @@ interface GetExpensesSumByTypeArgs {
 interface GetExpensesMonthlyAverageArgs {
 	lastNMonths: number;
 	excludedCategoryTypes?: CategoryTypeValue[];
+	currentMonth: string;
 }
 
 interface RegisterExpenseArgs {
@@ -106,19 +107,17 @@ export const Query = {
 		};
 	},
 	/**
-	 * Get list of expenses for a specific user between two dates
+	 * Get list of expenses for a specific user between two days (`YYYY-MM-DD`), both inclusive
 	 */
 	getExpensesBetweenDates: async (_parent: unknown, { startDate, endDate }: GetExpensesBetweenDatesArgs, context: Context): Promise<ExpenseDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
-		context.di.datetimeValidation.ensureDateIsValid(startDate);
-		context.di.datetimeValidation.ensureDateIsValid(endDate);
-		context.di.datetimeValidation.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
+		context.di.datetimeValidation.ensureDayRangeIsValid(startDate, endDate);
 
 		const user = await context.di.authValidation.getUser(context);
 
 		const sortCriteria: Record<string, SortValues> = { date: 'desc', _id: 'desc' };
 
-		const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: { $gte: startDate, $lt: endDate } }).sort(sortCriteria).lean();
+		const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: dayRangeToBounds(startDate, endDate) }).sort(sortCriteria).lean();
 
 		return expenses.map((expense) => expenseDTO(expense));
 	},
@@ -164,18 +163,19 @@ export const Query = {
 		return expenseSumByTypeDTO(categoryType, firstCurrencyGroup.currencyISO, firstCurrencyGroup.sum);
 	},
 	/**
-	 * Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types.
+	 * Get the average monthly expenses for a user over the last N full months before `currentMonth` (the user's month, `YYYY-MM`), optionally ignoring expenses of specified category types.
 	 */
-	getExpensesMonthlyAverage: async (_parent: unknown, { lastNMonths, excludedCategoryTypes = [] }: GetExpensesMonthlyAverageArgs, context: Context): Promise<ExpenseMonthlyAverageDTO> => {
+	getExpensesMonthlyAverage: async (_parent: unknown, { lastNMonths, excludedCategoryTypes = [], currentMonth }: GetExpensesMonthlyAverageArgs, context: Context): Promise<ExpenseMonthlyAverageDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
 
 		const minMonths = 1;
 		const maxMonths = 240;
 		context.di.parameterValidations.isIntegerBetween(lastNMonths, minMonths, maxMonths);
+		context.di.datetimeValidation.ensureMonthIsValid(currentMonth);
 
 		const user = await context.di.authValidation.getUser(context);
 
-		const { startDate, endDate } = getLastMonthsRangeExcludingCurrent(lastNMonths);
+		const { startDate, endDate } = getMonthlyAverageWindow(lastNMonths, currentMonth);
 
 		const fromCollection = context.di.model.ExpenseCategory.collection.name;
 
@@ -206,7 +206,7 @@ export const Query = {
 		return expenseMonthlyAverageDTO(average, CurrencyISO.EUR);
 	},
 	/**
-	 * Search expenses of a user filtering by category, subcategory, date range and amount range
+	 * Search expenses of a user filtering by category, subcategory, day range (`YYYY-MM-DD`, both inclusive) and amount range
 	 */
 	searchExpenses: async (_parent: unknown, { category, subcategory, startDate, endDate, minQuantity, maxQuantity, sortBy = 'date', sortDirection = 'desc', page, pageSize }: SearchExpensesArgs, context: Context): Promise<ExpenseSearchResultDTO> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
@@ -219,15 +219,7 @@ export const Query = {
 		if (isProvided(subcategory)) {
 			context.di.parameterValidations.isValidObjectId(subcategory);
 		}
-		if (isProvided(startDate)) {
-			context.di.datetimeValidation.ensureDateIsValid(startDate);
-		}
-		if (isProvided(endDate)) {
-			context.di.datetimeValidation.ensureDateIsValid(endDate);
-		}
-		if (isProvided(startDate) && isProvided(endDate)) {
-			context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate(startDate, endDate);
-		}
+		context.di.datetimeValidation.ensureDayRangeIsValid(startDate, endDate);
 		if (isProvided(minQuantity)) {
 			context.di.parameterValidations.isNumberGreaterThanOrEqualToZero(minQuantity);
 		}
@@ -248,14 +240,7 @@ export const Query = {
 			matchStage.subcategory = new Types.ObjectId(subcategory);
 		}
 		if (isProvided(startDate) || isProvided(endDate)) {
-			const dateFilter: Record<string, Date> = {};
-			if (isProvided(startDate)) {
-				dateFilter.$gte = new Date(startDate);
-			}
-			if (isProvided(endDate)) {
-				dateFilter.$lte = new Date(endDate);
-			}
-			matchStage.date = dateFilter;
+			matchStage.date = dayRangeToBounds(startDate, endDate);
 		}
 
 		const quantityFilter: Record<string, number> = {};
@@ -334,11 +319,11 @@ export const Mutation = {
 		if (isProvided(subcategory)) {
 			context.di.parameterValidations.isValidObjectId(subcategory);
 		}
-		context.di.datetimeValidation.ensureDateIsValid(date);
+		context.di.datetimeValidation.ensureDayIsValid(date);
 
 		const user = await context.di.authValidation.getUser(context);
 
-		return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date }).save()
+		return new context.di.model.Expenses({ user_id: user._id, category, subcategory, quantity, date: dayToStoredDate(date) }).save()
 			.then((expense) => expenseDTO(expense));
 	},
 	/**

@@ -1,4 +1,6 @@
 import { UserInputError } from '#/gql/errors.js';
+import { isProvided } from '#/helpers/isProvided.js';
+import { isValidDay, isValidMonth } from '#/helpers/spendingDay.js';
 
 /**
  * Datetime validations repository
@@ -6,31 +8,33 @@ import { UserInputError } from '#/gql/errors.js';
 export const datetimeValidations = {
 
 	/**
-	 * Check if date provided is valid
+	 * Check if a day is a real calendar day as `YYYY-MM-DD`
 	 */
-	ensureDateIsValid: (value: unknown): void => {
-		const date = new Date(value as Date | string | number);
-
-		if (isNaN(date.getTime())) {
-			throw new UserInputError('The date provided is not valid');
+	ensureDayIsValid: (value: unknown): void => {
+		if (!isValidDay(value)) {
+			throw new UserInputError('The day provided is not valid');
 		}
 	},
 
 	/**
-	 * Check if a date is earlier than other
+	 * Check if a month is valid as `YYYY-MM`
 	 */
-	ensureStartDateIsEarlierThanEndDate: (startDate: Date | string, endDate: Date | string): void => {
-		if (startDate >= endDate) {
-			throw new UserInputError('The start date is not earlier than the end date');
+	ensureMonthIsValid: (value: unknown): void => {
+		if (!isValidMonth(value)) {
+			throw new UserInputError('The month provided is not valid');
 		}
 	},
 
 	/**
-	 * Check if a date is not later than other. Both ends of the range are considered valid
+	 * Check a range of days, both inclusive. An end that is not provided leaves the range open on that side;
+	 * an end that is provided must be a valid `YYYY-MM-DD` day, and the start can't be later than the end
 	 */
-	ensureStartDateIsNotLaterThanEndDate: (startDate: Date | string, endDate: Date | string): void => {
-		if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
-			throw new UserInputError('The start date is later than the end date');
+	ensureDayRangeIsValid: (startDay?: unknown, endDay?: unknown): void => {
+		[startDay, endDay].filter(isProvided).forEach(datetimeValidations.ensureDayIsValid);
+
+		// Valid days sort as text in the same order as dates
+		if (isProvided(startDay) && isProvided(endDay) && String(startDay) > String(endDay)) {
+			throw new UserInputError('The start day is later than the end day');
 		}
 	}
 };
