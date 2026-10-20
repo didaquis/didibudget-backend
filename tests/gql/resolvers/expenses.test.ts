@@ -168,35 +168,47 @@ describe('expenses resolvers', () => {
 	});
 
 	describe('Query.getExpensesBetweenDates', () => {
-		test('Should validate dates', async () => {
-			const context = createMockContext();
+		const mockFindOnce = (result: unknown[]) => {
 			(models.Expenses.find as ReturnType<typeof vi.fn>).mockReturnValueOnce({
 				sort: vi.fn().mockReturnValueOnce({
-					lean: vi.fn().mockResolvedValueOnce([])
+					lean: vi.fn().mockResolvedValueOnce(result)
 				})
 			});
+		};
+
+		test('Should validate both days and their order', async () => {
+			const context = createMockContext();
+			mockFindOnce([]);
 
 			await Query.getExpensesBetweenDates({}, { startDate: '2024-01-01', endDate: '2024-12-31' }, context);
 
-			expect(context.di.datetimeValidation.ensureDateIsValid).toHaveBeenCalledWith('2024-01-01');
-			expect(context.di.datetimeValidation.ensureDateIsValid).toHaveBeenCalledWith('2024-12-31');
-			expect(context.di.datetimeValidation.ensureStartDateIsEarlierThanEndDate).toHaveBeenCalledWith('2024-01-01', '2024-12-31');
+			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-01-01');
+			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-12-31');
+			expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).toHaveBeenCalledWith('2024-01-01', '2024-12-31');
 		});
 
-		test('Should return expenses within date range', async () => {
+		test('Should find the expenses of both days inclusive', async () => {
 			const context = createMockContext();
-			(models.Expenses.find as ReturnType<typeof vi.fn>).mockReturnValueOnce({
-				sort: vi.fn().mockReturnValueOnce({
-					lean: vi.fn().mockResolvedValueOnce([mockExpense])
-				})
-			});
+			mockFindOnce([mockExpense]);
 
 			const result = await Query.getExpensesBetweenDates({}, { startDate: '2024-01-01', endDate: '2024-12-31' }, context);
 
 			expect(result).toHaveLength(1);
 			expect(models.Expenses.find).toHaveBeenCalledWith({
 				user_id: 'user-id-1',
-				date: { $gte: '2024-01-01', $lt: '2024-12-31' }
+				date: { $gte: new Date('2024-01-01T00:00:00.000Z'), $lt: new Date('2025-01-01T00:00:00.000Z') }
+			});
+		});
+
+		test('Should accept a range of a single day', async () => {
+			const context = createMockContext();
+			mockFindOnce([]);
+
+			await Query.getExpensesBetweenDates({}, { startDate: '2026-03-15', endDate: '2026-03-15' }, context);
+
+			expect(models.Expenses.find).toHaveBeenCalledWith({
+				user_id: 'user-id-1',
+				date: { $gte: new Date('2026-03-15T00:00:00.000Z'), $lt: new Date('2026-03-16T00:00:00.000Z') }
 			});
 		});
 	});
@@ -543,20 +555,20 @@ describe('expenses resolvers', () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
 
-			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z', endDate: '2024-12-31T23:59:59.999Z' }, context);
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01', endDate: '2024-12-31' }, context);
 
-			expect(context.di.datetimeValidation.ensureDateIsValid).toHaveBeenCalledWith('2024-01-01T00:00:00.000Z');
-			expect(context.di.datetimeValidation.ensureDateIsValid).toHaveBeenCalledWith('2024-12-31T23:59:59.999Z');
-			expect(context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate).toHaveBeenCalledWith('2024-01-01T00:00:00.000Z', '2024-12-31T23:59:59.999Z');
+			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-01-01');
+			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-12-31');
+			expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).toHaveBeenCalledWith('2024-01-01', '2024-12-31');
 		});
 
 		test('Should not compare the dates when only one of them is provided', async () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
 
-			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z' }, context);
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01' }, context);
 
-			expect(context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate).not.toHaveBeenCalled();
+			expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).not.toHaveBeenCalled();
 		});
 
 		test('Should validate the amounts when they are provided', async () => {
@@ -587,8 +599,8 @@ describe('expenses resolvers', () => {
 				await Query.searchExpenses({}, { ...searchArgs, ...nullArgumentCase.args }, context);
 
 				expect(context.di.parameterValidations.isValidObjectId).not.toHaveBeenCalled();
-				expect(context.di.datetimeValidation.ensureDateIsValid).not.toHaveBeenCalled();
-				expect(context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate).not.toHaveBeenCalled();
+				expect(context.di.datetimeValidation.ensureDayIsValid).not.toHaveBeenCalled();
+				expect(context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay).not.toHaveBeenCalled();
 				expect(context.di.parameterValidations.isNumberGreaterThanOrEqualToZero).not.toHaveBeenCalled();
 				expect(context.di.parameterValidations.isMinNotGreaterThanMax).not.toHaveBeenCalled();
 				expect(getStages('$match')).toStrictEqual([{ $match: { user_id: 'user-id-1' } }]);
@@ -644,13 +656,13 @@ describe('expenses resolvers', () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
 
-			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z', endDate: '2024-12-31T23:59:59.999Z' }, context);
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01', endDate: '2024-12-31' }, context);
 
 			const match = getStages('$match')[0].$match as Record<string, unknown>;
 
 			expect(match.date).toStrictEqual({
 				$gte: new Date('2024-01-01T00:00:00.000Z'),
-				$lte: new Date('2024-12-31T23:59:59.999Z')
+				$lt: new Date('2025-01-01T00:00:00.000Z')
 			});
 		});
 
@@ -658,7 +670,7 @@ describe('expenses resolvers', () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
 
-			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01T00:00:00.000Z' }, context);
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-01-01' }, context);
 
 			const match = getStages('$match')[0].$match as Record<string, unknown>;
 
@@ -669,23 +681,22 @@ describe('expenses resolvers', () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
 
-			await Query.searchExpenses({}, { ...searchArgs, endDate: '2024-12-31T23:59:59.999Z' }, context);
+			await Query.searchExpenses({}, { ...searchArgs, endDate: '2024-12-31' }, context);
 
 			const match = getStages('$match')[0].$match as Record<string, unknown>;
 
-			expect(match.date).toStrictEqual({ $lte: new Date('2024-12-31T23:59:59.999Z') });
+			expect(match.date).toStrictEqual({ $lt: new Date('2025-01-01T00:00:00.000Z') });
 		});
 
-		test('Should accept a range of a single instant', async () => {
+		test('Should accept a range of a single day', async () => {
 			const context = createMockContext();
 			mockAggregateOnce(emptyFacetResult);
-			const instant = '2024-06-15T10:30:00.000Z';
 
-			await Query.searchExpenses({}, { ...searchArgs, startDate: instant, endDate: instant }, context);
+			await Query.searchExpenses({}, { ...searchArgs, startDate: '2024-06-15', endDate: '2024-06-15' }, context);
 
 			const match = getStages('$match')[0].$match as Record<string, unknown>;
 
-			expect(match.date).toStrictEqual({ $gte: new Date(instant), $lte: new Date(instant) });
+			expect(match.date).toStrictEqual({ $gte: new Date('2024-06-15T00:00:00.000Z'), $lt: new Date('2024-06-16T00:00:00.000Z') });
 		});
 
 		test('Should apply the amount filter over the converted field after the addFields stage', async () => {

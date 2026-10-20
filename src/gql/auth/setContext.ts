@@ -43,9 +43,6 @@ export interface Context {
 			ensureDayIsValid: (value: unknown) => void;
 			ensureMonthIsValid: (value: unknown) => void;
 			ensureStartDayIsNotLaterThanEndDay: (startDay: string, endDay: string) => void;
-			ensureDateIsValid: (value: unknown) => void;
-			ensureStartDateIsEarlierThanEndDate: (startDate: Date | string, endDate: Date | string) => void;
-			ensureStartDateIsNotLaterThanEndDate: (startDate: Date | string, endDate: Date | string) => void;
 		};
 		parameterValidations: {
 			isValidEnumValue: (value: unknown, enumObj: Record<string, unknown>) => void;

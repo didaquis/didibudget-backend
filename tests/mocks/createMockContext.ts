@@ -52,10 +52,7 @@ export const createMockContext = ({ user = mockUser, clientIp }: MockContextOpti
 		datetimeValidation: {
 			ensureDayIsValid: vi.fn(),
 			ensureMonthIsValid: vi.fn(),
-			ensureStartDayIsNotLaterThanEndDay: vi.fn(),
-			ensureDateIsValid: vi.fn(),
-			ensureStartDateIsEarlierThanEndDate: vi.fn(),
-			ensureStartDateIsNotLaterThanEndDate: vi.fn()
+			ensureStartDayIsNotLaterThanEndDay: vi.fn()
 		},
 		parameterValidations: {
 			isValidEnumValue: vi.fn(),

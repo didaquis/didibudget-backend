@@ -6,7 +6,7 @@ import { expenseSumByTypeDTO, ExpenseSumByTypeDTO } from '#/dto/expenseSumByType
 import { expenseMonthlyAverageDTO, ExpenseMonthlyAverageDTO } from '#/dto/expenseMonthlyAverageDTO.js';
 import { paginationDTO, PaginationDTO } from '#/dto/paginationDTO.js';
 import { getOffset, getTotalPagesNumber } from '#/helpers/pagingUtilities.js';
-import { dayToStoredDate, getMonthlyAverageWindow } from '#/helpers/spendingDay.js';
+import { dayRangeToBounds, dayToStoredDate, getMonthlyAverageWindow } from '#/helpers/spendingDay.js';
 import { isProvided } from '#/helpers/isProvided.js';
 import { CurrencyISO } from '#/data/CurrencyISO.js';
 import { Context } from '../auth/setContext.js';
@@ -107,19 +107,19 @@ export const Query = {
 		};
 	},
 	/**
-	 * Get list of expenses for a specific user between two dates
+	 * Get list of expenses for a specific user between two days (`YYYY-MM-DD`), both inclusive
 	 */
 	getExpensesBetweenDates: async (_parent: unknown, { startDate, endDate }: GetExpensesBetweenDatesArgs, context: Context): Promise<ExpenseDTO[]> => {
 		context.di.authValidation.ensureThatUserIsLogged(context);
-		context.di.datetimeValidation.ensureDateIsValid(startDate);
-		context.di.datetimeValidation.ensureDateIsValid(endDate);
-		context.di.datetimeValidation.ensureStartDateIsEarlierThanEndDate(startDate, endDate);
+		context.di.datetimeValidation.ensureDayIsValid(startDate);
+		context.di.datetimeValidation.ensureDayIsValid(endDate);
+		context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay(startDate, endDate);
 
 		const user = await context.di.authValidation.getUser(context);
 
 		const sortCriteria: Record<string, SortValues> = { date: 'desc', _id: 'desc' };
 
-		const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: { $gte: startDate, $lt: endDate } }).sort(sortCriteria).lean();
+		const expenses = await context.di.model.Expenses.find({ user_id: user._id, date: dayRangeToBounds(startDate, endDate) }).sort(sortCriteria).lean();
 
 		return expenses.map((expense) => expenseDTO(expense));
 	},
@@ -222,13 +222,13 @@ export const Query = {
 			context.di.parameterValidations.isValidObjectId(subcategory);
 		}
 		if (isProvided(startDate)) {
-			context.di.datetimeValidation.ensureDateIsValid(startDate);
+			context.di.datetimeValidation.ensureDayIsValid(startDate);
 		}
 		if (isProvided(endDate)) {
-			context.di.datetimeValidation.ensureDateIsValid(endDate);
+			context.di.datetimeValidation.ensureDayIsValid(endDate);
 		}
 		if (isProvided(startDate) && isProvided(endDate)) {
-			context.di.datetimeValidation.ensureStartDateIsNotLaterThanEndDate(startDate, endDate);
+			context.di.datetimeValidation.ensureStartDayIsNotLaterThanEndDay(startDate, endDate);
 		}
 		if (isProvided(minQuantity)) {
 			context.di.parameterValidations.isNumberGreaterThanOrEqualToZero(minQuantity);
@@ -250,14 +250,7 @@ export const Query = {
 			matchStage.subcategory = new Types.ObjectId(subcategory);
 		}
 		if (isProvided(startDate) || isProvided(endDate)) {
-			const dateFilter: Record<string, Date> = {};
-			if (isProvided(startDate)) {
-				dateFilter.$gte = new Date(startDate);
-			}
-			if (isProvided(endDate)) {
-				dateFilter.$lte = new Date(endDate);
-			}
-			matchStage.date = dateFilter;
+			matchStage.date = dayRangeToBounds(startDate, endDate);
 		}
 
 		const quantityFilter: Record<string, number> = {};
