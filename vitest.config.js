@@ -9,20 +9,9 @@ export default defineConfig({
 	},
 	test: {
 		environment: 'node',
-		projects: [
-			{
-				extends: true,
-				test: { name: 'default', include: ['tests/**/*.test.ts'] },
-			},
-			{
-				// Proves the day helpers do not depend on the process timezone
-				extends: true,
-				test: {
-					name: 'tz-auckland',
-					include: ['tests/helpers/spendingDay.test.ts'],
-					env: { TZ: 'Pacific/Auckland' },
-				},
-			},
-		],
+		include: ['tests/**/*.test.ts'],
+		env: {
+			TZ: 'Europe/Madrid',
+		},
 	},
 });

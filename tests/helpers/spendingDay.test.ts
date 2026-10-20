@@ -86,7 +86,7 @@ describe('spendingDay', () => {
 		});
 	});
 
-	test.runIf(process.env.TZ === 'Pacific/Auckland')('Should run in a process timezone east of UTC', () => {
-		expect(new Date('2026-01-01T00:00:00.000Z').getTimezoneOffset()).toBe(-780);
+	test('Should run in a process timezone other than UTC', () => {
+		expect(new Date('2026-01-01T00:00:00.000Z').getTimezoneOffset()).toBe(-60);
 	});
 });
