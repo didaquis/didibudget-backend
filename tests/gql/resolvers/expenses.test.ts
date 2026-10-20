@@ -241,7 +241,7 @@ describe('expenses resolvers', () => {
 			const context = createMockContext();
 			(models.Expenses.aggregate as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
 
-			await Query.getExpensesMonthlyAverage({}, { lastNMonths: 6 }, context);
+			await Query.getExpensesMonthlyAverage({}, { lastNMonths: 6, currentMonth: '2026-04' }, context);
 
 			expect(context.di.parameterValidations.isIntegerBetween).toHaveBeenCalledWith(6, 1, 240);
 		});
@@ -252,7 +252,7 @@ describe('expenses resolvers', () => {
 				{ totalSum: 600 }
 			]);
 
-			const result = await Query.getExpensesMonthlyAverage({}, { lastNMonths: 6 }, context);
+			const result = await Query.getExpensesMonthlyAverage({}, { lastNMonths: 6, currentMonth: '2026-04' }, context);
 
 			expect(result).toHaveProperty('average', 100);
 			expect(result).toHaveProperty('currencyISO', 'EUR');
@@ -262,9 +262,43 @@ describe('expenses resolvers', () => {
 			const context = createMockContext();
 			(models.Expenses.aggregate as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
 
-			const result = await Query.getExpensesMonthlyAverage({}, { lastNMonths: 3 }, context);
+			const result = await Query.getExpensesMonthlyAverage({}, { lastNMonths: 3, currentMonth: '2026-04' }, context);
 
 			expect(result).toHaveProperty('average', 0);
+		});
+
+		test('Should validate the current month', async () => {
+			const context = createMockContext();
+			mockAggregateOnce([]);
+
+			await Query.getExpensesMonthlyAverage({}, { lastNMonths: 3, currentMonth: '2026-04' }, context);
+
+			expect(context.di.datetimeValidation.ensureMonthIsValid).toHaveBeenCalledWith('2026-04');
+		});
+
+		test('Should match the full months before the current month', async () => {
+			const context = createMockContext();
+			mockAggregateOnce([]);
+
+			await Query.getExpensesMonthlyAverage({}, { lastNMonths: 3, currentMonth: '2026-04' }, context);
+
+			expect(getStages('$match')[0]).toStrictEqual({
+				$match: {
+					user_id: 'user-id-1',
+					date: { $gte: new Date('2026-01-01T00:00:00.000Z'), $lt: new Date('2026-04-01T00:00:00.000Z') }
+				}
+			});
+		});
+
+		test('Should not query the database when the current month is invalid', async () => {
+			const context = createMockContext();
+			(context.di.datetimeValidation.ensureMonthIsValid as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				throw new UserInputError('The month provided is not valid');
+			});
+
+			await expect(Query.getExpensesMonthlyAverage({}, { lastNMonths: 3, currentMonth: '2026-4' }, context)).rejects.toThrow(UserInputError);
+
+			expect(models.Expenses.aggregate).not.toHaveBeenCalled();
 		});
 	});
 
@@ -279,14 +313,35 @@ describe('expenses resolvers', () => {
 			expect(context.di.authValidation.ensureThatUserIsLogged).toHaveBeenCalledWith(context);
 		});
 
-		test('Should validate date', async () => {
+		test('Should validate the day', async () => {
 			const context = createMockContext();
 			const mockSave = vi.fn().mockResolvedValue(mockExpense);
 			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
 
 			await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
 
-			expect(context.di.datetimeValidation.ensureDateIsValid).toHaveBeenCalledWith('2024-01-15');
+			expect(context.di.datetimeValidation.ensureDayIsValid).toHaveBeenCalledWith('2024-01-15');
+		});
+
+		test('Should store the day at noon UTC', async () => {
+			const context = createMockContext();
+			const mockSave = vi.fn().mockResolvedValue(mockExpense);
+			(models.Expenses as unknown as ReturnType<typeof vi.fn>).mockImplementation(function () { return { save: mockSave }; });
+
+			await Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-01-15' }, context);
+
+			expect(models.Expenses).toHaveBeenCalledWith(expect.objectContaining({ date: new Date('2024-01-15T12:00:00.000Z') }));
+		});
+
+		test('Should not save the expense when the day is invalid', async () => {
+			const context = createMockContext();
+			(context.di.datetimeValidation.ensureDayIsValid as ReturnType<typeof vi.fn>).mockImplementation(() => {
+				throw new UserInputError('The day provided is not valid');
+			});
+
+			await expect(Mutation.registerExpense({}, { category: 'cat-1', quantity: 50, date: '2024-02-30' }, context)).rejects.toThrow(UserInputError);
+
+			expect(models.Expenses).not.toHaveBeenCalled();
 		});
 
 		test('Should create expense with user_id', async () => {
@@ -300,7 +355,7 @@ describe('expenses resolvers', () => {
 				user_id: 'user-id-1',
 				category: 'cat-1',
 				quantity: 50,
-				date: '2024-01-15'
+				date: new Date('2024-01-15T12:00:00.000Z')
 			});
 		});
 
@@ -326,7 +381,7 @@ describe('expenses resolvers', () => {
 				category: 'cat-1',
 				subcategory: 'sub-1',
 				quantity: 50,
-				date: '2024-01-15'
+				date: new Date('2024-01-15T12:00:00.000Z')
 			});
 		});
 

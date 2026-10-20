@@ -61,8 +61,8 @@ const expenses: string = `
 		""" Get the total expenses of a specific type for a user """
 		getExpensesSumByType(categoryType: CategoryType!): ExpenseSumByType!
 
-		""" Get the average monthly expenses for a user over the last N months (excluding the current month), optionally ignoring expenses of specified category types. """
-		getExpensesMonthlyAverage(lastNMonths: Int!, excludedCategoryTypes: [CategoryType!]): ExpensesMonthlyAverage!
+		""" Get the average monthly expenses for a user over the last N full months before currentMonth (the user's month, YYYY-MM), optionally ignoring expenses of specified category types. """
+		getExpensesMonthlyAverage(lastNMonths: Int!, excludedCategoryTypes: [CategoryType!], currentMonth: String!): ExpensesMonthlyAverage!
 
 		""" Search expenses of a user filtering by category, subcategory, date range and amount range """
 		searchExpenses(
@@ -80,7 +80,7 @@ const expenses: string = `
 	}
 
 	type Mutation {
-		""" It allows register an expense """
+		""" It allows register an expense. The date is a calendar day, YYYY-MM-DD """
 		registerExpense(category: ID!, subcategory: ID, quantity: Float!, date: String!): Expense
 
 		""" It allows delete an expense """
