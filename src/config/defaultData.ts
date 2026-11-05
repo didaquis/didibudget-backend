@@ -113,7 +113,7 @@ export const expenseCategories: ExpenseCategory[] = [
 			},
 			{
 				name: 'Public charging',
-				inmutableKey: 'e1bb6d132a68376477cf',
+				inmutableKey: '460371f9c7dd617db025',
 				emojis: ['⚡️'],
 			},
 			{
