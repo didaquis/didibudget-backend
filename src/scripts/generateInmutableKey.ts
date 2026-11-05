@@ -1,5 +1,5 @@
-import { expenseCategories } from '../src/config/defaultData.js';
-import { generateInmutableKey } from '../src/helpers/inmutableKey.js';
+import { expenseCategories } from '#/config/defaultData.js';
+import { generateInmutableKey } from '#/helpers/inmutableKey.js';
 
 /**
  * Print a new `inmutableKey` that no default category or subcategory uses yet.

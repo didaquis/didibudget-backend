@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "clean": "rimraf logs dist",
-    "generate-key": "tsx scripts/generateInmutableKey.ts",
+    "generate-key": "tsx src/scripts/generateInmutableKey.ts",
     "prepare": "husky"
   },
   "keywords": [
