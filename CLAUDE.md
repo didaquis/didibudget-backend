@@ -16,6 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm test` — run all tests once (Vitest); `npm run test:watch` for watch mode
 - Run a single test file: `npx vitest run tests/gql/resolvers/expenses.test.ts`
 - Filter by name: `npx vitest run -t "registerExpense"`
+- `npm run generate-key` — prints a new random `inmutableKey` for a default category or subcategory
 
 Node 24.x is required (see `.nvmrc` / `engines`). Husky runs a pre-commit hook.
 
@@ -35,7 +36,7 @@ When adding a feature, add a type file and a resolver file, then register both i
 
 **Auth & data isolation:** call `context.di.authValidation.ensureThatUserIsLogged(context)` first, get the user with `getUser(context)`, and scope every query by `user_id: user._id`. Admin-only actions use `ensureThatUserIsAdministrator`.
 
-**Startup sequence** (in `server.ts`, on DB `open`): ensure indexes → upsert default expense categories → start Express/Apollo. The category seed data in [src/config/defaultData.ts](src/config/defaultData.ts) must not be modified without explicit user consent (see AGENTS.md §6). Introspection and the GraphQL Playground are enabled only outside production.
+**Startup sequence** (in `server.ts`, on DB `open`): ensure indexes → upsert default expense categories → start Express/Apollo. The category seed data in [src/config/defaultData.ts](src/config/defaultData.ts) must not be modified without explicit user consent (see AGENTS.md §6). Each new category or subcategory gets its `inmutableKey` from `npm run generate-key`, never from another tool. Introspection and the GraphQL Playground are enabled only outside production.
 
 ## Conventions
 

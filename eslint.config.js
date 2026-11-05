@@ -19,7 +19,7 @@ export default tseslint.config(
 				...globals.es6,
 			},
 		},
-		files: ['src/**/*.ts', 'tests/**/*.ts'],
+		files: ['src/**/*.ts', 'tests/**/*.ts', 'scripts/**/*.ts'],
 		rules: {
 			indent: [
 				'error',
