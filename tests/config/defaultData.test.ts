@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { expenseCategories } from '#/config/defaultData.js';
 import { CategoryType } from '#/data/CategoryType.js';
+import { INMUTABLE_KEY_PATTERN } from '#/helpers/inmutableKey.js';
 
 describe('defaultData', () => {
 	it('should be a valid array with expense categories and subcategories', () => {
@@ -55,12 +56,11 @@ describe('defaultData', () => {
 	});
 
 	it('should have a valid value in the property inmutableKey of the expense categories and subcategories', () => {
-		const validPattern = new RegExp(/^[a-f0-9]{20}$/i);
 		expenseCategories.forEach(category => {
-			expect(category.inmutableKey).toMatch(validPattern);
+			expect(category.inmutableKey).toMatch(INMUTABLE_KEY_PATTERN);
 
 			category.subcategories.forEach(subcategory => {
-				expect(subcategory.inmutableKey).toMatch(validPattern);
+				expect(subcategory.inmutableKey).toMatch(INMUTABLE_KEY_PATTERN);
 			});
 		});
 	});

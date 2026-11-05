@@ -145,6 +145,8 @@ The category lists and default data included in this repository (for example, fi
 
 If a change to the default categories is required, you should obtain explicit consent from the end-user before.
 
+Every new category or subcategory needs a new `inmutableKey`. Always create it with `npm run generate-key` (never by hand or with other tools), and never change or reuse an existing one.
+
 ---
 
 ## 7. Code quality guidelines

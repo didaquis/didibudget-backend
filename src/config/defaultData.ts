@@ -2,6 +2,10 @@ import { CategoryType } from '../data/CategoryType.js';
 
 /**
  * Contains all the default data to insert on database on first start of application
+ *
+ * Do not change these categories without the explicit consent of the project owner (see AGENTS.md §6).
+ * Every new category or subcategory needs a new `inmutableKey`: create it with `npm run generate-key`.
+ * Never change or reuse an existing `inmutableKey`.
  */
 
 export interface Subcategory {
