@@ -112,6 +112,11 @@ export const expenseCategories: ExpenseCategory[] = [
 				emojis: ['⛽️'],
 			},
 			{
+				name: 'Public charging',
+				inmutableKey: '460371f9c7dd617db025',
+				emojis: ['⚡️'],
+			},
+			{
 				name: 'Tolls, parkings and tunnels',
 				inmutableKey: 'a54b87aab3bf45fa393b',
 				emojis: ['🅿️'],
